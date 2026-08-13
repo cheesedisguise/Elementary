@@ -80,70 +80,87 @@ def gradient_map(img, stops):
 # Roles: D drop edge, Od dark edge, Ol lit edge, B body, M dim panel,
 # L soft light, H bright highlight.
 GEM_PALETTES = {
-    "earth": {"D": "#0d1c06", "Od": "#1e3d10", "Ol": "#94e05c", "B": "#4fae2a",
+    "earth": {"D": "#0d1c06", "Od": "#1e3d10", "Ol": "#62c53a", "B": "#4fae2a",
               "M": "#398420", "L": "#94e05c", "H": "#e0fab6"},
-    "water": {"D": "#051535", "Od": "#0e3070", "Ol": "#6fd8f2", "B": "#2f95ea",
+    "water": {"D": "#051535", "Od": "#0e3070", "Ol": "#4babf2", "B": "#2f95ea",
               "M": "#2270c2", "L": "#6fd8f2", "H": "#dcf8fe"},
-    "fire":  {"D": "#2e0802", "Od": "#671807", "Ol": "#ffa844", "B": "#f0681a",
+    "fire":  {"D": "#2e0802", "Od": "#671807", "Ol": "#fa8132", "B": "#f0681a",
               "M": "#c24310", "L": "#ffa844", "H": "#ffecb4"},
-    "air":   {"D": "#38465c", "Od": "#5d7189", "Ol": "#f4faff", "B": "#d8e7f6",
+    "air":   {"D": "#38465c", "Od": "#5d7189", "Ol": "#e8f2fc", "B": "#d8e7f6",
               "M": "#b5cde5", "L": "#eef6fe", "H": "#ffffff"},
 }
 
 # Reference colourway (the art the gem was transcribed from), used only
 # for eyeballing against the original — not shipped as an element.
-GEM_REFERENCE = {"D": "#1c0c33", "Od": "#371a63", "Ol": "#b678f2", "B": "#8a30e8",
+GEM_REFERENCE = {"D": "#1c0c33", "Od": "#371a63", "Ol": "#9f52f0", "B": "#8a30e8",
                  "M": "#6f2ad0", "L": "#b678f2", "H": "#e8d3fc"}
 
 
 def draw_gem(pal):
-    """32x32 transcription of the reference gem.
+    """24x24 transcription of the reference gem.
 
-    A diagonal band running bottom-left -> top-right (s = x+y across the
-    band, d = x-y along it), flat 45-degree cut faces at both ends, a
-    dark outline with a lit bevel inside the upper-left edge, a pale
-    highlight: the top cut face plus a Z sweep (down the bevel, kink
-    across the body, tail along the dark edge), a dim panel and echo
-    streak at the bottom-left, and a darkest drop edge outside the
-    lower-right for thickness.
+    The silhouette is a sheared bar: flat horizontal top, straight
+    vertical right side, a 1:1 staircase down the lower-right, flat
+    bottom, vertical left side, and a staircase back up the upper-left.
+    Inside: a big pale arch across the top end (with a V notch of body),
+    a pale Z sweep down the lit side that kinks across to the dark edge,
+    a lit bevel inside the upper-left/left/bottom rim, an echo streak
+    fencing off the dim bottom-left panel, and a darkest drop edge
+    outside the right/lower-right/bottom for thickness.
     """
     pal = {k: c(v) for k, v in pal.items()}
-    N = 32
+    N = 24
     img = Image.new("RGBA", (N, N), (0, 0, 0, 0))
     px = img.load()
 
-    def s(x, y):
-        return x + y
+    top = [(x, 1) for x in range(11, 20)]
+    right = [(19, y) for y in range(2, 10)]
+    lr_stairs = [(18, 10), (17, 11), (16, 12), (15, 13),
+                 (14, 14), (13, 15), (12, 16), (11, 17)]
+    bottom = [(x, 18) for x in range(2, 11)]
+    left = [(2, y) for y in range(10, 18)]
+    ul_stairs = [(10, 2), (9, 3), (8, 4), (7, 5),
+                 (6, 6), (5, 7), (4, 8), (3, 9)]
+    outline = set(top + right + lr_stairs + bottom + left + ul_stairs)
 
-    def d(x, y):
-        return x - y
+    # interior = flood fill from the centre; 1:1 stairs are tight for a
+    # 4-connected fill, so no leaks
+    interior, queue = set(), [(11, 9)]
+    while queue:
+        (x, y) = queue.pop()
+        if (x, y) in interior or (x, y) in outline or not (0 <= x < N and 0 <= y < N):
+            continue
+        interior.add((x, y))
+        queue += [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+    shape = outline | interior
 
-    cells = [(x, y) for y in range(N) for x in range(N)
-             if 20 <= s(x, y) <= 34 and -21 <= d(x, y) <= 21]
-    outline = {(x, y) for (x, y) in cells
-               if s(x, y) in (20, 34) or abs(d(x, y)) == 21}
-    interior = [c_ for c_ in cells if c_ not in outline]
-
-    shape = set(cells)
     drop = set()
-    for (x, y) in outline:
-        if s(x, y) == 34 or d(x, y) == 21 or (d(x, y) == -21 and s(x, y) >= 27):
-            for (dx, dy) in ((1, 1), (1, 0), (0, 1)):
-                if (x + dx, y + dy) not in shape:
-                    drop.add((x + dx, y + dy))
+    for (x, y) in right + lr_stairs + bottom + [(19, 1)]:
+        for (dx, dy) in ((1, 0), (0, 1), (1, 1)):
+            if (x + dx, y + dy) not in shape:
+                drop.add((x + dx, y + dy))
 
-    # big pale patch across the whole top end, stopping short of the dark
-    # side; long sweep hugging the lit edge past the midpoint, kinking
-    # across to the dark edge with a short tail; long echo line fencing
-    # off the dim bottom-left end
-    face = {c_ for c_ in interior if d(*c_) >= 13 and s(*c_) <= 29}
-    bevel = {c_ for c_ in interior if s(*c_) in (21, 22) and d(*c_) < 13}
-    leg = [(17, 5), (16, 6), (15, 7), (14, 8), (13, 9),
-           (12, 10), (11, 11), (10, 12), (9, 13)]
-    kink = [(10, 14), (11, 15), (12, 16), (13, 17)]
-    tail = [(13, 18), (12, 19), (11, 20)]
-    sweep = set(leg + kink + tail)
-    echo = {(2, 20), (3, 21), (4, 22), (5, 23), (6, 24)}
+    # pale arch across the top end: two full rows, then legs down each
+    # side leaving a V notch of body in the middle
+    face = ({(x, 2) for x in range(11, 19)}
+            | {(x, 3) for x in range(11, 19) if x != 14}
+            | {(11, 4), (12, 4), (11, 5), (12, 5), (17, 4), (18, 4), (18, 5)})
+    # Z sweep: pale 1px line floating ~2 cells inside the lit edge,
+    # kinking at mid-height into one crossing stroke that lands on the
+    # dark staircase, with a short tail riding up it
+    leg = [(10, 5), (9, 6), (8, 7), (7, 8), (7, 9), (6, 10), (6, 11), (6, 12)]
+    crossing = [(7, 13), (8, 14), (9, 15), (10, 16), (11, 16)]
+    sweep = set(leg + crossing)
+    # lit facet: the filled strip between the upper-left staircase/wall
+    # and the leg, plus a 1px rim inside the wall and bottom edge
+    strip_rows = {3: (10, 10), 4: (9, 10), 5: (8, 9), 6: (7, 8), 7: (6, 7),
+                  8: (5, 6), 9: (4, 6), 10: (3, 5), 11: (3, 5), 12: (3, 5)}
+    bevel = ({(x, y) for y, (a, b) in strip_rows.items() for x in range(a, b + 1)}
+             | {(3, y) for y in range(13, 18)} | {(x, 17) for x in range(4, 11)})
+    # small pale accent where the dim panel meets the kink
+    echo = {(4, 13), (5, 14)}
+    # dim panel pinned under the crossing stroke
+    dim = {(x, y) for y in range(13, 17) for x in range(4, 10) if x < y - 6}
 
     for (x, y) in drop:
         if 0 <= x < N and 0 <= y < N:
@@ -153,11 +170,11 @@ def draw_gem(pal):
     for (x, y) in interior:
         if (x, y) in face or (x, y) in sweep:
             px[x, y] = pal["H"]
-        elif (x, y) in bevel:
-            px[x, y] = pal["Ol"]
         elif (x, y) in echo:
             px[x, y] = pal["L"]
-        elif d(x, y) <= -12:
+        elif (x, y) in bevel:
+            px[x, y] = pal["Ol"]
+        elif (x, y) in dim:
             px[x, y] = pal["M"]
         else:
             px[x, y] = pal["B"]
@@ -234,12 +251,10 @@ def main():
             for tx in range(0, tile_px, 20):
                 if (tx + ty) // 20 % 2:
                     tdraw.rectangle([tx, ty, tx + 19, ty + 19], fill=c("#323845"))
-        if img.size == (16, 16):
-            big = img.resize((tile_px, tile_px), Image.NEAREST)
-            tile.alpha_composite(big)
-        else:
-            big = img.resize((128, 128), Image.NEAREST)
-            tile.alpha_composite(big, (16, 16))
+        k = max(1, tile_px // img.width)
+        big = img.resize((img.width * k, img.height * k), Image.NEAREST)
+        off = (tile_px - big.width) // 2
+        tile.alpha_composite(big, (off, off))
         sheet.alpha_composite(tile, (gx + pad, gy + pad))
         draw.text((gx + pad, gy + pad + tile_px + 2), name, fill=c("#c8cdd8"))
     sheet_path = os.path.join(HERE, "contact_sheet.png")

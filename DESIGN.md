@@ -119,6 +119,8 @@ Ability messages are **client-sided** — only the caster sees them. Nothing is 
 
 ## 5. The four elements
 
+**Every ability has a particle signature.** Ability messages are caster-only (§4), so particles and sound are the *public* language of a fight — the thing everyone else reads. Each ability below lists its signature. All of them use vanilla particle types only (they render for every client with no resource-pack support), and each effect should stay under ~200 particles per tick — loud payoffs, cheap idle loops.
+
 ### 🟫 Earth Shard
 
 *Moss green. Zone denial and a shield you can weaponise.*
@@ -131,10 +133,14 @@ Ability messages are **client-sided** — only the caster sees them. Nothing is 
 **Ability 1 (RMB) — Tremor** · 25s
 Ground slam. Enemies within 6 blocks are launched upward, take 4 damage, and get Slowness II for 4s. Does not affect the caster.
 
+*Particles:* an expanding ground ring of stone `BLOCK` crack particles racing from the caster to the 6-block edge, with a burst of dust kicked up under each launched enemy.
+
 **Ability 2 (⇧LMB) — Bulwark** · 35s
 Summons a 5-wide × 3-tall stone wall 3 blocks in front of the player. The wall **continuously repositions to face wherever the caster looks**, orbiting them at a fixed 3-block distance. It blocks projectiles and bodies.
 
 **Punch the wall** and it launches forward at ~8 blocks/second for up to 15 blocks, shoving any player or mob it contacts along with it and dealing 3 damage. It dissipates on hitting terrain or reaching max range. Lifetime 12s either way. Recast dismisses early.
+
+*Particles:* the wall sheds a light drizzle of its own `BLOCK` dust while orbiting; launched, it plows a bow-wave of stone crack + `CRIT` particles and dissipates in a dust burst.
 
 ---
 
@@ -150,12 +156,16 @@ Summons a 5-wide × 3-tall stone wall 3 blocks in front of the player. The wall 
 **Ability 1 (RMB) — Tide Pull** · 20s
 Fires a 15-block hook. Hits a player or mob → yanks them to you. Hits a block → yanks you to it. No damage.
 
+*Particles:* the hook line is drawn in `DRIPPING_WATER` + `BUBBLE_POP` particles as it flies; on impact a `SPLASH` burst, and a bubble stream trails whoever gets yanked.
+
 **Ability 2 (⇧LMB) — Thunderstorm** · 40s
 A storm cloud forms above the caster and **follows them for 10s**. While active, every melee hit the caster lands calls a lightning strike on the target dealing **2 true damage** (bypasses armour, absorption, and i-frames) on top of normal weapon damage.
 
 - **No internal cooldown per target** — every hit procs
 - Lightning is visual only (`strikeLightningEffect`) — no fires, no collateral damage
 - Only affects entities the caster hits. No AoE, no friendly fire
+
+*Particles:* the cloud itself is drawn from `CLOUD` particles crackling with `ELECTRIC_SPARK`; each proc uses the vanilla lightning flash, so it needs no extra effects.
 
 > This is the highest sustained damage in the plugin by design. Watch it in playtesting; if it dominates, raise the cooldown to 60s before touching the damage.
 
@@ -172,6 +182,8 @@ A storm cloud forms above the caster and **follows them for 10s**. While active,
 
 **Ability 1 (RMB) — Fireball** · 20s
 Explosive projectile. 6 damage, 1.5-block blast, ignites on hit. **Does not break blocks.**
+
+*Particles:* a `FLAME` + `LAVA` spark trail in flight; the blast is a single `EXPLOSION` followed by a shower of ember-orange `DUST`.
 
 **Ability 2 (⇧LMB) — Pyre** · 30s
 Ignites a 5-block-radius ring of flame at the caster's feet that **stays there for 10s**. It does not follow the caster.
@@ -194,6 +206,8 @@ Only the **topmost solid block of each column** is converted — raycast down fr
 
 Fixed in place, so it's a commitment. Leave it and you lose the buff — but the scorched ground marks the territory for the full ten seconds.
 
+*Particles:* the ring itself is `FLAME` jets with `SMALL_FLAME` filler licking between them; enemies crossing the line flash `LAVA` pops, and the converted floor smokes with thin `CAMPFIRE_COSY_SMOKE` columns.
+
 ---
 
 ### ⬜ Air Shard
@@ -208,6 +222,8 @@ Fixed in place, so it's a commitment. Leave it and you lose the buff — but the
 **Ability 1 (RMB) — Updraft** · 25s
 Launches **all other players and mobs within 6 blocks** 5 blocks straight up. The caster is unaffected and stays grounded.
 
+*Particles:* a `GUST` burst at the caster's feet — the breeze wind-charge effect — and a rising column of `CLOUD` puffs under each launched target.
+
 > Nerfed from 8 blocks / 20s. Five blocks is enough to interrupt, break a combo, and reposition someone, but survivable without armour. Because Air takes zero fall damage and the target does, any height increase scales asymmetrically into a kill button.
 
 **Ability 2 (⇧LMB) — Gale** · 30s
@@ -215,6 +231,8 @@ A cone of wind 8 blocks long and 60° wide in the aimed direction:
 
 - Enemies in the cone are knocked back hard, take 2 damage, and get Nausea for 3s
 - **The caster is launched in the opposite direction** — a hard recoil away from where they aimed
+
+*Particles:* the cone sweeps visibly with `GUST` and streaking `CLOUD` particles out to its full length; the caster's recoil pops a white `SWEEP_ATTACK` flash and leaves a short cloud wake.
 
 Air's escape. Aim at a pursuer to push them off and rocket yourself clear in one motion. Aim at the ground to launch upward.
 
@@ -272,12 +290,12 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | | Tier 1 | Tier 2 |
 |---|---|---|
 | **Name** | Earth Shard | Earth Shard *(unchanged)* |
-| **Shape** | The vanilla amethyst shard texture, recoloured | Diagonal cut gem (from the reference art), 32×32 |
+| **Shape** | The vanilla amethyst shard texture, recoloured | Diagonal cut gem (from the reference art), 24×24 |
 | **Colour** | Flat element colour, vanilla-style facet shading — no gradients | Same colour, with a pale cut face and highlight sweep |
 
 **Tier 1** is literally the vanilla amethyst shard texture run through a per-element recolour (a luminance gradient map: each flat vanilla colour maps to one flat element colour). Green for Earth, ocean blue for Water, ember orange for Fire, pale white for Air. Nothing is redrawn, so it always reads as "a shard" at a glance.
 
-**Tier 2** is the **cut gem** from the project's reference art: a diagonal bar with flat cut ends, a dark drop edge for thickness, a lit bevel along the top edge, and a bright Z-shaped highlight sweep — a raw crystal that has been cut and polished. It's authored at 32×32 (vs the shard's 16×16), which also makes Tier 2 items visibly crisper in the inventory. Same flat-colour rule: one hue per element, shading by discrete facet tones, no gradients.
+**Tier 2** is the **cut gem** transcribed from the project's reference art: a sheared bar (flat top, vertical sides, stepped diagonals), a dark drop edge for thickness, a big pale cut face at the top with a notch, a lit facet inside the upper-left edge, and a pale Z-shaped highlight sweep — a raw crystal that has been cut and polished. It's authored at 24×24 (vs the shard's 16×16), so it renders visibly crisper in the inventory. Same flat-colour rule: one hue per element, shading by discrete facet tones, no gradients.
 
 > Provenance: Tier 1 derives from the game's own texture, which is standard resource-pack practice. The gem is transcribed from our own reference art, and the ability icons are CC BY 3.0 glyphs from game-icons.net (credited in `resourcepack/README.md`) — nothing is lifted from another plugin.
 
@@ -416,14 +434,22 @@ Bukkit.broadcast(Component.text(player.getName() + " has made the advancement ")
 ### 🟫 Earth — Cataclysm
 Stone spikes erupt in a 10-block radius. 8 damage, enemies rooted 3s, caster gains Resistance II for 8s. Display entities, gone after 3s.
 
+*Particles:* every spike erupts through a geyser of stone `BLOCK` crack particles; one `EXPLOSION_EMITTER` at the epicentre, and rooted enemies shed a slow drip of dust for the root duration.
+
 ### 🟦 Water — Maelstrom
 A whirlpool at the caster's position for 6s, 12-block radius. Enemies inside are pulled continuously toward the centre, given Slowness III, and take drowning damage regardless of water.
+
+*Particles:* **a spinning whirlpool around the player** — two helical arms of `SPLASH` and `BUBBLE_COLUMN_UP` particles rotating around the caster and tightening toward the centre, while `NAUTILUS` particles stream inward along the pull, so victims can read both the edge and the direction of the drag.
 
 ### 🟥 Fire — Meteor
 Call a meteor at the crosshair, up to 30 blocks. 12 damage in a 6-block radius, ignites everything hit, burning ground for 8s. **No terrain damage.**
 
+*Particles:* the meteor falls as a `FLAME` + `LAVA` comet trailing a smoke column; impact fires an `EXPLOSION_EMITTER` and rains ember `DUST` over the radius, and the burning ground shimmers with `SMALL_FLAME` for its 8 seconds.
+
 ### ⬜ Air — Tempest
 True flight for 8s. Every enemy within 8 blocks is continuously lifted and takes 1 damage per second. Flight ends abruptly — safe, since Air ignores falling.
+
+*Particles:* a slow cyclone of `CLOUD` particles spirals around the flying caster; each lifted enemy stands in their own small `GUST` column, and the flight's end puffs a falling ring of cloud.
 
 ---
 

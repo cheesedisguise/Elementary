@@ -13,8 +13,8 @@ python3 gen_textures.py
 - `assets/elementary/textures/item/` — 8 shard textures: 4 elements × 2 tiers.
   Tier 1 (16×16) is the **vanilla amethyst shard** recoloured per element with
   a luminance gradient map (flat colours, vanilla facet shading). Tier 2
-  (32×32) is the **cut gem** transcribed from the project's reference art —
-  pale cut face, lit bevel, Z-highlight sweep, dark drop edge. See
+  (24×24) is the **cut gem** transcribed from the project's reference art —
+  pale cut face, lit facet, Z-highlight sweep, dark drop edge. See
   DESIGN.md §6.
 - `assets/elementary/textures/hud/` — 12 ability icons (DESIGN.md §3),
   rendered from `icons_svg/` as white-on-transparent 64×64 glyphs so the
