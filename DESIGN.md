@@ -79,12 +79,14 @@ You already need a pack for the shard textures, so this is incremental. It is fi
 
 ### Icon assignments
 
+Icons are glyphs from **game-icons.net** (CC BY 3.0 — Lorc and Delapouite; attribution lives in `resourcepack/README.md`). They ship as white-on-transparent 64×64 PNGs so the HUD can tint them per element and per state (dim while recharging, element colour when ready) with text colour codes rather than needing one texture per colour.
+
 | Element | Ability 1 | Ability 2 | Ultimate |
 |---|---|---|---|
-| Earth | Tremor — cracked ground | Bulwark — shield wall | Cataclysm — spike burst |
-| Water | Tide Pull — hook | Thunderstorm — storm cloud | Maelstrom — spiral |
-| Fire | Fireball — flame orb | Pyre — flame ring | Meteor — falling rock |
-| Air | Updraft — upward arrows | Gale — wind swirl | Tempest — cyclone |
+| Earth | Tremor — `quake-stomp` | Bulwark — `stone-wall` | Cataclysm — `spiky-explosion` |
+| Water | Tide Pull — `fishing-hook` | Thunderstorm — `lightning-storm` | Maelstrom — `ink-swirl` |
+| Fire | Fireball — `fireball` | Pyre — `fire-ring` | Meteor — `burning-meteor` |
+| Air | Updraft — `eruption` | Gale — `wind-slap` | Tempest — `tornado` |
 
 ---
 
@@ -119,7 +121,7 @@ Ability messages are **client-sided** — only the caster sees them. Nothing is 
 
 ### 🟫 Earth Shard
 
-*Brown-to-green gradient. Zone denial and a shield you can weaponise.*
+*Moss green. Zone denial and a shield you can weaponise.*
 
 **Passive — Stoneskin**
 - +4 max health (2 extra hearts)
@@ -138,7 +140,7 @@ Summons a 5-wide × 3-tall stone wall 3 blocks in front of the player. The wall 
 
 ### 🟦 Water Shard
 
-*Blue-to-cyan gradient. Sustained melee damage. Wants to be in your face.*
+*Ocean blue. Sustained melee damage. Wants to be in your face.*
 
 **Passive — Tidebound**
 - Permanent water breathing and Dolphin's Grace
@@ -161,7 +163,7 @@ A storm cloud forms above the caster and **follows them for 10s**. While active,
 
 ### 🟥 Fire Shard
 
-*Red-to-orange gradient. Area control. Stand your ground and burn.*
+*Ember orange. Area control. Stand your ground and burn.*
 
 **Passive — Emberheart**
 - Full fire and lava immunity
@@ -196,7 +198,7 @@ Fixed in place, so it's a commitment. Leave it and you lose the buff — but the
 
 ### ⬜ Air Shard
 
-*White-to-pale-blue gradient. Vertical control and disengagement.*
+*Pale sky white. Vertical control and disengagement.*
 
 **Passive — Windborne**
 - Permanent Speed I
@@ -270,14 +272,14 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | | Tier 1 | Tier 2 |
 |---|---|---|
 | **Name** | Earth Shard | Earth Shard *(unchanged)* |
-| **Shape** | Amethyst shard silhouette | Cut, faceted gem |
-| **Colour** | Element gradient | Same gradient, richer and more saturated |
+| **Shape** | The vanilla amethyst shard texture, recoloured | Diagonal cut gem (from the reference art), 32×32 |
+| **Colour** | Flat element colour, vanilla-style facet shading — no gradients | Same colour, with a pale cut face and highlight sweep |
 
-**Tier 1** keeps the raw amethyst shard outline, recoloured per element — brown-to-green for Earth, blue-to-cyan for Water, red-to-orange for Fire, white-to-pale-blue for Air.
+**Tier 1** is literally the vanilla amethyst shard texture run through a per-element recolour (a luminance gradient map: each flat vanilla colour maps to one flat element colour). Green for Earth, ocean blue for Water, ember orange for Fire, pale white for Air. Nothing is redrawn, so it always reads as "a shard" at a glance.
 
-**Tier 2** switches to a **cut gem silhouette**: a faceted diamond/teardrop form with a bright core and darker facet edges, in the same colourway. Raw shard becomes polished gem — the progression reads instantly even at 16×16 in a hotbar, which matters a lot given the name gives nothing away.
+**Tier 2** is the **cut gem** from the project's reference art: a diagonal bar with flat cut ends, a dark drop edge for thickness, a lit bevel along the top edge, and a bright Z-shaped highlight sweep — a raw crystal that has been cut and polished. It's authored at 32×32 (vs the shard's 16×16), which also makes Tier 2 items visibly crisper in the inventory. Same flat-colour rule: one hue per element, shading by discrete facet tones, no gradients.
 
-> Draw these yourself rather than extracting textures from an existing gem plugin. The faceted style is easy to reproduce and you'd be recolouring to your four elements regardless; shipping someone else's PNGs is how projects get pulled.
+> Provenance: Tier 1 derives from the game's own texture, which is standard resource-pack practice. The gem is transcribed from our own reference art, and the ability icons are CC BY 3.0 glyphs from game-icons.net (credited in `resourcepack/README.md`) — nothing is lifted from another plugin.
 
 **Consequences of the fixed name:**
 - Tier is only readable from the texture in-world, so make the two silhouettes genuinely distinct — not just a brightness change

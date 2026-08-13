@@ -1,19 +1,29 @@
 # Elementary resource pack
 
-All textures are generated — never hand-edit a PNG. Edit the text-art grids or
-palettes in `gen_textures.py` and re-run it:
+All textures are generated — never hand-edit a PNG. Edit the palettes,
+geometry, or icon mapping in `gen_textures.py` and re-run it:
 
 ```
+pip install pillow cairosvg   # once
 python3 gen_textures.py
 ```
 
 ## Contents
 
 - `assets/elementary/textures/item/` — 8 shard textures: 4 elements × 2 tiers.
-  Tier 1 is the raw shard cluster, tier 2 the cut gem (see DESIGN.md §6).
-- `assets/elementary/textures/hud/` — 12 ability icons for the HUD
-  (DESIGN.md §3). These become `elementary:hud` font glyphs when the
-  Option B font HUD is built; until then they are plain textures.
+  Tier 1 (16×16) is the **vanilla amethyst shard** recoloured per element with
+  a luminance gradient map (flat colours, vanilla facet shading). Tier 2
+  (32×32) is the **cut gem** transcribed from the project's reference art —
+  pale cut face, lit bevel, Z-highlight sweep, dark drop edge. See
+  DESIGN.md §6.
+- `assets/elementary/textures/hud/` — 12 ability icons (DESIGN.md §3),
+  rendered from `icons_svg/` as white-on-transparent 64×64 glyphs so the
+  HUD can tint them per element and state. These become `elementary:hud`
+  font glyphs when the Option B font HUD is built.
+- `icons_svg/` — the game-icons.net SVG sources for the 12 icons (see
+  credits below).
+- `vanilla/amethyst_shard.png` — the vanilla 1.21 amethyst shard texture
+  (16×16), the recolour base for the tier 1 shards.
 - `assets/minecraft/items/amethyst_shard.json` — 1.21.4+ item model
   definition: `range_dispatch` on `custom_model_data` mapping
   1001/1002 (earth), 1011/1012 (water), 1021/1022 (fire), 1031/1032 (air)
@@ -27,6 +37,37 @@ Resource pack format **75** = Java 1.21.11 (verified against the
 [pack format table](https://minecraft.wiki/w/Pack_format)). Since 1.21.9 the
 metadata uses `min_format`/`max_format`; the legacy `pack_format` field is
 kept alongside for older tooling. Bump these when the server updates.
+
+## Credits & licences
+
+**Ability icons** are from [game-icons.net](https://game-icons.net),
+licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
+
+| Icon | Used for | Author |
+|---|---|---|
+| `quake-stomp` | Tremor | [Lorc](https://lorcblog.blogspot.com/) |
+| `stone-wall` | Bulwark | [Delapouite](https://delapouite.com/) |
+| `spiky-explosion` | Cataclysm | Lorc |
+| `fishing-hook` | Tide Pull | Lorc |
+| `lightning-storm` | Thunderstorm | Lorc |
+| `ink-swirl` | Maelstrom | Lorc |
+| `fireball` | Fireball | Lorc |
+| `fire-ring` | Pyre | Lorc |
+| `burning-meteor` | Meteor | Lorc |
+| `eruption` | Updraft | Lorc |
+| `wind-slap` | Gale | Lorc |
+| `tornado` | Tempest | Lorc |
+
+Keep this attribution with the pack when distributing it (the CC BY
+licence requires it — a link to this file from the server's pack listing
+is enough).
+
+**Tier 1 shard textures** derive from Mojang's amethyst shard texture and
+are for use within Minecraft (standard resource-pack practice; not
+redistributable outside the game context).
+
+**Tier 2 gem** is original art transcribed from the project's reference
+image.
 
 ## Still missing (build order step 14+)
 
