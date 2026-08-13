@@ -10,13 +10,14 @@ python3 gen_textures.py
 
 ## Contents
 
-- `assets/elementary/textures/item/` — 8 shard textures: 4 elements × 2 tiers.
+- `assets/elementary/textures/item/` — 10 shard textures: 4 elements plus
+  the player-bound Aqua Shard (DESIGN.md §5), × 2 tiers.
   Tier 1 (16×16) is the **vanilla amethyst shard** recoloured per element with
   a luminance gradient map (flat colours, vanilla facet shading). Tier 2
   (24×24) is the **cut gem** transcribed from the project's reference art —
   pale cut face, lit facet, Z-highlight sweep, dark drop edge. See
   DESIGN.md §6.
-- `assets/elementary/textures/hud/` — 12 ability icons (DESIGN.md §3),
+- `assets/elementary/textures/hud/` — 15 ability icons (DESIGN.md §3),
   rendered from `icons_svg/` as white-on-transparent 64×64 glyphs so the
   HUD can tint them per element and state. These become `elementary:hud`
   font glyphs when the Option B font HUD is built.
@@ -26,8 +27,9 @@ python3 gen_textures.py
   (16×16), the recolour base for the tier 1 shards.
 - `assets/minecraft/items/amethyst_shard.json` — 1.21.4+ item model
   definition: `range_dispatch` on `custom_model_data` mapping
-  1001/1002 (earth), 1011/1012 (water), 1021/1022 (fire), 1031/1032 (air)
-  to the elementary models, falling back to the vanilla shard.
+  1001/1002 (earth), 1011/1012 (water), 1021/1022 (fire), 1031/1032 (air),
+  1041/1042 (aqua) to the elementary models, falling back to the vanilla
+  shard.
 - `contact_sheet.png` — labelled preview of every texture, regenerated on
   each run.
 
@@ -57,6 +59,9 @@ licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
 | `eruption` | Updraft | Lorc |
 | `wind-slap` | Gale | Lorc |
 | `tornado` | Tempest | Lorc |
+| `shadow-follower` | Mirage | Lorc |
+| `frozen-orb` | Orbital Ice | Lorc |
+| `frozen-body` | Sub-Zero | [Delapouite](https://delapouite.com/) |
 
 Keep this attribution with the pack when distributing it (the CC BY
 licence requires it — a link to this file from the server's pack listing

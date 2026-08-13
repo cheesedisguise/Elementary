@@ -8,7 +8,7 @@ This document is the source of truth. If code and this document disagree, the do
 
 ## 1. Core rules
 
-1. On first join, a player is assigned a **random element** and given their shard.
+1. On first join, a player is assigned a **random element** and given their shard. Exception: **bound players** (config `bound-players`, UUID → element) skip the roll and always receive their bound element — `aqudr` gets the **Aqua Shard** 100% of the time (§5).
 2. The shard is a **recoloured amethyst shard** with custom model data.
 3. The shard is **bound to its owner's UUID**. Nobody else can use it.
 4. Passives apply **only while the shard is held in the offhand**.
@@ -87,6 +87,7 @@ Icons are glyphs from **game-icons.net** (CC BY 3.0 — Lorc and Delapouite; att
 | Water | Tide Pull — `fishing-hook` | Thunderstorm — `lightning-storm` | Maelstrom — `ink-swirl` |
 | Fire | Fireball — `fireball` | Pyre — `fire-ring` | Meteor — `burning-meteor` |
 | Air | Updraft — `eruption` | Gale — `wind-slap` | Tempest — `tornado` |
+| Aqua *(player-bound)* | Mirage — `shadow-follower` | Orbital Ice — `frozen-orb` | Sub-Zero — `frozen-body` |
 
 ---
 
@@ -238,6 +239,43 @@ Air's escape. Aim at a pursuer to push them off and rocket yourself clear in one
 
 ---
 
+### 🩵 Aqua Shard — player-bound
+
+*Ice blue over light blue. A one-of-one kit, bound to the player `aqudr`.*
+
+**Binding.** The Aqua Shard is not in the random pool. It's assigned through `bound-players` in the config (store `aqudr`'s **UUID**, not the name — names change). Every path that hands out a shard — first join, respawn re-issue, integrity check — gives `aqudr` Aqua, always. Nobody else can ever hold it: it can't be rolled, a Shard Trader can't produce it, and shards are UUID-locked anyway (§1). The item is named **Aqua Shard** at both tiers, custom model data 1041/1042 — the Water gem with a light blue bottom (§6).
+
+**Passive — Catch The Rainbow**
+- **In rain** — the world is raining and the sky above him is open — aqudr can **double jump**: one extra mid-air jump per airborne stretch, recharged on landing
+- The second jump is a fresh boost (~0.9 upward velocity with a touch of forward carry) and clears accumulated fall distance
+- No rain, no wings: nothing indoors, underground, or in biomes where it doesn't rain
+
+*Particles:* a small arc of rainbow `DUST` — red through violet — bursts **under his feet** at the moment of the double jump, with a `CLOUD` puff to sell the push-off.
+
+*Implementation:* the classic trick — while he's rain-exposed and mid-air-eligible, set `allowFlight(true)`; catch `PlayerToggleFlightEvent`, cancel it, apply the velocity, reset fall distance. Drop `allowFlight` the moment the rain window closes, or anti-cheat and vanilla flight-kick will both complain.
+
+**Ability 1 (RMB) — Mirage** · 30s
+Four clones of aqudr step out of him — **same skin, same armour, same held item, live-synced** (he swaps items, they swap within a tick). They walk out along the four cardinal directions for 4 blocks, all **turn right 90°**, walk 3 more, then wander randomly — short walks, pauses, random turns — for the rest of their 15s lifetime.
+
+- One melee hit pops a clone: it **disappears into a cloud**. No damage to the hitter, no knockback, no drops
+- Clones deal no damage, block nothing, trigger nothing; mobs ignore them
+- Recast while active dismisses the survivors
+
+*Particles:* a popped clone bursts into dense `CLOUD` with a few `SNOWFLAKE` flecks; each clone trails a faint mist at the feet.
+
+*Implementation:* packet-level fake players carrying aqudr's `GameProfile` — that's what makes the skin correct. Spawn/equipment/relative-move packets only; no real entities. Hits arrive as interaction packets on the fake entity ids; equipment re-sync hooks his held-slot and armour-change events. A packets library (e.g. PacketEvents) earns its keep here.
+
+**Ability 2 (⇧LMB) — Orbital Ice** · 30s
+Five ice pellets materialise and **orbit aqudr** — radius 1.5 blocks, one revolution every ~2s, a slight bob. While any pellet survives, **left-click fires one** along his crosshair:
+
+- **1 true damage** per pellet (bypasses armour, absorption, and i-frames — same rule as Thunderstorm)
+- Pellets fly flat and fast, no gravity, up to 24 blocks
+- The ring lasts 20s; unfired pellets melt away
+
+*Particles:* the pellets are small packed-ice `ITEM_DISPLAY`s trailing `SNOWFLAKE`; a fired pellet draws a snowflake streak and hits with an ice `BLOCK` crack + frost puff.
+
+---
+
 ## 6. Tier 2
 
 Two routes. Either finish your element's challenge, or take an Upgrader from someone you killed.
@@ -252,6 +290,7 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | **🟦 Water** | **Deep Current** — swim 1,000 blocks fully submerged without surfacing. Breaking the surface resets the attempt. |
 | **🟥 Fire** | **Kindling** — kill 50 entities while they are burning. |
 | **⬜ Air** | **Untouched Sky** — remain continuously airborne for 20 seconds using sneak-Slow Falling. Touching any block, including water, resets the timer. |
+| **🩵 Aqua** | **Hailstorm** — hit players or mobs with 100 Orbital Ice pellets. Misses don't count. |
 
 ### Route 2 — The Upgrader
 
@@ -282,6 +321,7 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | **Water** | Regeneration II near water | Tide Pull hits up to 3 targets | Thunderstorm lasts 15s, 3 true damage |
 | **Fire** | Nether bonus applies everywhere at +1 | Fireball fires 3 in a spread | Pyre radius 5 → 8, adds Regeneration I to caster |
 | **Air** | Speed II | Updraft radius 6 → 9 | Gale cone 8 → 12 blocks, stronger recoil |
+| **Aqua** | Double jump gains a second charge (triple jump) during thunderstorms | Mirage cooldown 30s → 20s | Orbital Ice 5 → 7 pellets |
 
 ### Item appearance across tiers
 
@@ -313,6 +353,7 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | Water | 1011 | 1012 |
 | Fire | 1021 | 1022 |
 | Air | 1031 | 1032 |
+| Aqua *(player-bound)* | 1041 | 1042 |
 
 Leaving gaps between elements means a fifth element slots in without renumbering.
 
@@ -451,6 +492,13 @@ True flight for 8s. Every enemy within 8 blocks is continuously lifted and takes
 
 *Particles:* a slow cyclone of `CLOUD` particles spirals around the flying caster; each lifted enemy stands in their own small `GUST` column, and the flight's end puffs a falling ring of cloud.
 
+### 🩵 Aqua — Sub-Zero
+Every player and mob within a **10-block radius** is **flash-frozen for 2.5s**: encased in an ice shell, hoisted just off the ground and **held mid-air**, **frostbitten**, and **camera-locked** — they can't move, can't turn their view, and take **4 true damage** (2 hearts) on trigger. They **can still be hit** the whole time. The caster is unaffected.
+
+*Particles / visuals:* the shells are `BLOCK_DISPLAY` ice — display entities only, nothing real is placed (same rule as Cataclysm) — appearing with an ice `BLOCK` crack burst; on release every shell shatters in a `SNOWFLAKE` + ice-crack shower.
+
+*Implementation:* suspension = lift ~0.5 and zero velocity every tick; frostbite = `setFreezeTicks(max)` refreshed every tick, which gives the vanilla frost vignette and frozen hearts for free; camera lock = re-send position-and-look with pinned yaw/pitch each tick. The lock is deliberately oppressive — it's the ult — but keep it exactly 2.5s and never chain-apply it without the full cooldown between casts.
+
 ---
 
 ## 8. Items and commands
@@ -459,6 +507,7 @@ True flight for 8s. Every enemy within 8 blocks is continuously lifted and takes
 - **Recipe:** 4 Amethyst Shard + 1 Ender Eye + 4 Gold Ingot
 - Right-click to reroll into a *different* random element at Tier 1. Consumed on use.
 - **Rerolling wipes Tier 2 and all challenge progress.**
+- **Can never produce Aqua**, and a bound player's shard (§5 — `aqudr`) refuses the reroll entirely; the trader is not consumed.
 
 ### Upgrader
 - **Not craftable.** Dropped by Tier 2 players on death (section 6) — a dying player's tier made physical.

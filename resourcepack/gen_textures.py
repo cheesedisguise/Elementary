@@ -38,6 +38,8 @@ T1_RAMPS = {
     "water": ["#0b2a6e", "#2a7fd6", "#5fd4ee", "#d8f8fc"],
     "fire":  ["#57100a", "#c93c14", "#f5952f", "#ffe9ad"],
     "air":   ["#54677f", "#a7c4de", "#e2eefa", "#ffffff"],
+    # player-bound Aqua (aqudr): icier and lighter than Water
+    "aqua":  ["#134a80", "#3fb2e8", "#8ce4f6", "#f2fdff"],
 }
 
 
@@ -81,19 +83,29 @@ def gradient_map(img, stops):
 # L soft light, H bright highlight.
 GEM_PALETTES = {
     "earth": {"D": "#0d1c06", "Od": "#1e3d10", "Ol": "#62c53a", "B": "#4fae2a",
-              "M": "#398420", "L": "#94e05c", "H": "#e0fab6"},
+              "M": "#398420", "S": "#3d8c20", "L": "#94e05c",
+              "H": "#e0fab6", "W": "#f2fdda"},
     "water": {"D": "#051535", "Od": "#0e3070", "Ol": "#4babf2", "B": "#2f95ea",
-              "M": "#2270c2", "L": "#6fd8f2", "H": "#dcf8fe"},
+              "M": "#2270c2", "S": "#2472c4", "L": "#6fd8f2",
+              "H": "#dcf8fe", "W": "#f0fcff"},
     "fire":  {"D": "#2e0802", "Od": "#671807", "Ol": "#fa8132", "B": "#f0681a",
-              "M": "#c24310", "L": "#ffa844", "H": "#ffecb4"},
+              "M": "#c24310", "S": "#c8480f", "L": "#ffa844",
+              "H": "#ffecb4", "W": "#fff8da"},
     "air":   {"D": "#38465c", "Od": "#5d7189", "Ol": "#e8f2fc", "B": "#d8e7f6",
-              "M": "#b5cde5", "L": "#eef6fe", "H": "#ffffff"},
+              "M": "#b5cde5", "S": "#b9cfe6", "L": "#eef6fe",
+              "H": "#ffffff", "W": "#ffffff"},
+    # Aqua: the Water gem with a light blue bottom — the dim panel goes
+    # pale while the shadow rim stays deep like Water's
+    "aqua":  {"D": "#051535", "Od": "#0e3070", "Ol": "#4babf2", "B": "#2f95ea",
+              "M": "#a6e6fa", "S": "#2472c4", "L": "#c8f2fd",
+              "H": "#dcf8fe", "W": "#f0fcff"},
 }
 
 # Reference colourway (the art the gem was transcribed from), used only
 # for eyeballing against the original — not shipped as an element.
 GEM_REFERENCE = {"D": "#1c0c33", "Od": "#371a63", "Ol": "#9f52f0", "B": "#8a30e8",
-                 "M": "#6f2ad0", "L": "#b678f2", "H": "#e8d3fc"}
+                 "M": "#6f2ad0", "S": "#6b28c8", "L": "#b678f2",
+                 "H": "#e8d3fc", "W": "#f6ecff"}
 
 
 def draw_gem(pal):
@@ -156,11 +168,17 @@ def draw_gem(pal):
     strip_rows = {3: (10, 10), 4: (9, 10), 5: (8, 9), 6: (7, 8), 7: (6, 7),
                   8: (5, 6), 9: (4, 6), 10: (3, 5), 11: (3, 5), 12: (3, 5)}
     bevel = ({(x, y) for y, (a, b) in strip_rows.items() for x in range(a, b + 1)}
-             | {(3, y) for y in range(13, 18)} | {(x, 17) for x in range(4, 11)})
+             | {(3, y) for y in range(13, 18)} | {(x, 17) for x in range(4, 9)})
     # small pale accent where the dim panel meets the kink
     echo = {(4, 13), (5, 14)}
     # dim panel pinned under the crossing stroke
     dim = {(x, y) for y in range(13, 17) for x in range(4, 10) if x < y - 6}
+    # shading like the reference: a near-white hot spot in the face's
+    # top-left corner, and a darker inner rim inside the right wall and
+    # lower-right staircase — the shadow side of the light direction
+    hot = {(11, 2), (12, 2), (11, 3)}
+    rim = ({(18, y) for y in range(6, 10)}
+           | {(x - 1, y) for (x, y) in lr_stairs} | {(9, 17), (10, 17)})
 
     for (x, y) in drop:
         if 0 <= x < N and 0 <= y < N:
@@ -168,7 +186,9 @@ def draw_gem(pal):
     for (x, y) in outline:
         px[x, y] = pal["Od"]
     for (x, y) in interior:
-        if (x, y) in face or (x, y) in sweep:
+        if (x, y) in hot:
+            px[x, y] = pal["W"]
+        elif (x, y) in face or (x, y) in sweep:
             px[x, y] = pal["H"]
         elif (x, y) in echo:
             px[x, y] = pal["L"]
@@ -176,6 +196,8 @@ def draw_gem(pal):
             px[x, y] = pal["Ol"]
         elif (x, y) in dim:
             px[x, y] = pal["M"]
+        elif (x, y) in rim:
+            px[x, y] = pal["S"]
         else:
             px[x, y] = pal["B"]
     return img
@@ -197,6 +219,9 @@ ICONS = {
     "icon_updraft": ("eruption", "Lorc"),
     "icon_gale": ("wind-slap", "Lorc"),
     "icon_tempest": ("tornado", "Lorc"),
+    "icon_mirage": ("shadow-follower", "Lorc"),
+    "icon_orbital_ice": ("frozen-orb", "Lorc"),
+    "icon_subzero": ("frozen-body", "Delapouite"),
 }
 
 ICON_SIZE = 64

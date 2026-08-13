@@ -11,7 +11,9 @@
       { "threshold": 1021, "model": { "type": "minecraft:model", "model": "elementary:item/fire_shard_tier1" } },
       { "threshold": 1022, "model": { "type": "minecraft:model", "model": "elementary:item/fire_shard_tier2" } },
       { "threshold": 1031, "model": { "type": "minecraft:model", "model": "elementary:item/air_shard_tier1" } },
-      { "threshold": 1032, "model": { "type": "minecraft:model", "model": "elementary:item/air_shard_tier2" } }
+      { "threshold": 1032, "model": { "type": "minecraft:model", "model": "elementary:item/air_shard_tier2" } },
+      { "threshold": 1041, "model": { "type": "minecraft:model", "model": "elementary:item/aqua_shard_tier1" } },
+      { "threshold": 1042, "model": { "type": "minecraft:model", "model": "elementary:item/aqua_shard_tier2" } }
     ]
   }
 }
