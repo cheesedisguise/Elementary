@@ -1,0 +1,17 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "minecraft:custom_model_data",
+    "fallback": { "type": "minecraft:model", "model": "minecraft:item/amethyst_shard" },
+    "entries": [
+      { "threshold": 1001, "model": { "type": "minecraft:model", "model": "elementary:item/earth_shard_tier1" } },
+      { "threshold": 1002, "model": { "type": "minecraft:model", "model": "elementary:item/earth_shard_tier2" } },
+      { "threshold": 1011, "model": { "type": "minecraft:model", "model": "elementary:item/water_shard_tier1" } },
+      { "threshold": 1012, "model": { "type": "minecraft:model", "model": "elementary:item/water_shard_tier2" } },
+      { "threshold": 1021, "model": { "type": "minecraft:model", "model": "elementary:item/fire_shard_tier1" } },
+      { "threshold": 1022, "model": { "type": "minecraft:model", "model": "elementary:item/fire_shard_tier2" } },
+      { "threshold": 1031, "model": { "type": "minecraft:model", "model": "elementary:item/air_shard_tier1" } },
+      { "threshold": 1032, "model": { "type": "minecraft:model", "model": "elementary:item/air_shard_tier2" } }
+    ]
+  }
+}
