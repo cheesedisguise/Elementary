@@ -22,7 +22,7 @@ public class CombatListener implements Listener {
     }
 
     private PlayerData holdingData(Player player) {
-        if (!Shards.isShard(player.getInventory().getItemInMainHand())) return null;
+        // passive combat hooks apply all the time, whatever is held
         return plugin.shards().dataFor(player);
     }
 

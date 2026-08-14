@@ -44,7 +44,6 @@ public class CatchTheRainbow implements Listener {
     private void tick() {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
             if (!managed(player)) continue;
-            if (!Shards.isShard(player.getInventory().getItemInMainHand())) continue;
             PlayerData data = plugin.shards().dataFor(player);
             if (data.element != Element.ICE) {
                 continue;
@@ -66,7 +65,6 @@ public class CatchTheRainbow implements Listener {
     public void onToggleFlight(PlayerToggleFlightEvent event) {
         Player player = event.getPlayer();
         if (!managed(player)) return;
-        if (!Shards.isShard(player.getInventory().getItemInMainHand())) return;
         PlayerData data = plugin.shards().dataFor(player);
         if (data.element != Element.ICE) return;
         event.setCancelled(true);

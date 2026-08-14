@@ -29,11 +29,10 @@ public class PassiveTask extends BukkitRunnable {
     @Override
     public void run() {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            boolean holding = Shards.isShard(player.getInventory().getItemInMainHand());
+            // passives are always on - the shard grants them by being yours
             PlayerData data = plugin.shards().dataFor(player);
-            applyEarthHealth(player, holding && data.element == dev.elementary.element.Element.EARTH
+            applyEarthHealth(player, data.element == dev.elementary.element.Element.EARTH
                     ? (data.tier >= 2 ? 6.0 : 4.0) : 0.0);
-            if (!holding) continue;
             switch (data.element) {
                 case EARTH -> earth(player, data);
                 case WATER -> water(player, data);

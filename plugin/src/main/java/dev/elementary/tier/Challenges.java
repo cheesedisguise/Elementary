@@ -79,7 +79,6 @@ public class Challenges implements Listener {
 
     private void tick() {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            if (!Shards.isShard(player.getInventory().getItemInMainHand())) continue;
             PlayerData data = plugin.shards().dataFor(player);
             if (data.tier >= 2) continue;
             if (data.element == Element.WATER) {
@@ -109,7 +108,6 @@ public class Challenges implements Listener {
     public void onMove(org.bukkit.event.player.PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if (!player.isUnderWater()) return;
-        if (!Shards.isShard(player.getInventory().getItemInMainHand())) return;
         double distance = event.getFrom().toVector().setY(0)
                 .distance(event.getTo().toVector().setY(0));
         if (distance > 0.001 && distance < 1) {
@@ -120,7 +118,6 @@ public class Challenges implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onAbsorb(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
-        if (!Shards.isShard(player.getInventory().getItemInMainHand())) return;
         add(player, Element.EARTH, event.getFinalDamage());
     }
 
@@ -146,7 +143,6 @@ public class Challenges implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onSunlitHit(org.bukkit.event.entity.EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player attacker)) return;
-        if (!Shards.isShard(attacker.getInventory().getItemInMainHand())) return;
         if (!attacker.getWorld().isDayTime()) return;
         if (attacker.getLocation().getBlock().getLightFromSky() < 15) return;
         add(attacker, Element.LIGHT, event.getFinalDamage());

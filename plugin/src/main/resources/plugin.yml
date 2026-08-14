@@ -3,7 +3,6 @@ version: "0.1.0"
 main: dev.elementary.ElementaryPlugin
 api-version: "1.21"
 description: Elemental shards - eight elements; aqudr always spawns with Ice.
-softdepend: [packetevents]
 commands:
   info:
     description: Show your shard, tier, challenge progress and cooldowns.

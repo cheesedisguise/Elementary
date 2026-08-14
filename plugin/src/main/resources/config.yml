@@ -17,10 +17,8 @@ announce-ascension: true
 # on or off for new players (each player can /info toggle).
 ability-messages-default: true
 
-# Mirage clone rendering. "stands" (default) is safe everywhere:
-# armour-stand mannequins wearing the caster's head and gear.
-# "packets" spawns real-skin fake players through PacketEvents - only
-# enable it when your installed PacketEvents build supports the
-# server's exact Minecraft version, otherwise clients can be kicked
-# with network protocol errors.
-mirage-clones: stands
+# Mirage clone rendering. "players" (default) shows real fake players
+# wearing the caster's actual skin, built from the server's own packet
+# classes - no extra plugin needed. "stands" falls back to armour-stand
+# mannequins.
+mirage-clones: players

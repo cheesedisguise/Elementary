@@ -8,7 +8,7 @@ import dev.elementary.ability.ice.CatchTheRainbow;
 import dev.elementary.ability.ice.Mirage;
 import dev.elementary.ability.ice.MirageSyncListener;
 import dev.elementary.ability.ice.OrbitalIce;
-import dev.elementary.ability.ice.PacketCloneRenderer;
+import dev.elementary.ability.ice.PlayerCloneRenderer;
 import dev.elementary.ability.ice.StandCloneRenderer;
 import dev.elementary.ability.ice.SubZero;
 import dev.elementary.ability.earth.Bulwark;
@@ -77,13 +77,11 @@ final class Registrations {
         abilities.register(Element.AIR,
                 new AbilityManager.Kit(updraft, gale, tempest));
 
-        boolean packetsWanted = "packets".equalsIgnoreCase(
-                plugin.getConfig().getString("mirage-clones", "stands"));
-        boolean packets = packetsWanted && pm.getPlugin("packetevents") != null;
+        boolean stands = "stands".equalsIgnoreCase(
+                plugin.getConfig().getString("mirage-clones", "players"));
         Mirage mirage = new Mirage(plugin, null);
-        Mirage.CloneRenderer renderer = packets
-                ? new PacketCloneRenderer(plugin, mirage)
-                : new StandCloneRenderer();
+        Mirage.CloneRenderer renderer = stands
+                ? new StandCloneRenderer() : new PlayerCloneRenderer(plugin);
         mirage.setRenderer(renderer);
         plugin.setMirage(mirage);
         OrbitalIce orbitalIce = new OrbitalIce(plugin);
@@ -98,7 +96,7 @@ final class Registrations {
         abilities.register(Element.LIGHTNING, new AbilityManager.Kit(
                 new Arc(plugin), new ChainLightning(plugin), new Supercell(plugin)));
         plugin.getSLF4JLogger().info("Mirage clones: {}",
-                packets ? "packet players (PacketEvents)" : "armour-stand fallback");
+                stands ? "armour stands (config)" : "real-skin players");
 
         Challenges challenges = new Challenges(plugin);
         plugin.setChallenges(challenges);
