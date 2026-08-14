@@ -54,17 +54,23 @@ public class PlayerCloneRenderer implements Mirage.CloneRenderer {
     public Mirage.Clone spawn(Player owner, Location location) {
         ServerLevel level = ((CraftWorld) location.getWorld()).getHandle();
         GameProfile profile = new GameProfile(UUID.randomUUID(), owner.getName());
-        ((CraftPlayer) owner).getProfile().getProperties().get("textures")
-                .forEach(property -> profile.getProperties().put("textures", property));
+        for (com.destroystokyo.paper.profile.ProfileProperty property
+                : owner.getPlayerProfile().getProperties()) {
+            if ("textures".equals(property.getName())) {
+                profile.properties().put("textures",
+                        new com.mojang.authlib.properties.Property("textures",
+                                property.getValue(), property.getSignature()));
+            }
+        }
         ServerPlayer npc = new ServerPlayer(level.getServer(), level, profile,
                 ClientInformation.createDefault());
-        npc.absMoveTo(location.getX(), location.getY(), location.getZ(),
+        npc.snapTo(location.getX(), location.getY(), location.getZ(),
                 location.getYaw(), location.getPitch());
 
         broadcast(new ClientboundPlayerInfoUpdatePacket(
                 EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER),
                 List.of(npc)));
-        broadcast(new ClientboundAddEntityPacket(npc.getId(), profile.getId(),
+        broadcast(new ClientboundAddEntityPacket(npc.getId(), profile.id(),
                 location.getX(), location.getY(), location.getZ(),
                 location.getPitch(), location.getYaw(),
                 EntityType.PLAYER, 0, Vec3.ZERO, location.getYaw()));
@@ -99,7 +105,7 @@ public class PlayerCloneRenderer implements Mirage.CloneRenderer {
 
             @Override public void pop() {
                 broadcast(new ClientboundRemoveEntitiesPacket(npc.getId()));
-                broadcast(new ClientboundPlayerInfoRemovePacket(List.of(profile.getId())));
+                broadcast(new ClientboundPlayerInfoRemovePacket(List.of(profile.id())));
                 hitbox.remove();
             }
 

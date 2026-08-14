@@ -36,6 +36,11 @@ public final class Shards {
         CustomModelDataComponent cmd = meta.getCustomModelDataComponent();
         cmd.setFloats(List.of((float) element.cmd(tier)));
         meta.setCustomModelDataComponent(cmd);
+        // vanish on death - the respawn re-issue is the only way back,
+        // so a death can never duplicate a shard
+        meta.addEnchant(org.bukkit.enchantments.Enchantment.VANISHING_CURSE, 1, true);
+        meta.setEnchantmentGlintOverride(false); // tier 2's glow texture stays the only shine
+        meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         pdc.set(ELEMENT_KEY, PersistentDataType.STRING, element.name());
         pdc.set(OWNER_KEY, PersistentDataType.STRING, owner.toString());

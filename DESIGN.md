@@ -28,6 +28,7 @@ The shard must be impossible to lose. Cancel all of the following when the item 
 - `InventoryClickEvent` / `InventoryDragEvent` — cannot be moved into any container, including chests, ender chests, shulkers, and item frames
 - `EntityPickupItemEvent` — no other player can pick one up if one ever escapes
 - Death in the void, lava, or on despawn timers — irrelevant, since it never leaves the inventory
+- **Curse of Vanishing baked into the item** (glint suppressed) — even if every listener misses, a death destroys the drop instead of duplicating it; the respawn re-issue is the only way a shard comes back
 
 On respawn, verify the player still holds their shard. If not, silently re-issue it with their stored element, tier, and progress intact.
 

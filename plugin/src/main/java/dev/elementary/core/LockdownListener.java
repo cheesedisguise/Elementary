@@ -88,6 +88,15 @@ public class LockdownListener implements Listener {
         if (!(event.getEntity() instanceof Player player)
                 || !player.getUniqueId().equals(Shards.owner(item))) {
             event.setCancelled(true);
+            return;
+        }
+        // the owner never carries two: a stray copy on the ground evaporates
+        for (ItemStack held : player.getInventory().getContents()) {
+            if (Shards.isShard(held)) {
+                event.setCancelled(true);
+                event.getItem().remove();
+                return;
+            }
         }
     }
 }

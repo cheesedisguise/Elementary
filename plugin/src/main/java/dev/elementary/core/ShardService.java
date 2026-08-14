@@ -69,6 +69,9 @@ public class ShardService {
                     || !player.getUniqueId().equals(Shards.owner(item))) {
                 inv.setItem(i, null);
             } else {
+                // rebuild in place so older shards pick up format changes
+                // (curse of vanishing, component tweaks)
+                inv.setItem(i, Shards.create(data.element, player.getUniqueId(), data.tier));
                 found = true;
             }
         }
