@@ -30,6 +30,7 @@ import dev.elementary.ability.water.Maelstrom;
 import dev.elementary.ability.water.Thunderstorm;
 import dev.elementary.ability.water.TidePull;
 import dev.elementary.command.AdminCommand;
+import dev.elementary.command.BrokerCommand;
 import dev.elementary.command.InfoCommand;
 import dev.elementary.core.LockdownListener;
 import dev.elementary.element.Element;
@@ -120,5 +121,8 @@ final class Registrations {
 
         plugin.getCommand("info").setExecutor(new InfoCommand(plugin));
         plugin.getCommand("elementary").setExecutor(new AdminCommand(plugin));
+        BrokerCommand brokerCommand = new BrokerCommand(plugin);
+        plugin.getCommand("broker").setExecutor(brokerCommand);
+        plugin.getCommand("broker").setTabCompleter(brokerCommand);
     }
 }

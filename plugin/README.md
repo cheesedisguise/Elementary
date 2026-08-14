@@ -17,7 +17,8 @@ aqudr's actual skin; without it they fall back to armour-stand
 mannequins wearing his head and gear.
 
 Commands: `/info` (own shard, progress, cooldowns; `/info toggle` for
-ability messages), `/elementary set <player> <element> <1|2>` and
+ability messages), `/broker <player> <shard>` (admin: set anyone's
+element), `/elementary set <player> <element> <1|2>` and
 `/elementary reload` (admin).
 
 Inputs, offhand shard required: RMB = ability 1, sneak+LMB = ability 2,

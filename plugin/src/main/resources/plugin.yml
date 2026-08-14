@@ -12,6 +12,10 @@ commands:
     description: Admin utilities.
     usage: /elementary <set|reload> ...
     permission: elementary.admin
+  broker:
+    description: Change any player's shard to a chosen element.
+    usage: /broker <player> <shard>
+    permission: elementary.admin
 permissions:
   elementary.admin:
     default: op

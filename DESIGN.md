@@ -610,6 +610,8 @@ A personal storm for 8s: each second one random enemy within 10 blocks is struck
 
 > The Trader is the cheap gamble; the Broker is the expensive certainty. Diamonds buy you the right to stop rolling.
 
+**Admin:** `/broker <player> <shard>` applies the exchange to anyone, free — no item, no menu. Bound players still refuse it (edit `bound-players` first).
+
 ### Upgrader
 - **Not craftable.** Dropped by Tier 2 players on death (section 6) — a dying player's tier made physical.
 - Right-click while holding your shard to promote it to Tier 2.
