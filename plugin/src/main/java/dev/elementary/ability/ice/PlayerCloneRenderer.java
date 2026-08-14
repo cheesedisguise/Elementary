@@ -67,9 +67,14 @@ public class PlayerCloneRenderer implements Mirage.CloneRenderer {
         npc.snapTo(location.getX(), location.getY(), location.getZ(),
                 location.getYaw(), location.getPitch());
 
+        // build the info entry directly: the fake player has no network
+        // connection, and the ServerPlayer-based constructor dereferences it
         broadcast(new ClientboundPlayerInfoUpdatePacket(
                 EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER),
-                List.of(npc)));
+                List.of(new ClientboundPlayerInfoUpdatePacket.Entry(
+                        profile.id(), profile, false, 0,
+                        net.minecraft.world.level.GameType.SURVIVAL,
+                        null, false, 0, null))));
         broadcast(new ClientboundAddEntityPacket(npc.getId(), profile.id(),
                 location.getX(), location.getY(), location.getZ(),
                 location.getPitch(), location.getYaw(),

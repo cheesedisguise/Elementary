@@ -61,7 +61,16 @@ public class Mirage implements Ability {
                 new Vector(0, 0, -1), new Vector(1, 0, 0),
                 new Vector(0, 0, 1), new Vector(-1, 0, 0)};
         for (Vector dir : cardinals) {
-            Clone clone = renderer.spawn(caster, caster.getLocation().clone());
+            Clone clone;
+            try {
+                clone = renderer.spawn(caster, caster.getLocation().clone());
+            } catch (Throwable t) {
+                plugin.getSLF4JLogger().error(
+                        "Mirage clone renderer failed - falling back to armour stands. "
+                                + "Report this stacktrace:", t);
+                renderer = new StandCloneRenderer();
+                clone = renderer.spawn(caster, caster.getLocation().clone());
+            }
             CloneWalker walker = new CloneWalker(caster, clone, dir.clone());
             walkers.add(walker);
             walker.runTaskTimer(plugin, 1, 1);
