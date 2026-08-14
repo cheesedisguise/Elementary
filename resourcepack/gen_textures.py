@@ -4,8 +4,8 @@
 - Tier 1 shards: the vanilla amethyst shard texture (vanilla/amethyst_shard.png)
   recoloured per element with a luminance gradient map — flat, vanilla-style
   facet shading, no painted gradients.
-- Tier 2 gems: a diagonal cut gem drawn to match the reference art (bright
-  angular highlight, dark drop edge), recoloured per element.
+- Tier 2: the tier 1 shard wrapped in a glow outline of a lighter tone
+  of its own colour (the "glowing" effect baked into the texture).
 - Ability icons: game-icons.net glyphs (icons_svg/, CC BY 3.0 — see README)
   rendered white at 64x64 so the HUD and GUIs can tint them freely.
 
@@ -74,112 +74,44 @@ def gradient_map(img, stops):
 
 
 # ------------------------------------------------------------------ tier 2
-# Diagonal cut gem, transcribed from the reference art: an elongated
-# hexagon running bottom-left -> top-right with flat-cut ends. The 3D
-# read comes from asymmetric edges — the upper-left edge is lit (Ol),
-# the lower-right edge is dark (Od) with a darker drop edge (D) outside
-# it for thickness — plus a bold pale Z-shaped highlight (H).
-# Roles: D drop edge, Od dark edge, Ol lit edge, B body, M dim panel,
-# L soft light, H bright highlight.
-GEM_PALETTES = {
-    "earth": {"D": "#0d1c06", "Od": "#1e3d10", "Ol": "#62c53a", "B": "#4fae2a",
-              "M": "#398420", "S": "#3d8c20", "L": "#94e05c",
-              "H": "#e0fab6", "W": "#f2fdda"},
-    "water": {"D": "#051535", "Od": "#0e3070", "Ol": "#4babf2", "B": "#2f95ea",
-              "M": "#2270c2", "S": "#2472c4", "L": "#6fd8f2",
-              "H": "#dcf8fe", "W": "#f0fcff"},
-    "fire":  {"D": "#2e0802", "Od": "#671807", "Ol": "#fa8132", "B": "#f0681a",
-              "M": "#c24310", "S": "#c8480f", "L": "#ffa844",
-              "H": "#ffecb4", "W": "#fff8da"},
-    "air":   {"D": "#38465c", "Od": "#5d7189", "Ol": "#e8f2fc", "B": "#d8e7f6",
-              "M": "#b5cde5", "S": "#b9cfe6", "L": "#eef6fe",
-              "H": "#ffffff", "W": "#ffffff"},
-    # Aqua: the Water gem with a light blue bottom — the dim panel goes
-    # pale while the shadow rim stays deep like Water's
-    "aqua":  {"D": "#051535", "Od": "#0e3070", "Ol": "#4babf2", "B": "#2f95ea",
-              "M": "#a6e6fa", "S": "#2472c4", "L": "#c8f2fd",
-              "H": "#dcf8fe", "W": "#f0fcff"},
+# Tier 2 is the tier 1 shard itself, surrounded by a glow outline in a
+# lighter tone of its own colour - the vanilla "glowing" effect look,
+# baked into the texture. Drawn on a 2x canvas so the outline is exactly
+# one art pixel thick and the shard renders the same size in the slot.
+GLOW_COLORS = {
+    "earth": "#c8f096",
+    "water": "#a8ecf8",
+    "fire":  "#ffcf70",
+    "air":   "#ffffff",
+    "aqua":  "#d6f6ff",
 }
 
-# Reference colourway (the art the gem was transcribed from), used only
-# for eyeballing against the original — not shipped as an element.
-GEM_REFERENCE = {"D": "#1c0c33", "Od": "#371a63", "Ol": "#9f52f0", "B": "#8a30e8",
-                 "M": "#6f2ad0", "S": "#6b28c8", "L": "#b678f2",
-                 "H": "#e8d3fc", "W": "#f6ecff"}
 
+def glow_wrap(t1, glow_hex):
+    """Upscale the shard 2x and trace a 2px glow outline around it."""
+    big = t1.convert("RGBA").resize((t1.width * 2, t1.height * 2), Image.NEAREST)
+    out = big.copy()
+    px_in = big.load()
+    px_out = out.load()
+    glow = c(glow_hex)
+    w, h = big.size
+    reach = 2  # one art pixel at the doubled scale
 
-def draw_gem(pal):
-    """24x24 cut gem, turned and shaded like the vanilla amethyst shard.
+    def opaque_near(x, y):
+        for dy in range(-reach, reach + 1):
+            for dx in range(-reach, reach + 1):
+                if dx == 0 and dy == 0:
+                    continue
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < w and 0 <= ny < h and px_in[nx, ny][3] > 0:
+                    return True
+        return False
 
-    Same diagonal as the vanilla shard (tip up-right): flat top cap,
-    short vertical right side, staircase down the lower-right, flat
-    bottom cap, vertical left side, staircase back up. Shading follows
-    the vanilla texture's language: a full dark outline (no drop
-    shadow), a bright top cut face with sparkle pixels, a thin lit line
-    inside the upper-left edge with a short highlight streak trailing
-    off the face, a flat body, a darker band along the lower-right, and
-    a dim region at the bottom end (light blue on Aqua).
-    """
-    pal = {k: c(v) for k, v in pal.items()}
-    N = 24
-    img = Image.new("RGBA", (N, N), (0, 0, 0, 0))
-    px = img.load()
-
-    top = [(x, 1) for x in range(14, 19)]
-    right = [(18, y) for y in range(2, 6)]
-    lr_stairs = [(17, 6), (16, 7), (15, 8), (14, 9), (13, 10),
-                 (12, 11), (11, 12), (10, 13), (9, 14)]
-    bottom = [(x, 15) for x in range(5, 10)]
-    left = [(5, y) for y in range(11, 15)]
-    ul_stairs = [(6, 10), (7, 9), (8, 8), (9, 7), (10, 6),
-                 (11, 5), (12, 4), (13, 3), (14, 2)]
-    outline = set(top + right + lr_stairs + bottom + left + ul_stairs)
-
-    interior, queue = set(), [(14, 4)]
-    while queue:
-        (x, y) = queue.pop()
-        if (x, y) in interior or (x, y) in outline or not (0 <= x < N and 0 <= y < N):
-            continue
-        interior.add((x, y))
-        queue += [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
-
-    # bright top cut face with the vanilla-style sparkle pixels
-    face = {(x, y) for (x, y) in interior if y <= 3}
-    sparkle = {(16, 2)}
-    cream = {(15, 3)}
-    # thin lit line inside the upper-left staircase, and a short
-    # highlight streak trailing down off the face like the vanilla shard
-    lit = {(x + 1, y) for (x, y) in ul_stairs} - face
-    streak = {(13, 4), (12, 5), (11, 6)}
-    # darker band hugging the lower-right staircase and right wall
-    shade = ({(x - 1, y) for (x, y) in lr_stairs}
-             | {(17, y) for y in range(2, 6)}) & interior
-    # dim bottom end (Aqua turns this light blue)
-    dim = {(x, y) for (x, y) in interior if y >= 12 and x <= 8}
-
-    for (x, y) in outline:
-        px[x, y] = pal["Od"]
-    for (x, y) in interior:
-        if (x, y) in sparkle:
-            px[x, y] = pal["W"]
-        elif (x, y) in cream:
-            px[x, y] = (255, 253, 213, 255)  # the vanilla shard's warm glint
-        elif (x, y) in face:
-            px[x, y] = pal["H"]
-        elif (x, y) in streak:
-            px[x, y] = pal["L"]
-        elif (x, y) in lit:
-            px[x, y] = pal["Ol"]
-        elif (x, y) in dim:
-            px[x, y] = pal["M"]
-        elif (x, y) in shade:
-            px[x, y] = pal["S"]
-        else:
-            px[x, y] = pal["B"]
-    # content spans x 5..18, y 1..15 - recentre on the canvas
-    centered = Image.new("RGBA", (N, N), (0, 0, 0, 0))
-    centered.alpha_composite(img, (0, 3))
-    return centered
+    for y in range(h):
+        for x in range(w):
+            if px_in[x, y][3] == 0 and opaque_near(x, y):
+                px_out[x, y] = glow
+    return out
 
 
 # ------------------------------------------------------------------- icons
@@ -224,15 +156,17 @@ def main():
     out = {}
 
     vanilla = Image.open(os.path.join(HERE, "vanilla", "amethyst_shard.png"))
+    tier1 = {}
     for element, ramp in T1_RAMPS.items():
         name = f"{element}_shard_tier1"
         img = gradient_map(vanilla, ramp)
         img.save(os.path.join(ITEM_DIR, name + ".png"))
         out[name] = img
+        tier1[element] = img
 
-    for element, pal in GEM_PALETTES.items():
+    for element, glow in GLOW_COLORS.items():
         name = f"{element}_shard_tier2"
-        img = draw_gem(pal)
+        img = glow_wrap(tier1[element], glow)
         img.save(os.path.join(ITEM_DIR, name + ".png"))
         out[name] = img
 

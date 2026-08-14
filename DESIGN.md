@@ -245,7 +245,7 @@ Air's escape. Aim at a pursuer to push them off and rocket yourself clear in one
 
 *Ice blue over light blue. A one-of-one kit, bound to the player `aqudr`.*
 
-**Binding.** The Aqua Shard is not in the random pool. It's assigned through `bound-players` in the config (store `aqudr`'s **UUID**, not the name — names change). Every path that hands out a shard — first join, respawn re-issue, integrity check — gives `aqudr` Aqua, always. Nobody else can ever hold it: it can't be rolled, a Shard Trader can't produce it, and shards are UUID-locked anyway (§1). The item is named **Aqua Shard** at both tiers, custom model data 1041/1042 — the Water gem with a light blue bottom (§6).
+**Binding.** The Aqua Shard is not in the random pool. It's assigned through `bound-players` in the config (store `aqudr`'s **UUID**, not the name — names change). Every path that hands out a shard — first join, respawn re-issue, integrity check — gives `aqudr` Aqua, always. Nobody else can ever hold it: it can't be rolled, a Shard Trader can't produce it, and shards are UUID-locked anyway (§1). The item is named **Aqua Shard** at both tiers, custom model data 1041/1042 — an icier, lighter blue than Water so the two never read alike (§6).
 
 **Passive — Catch The Rainbow**
 - **In rain** — the world is raining and the sky above him is open — aqudr can **double jump**: one extra mid-air jump per airborne stretch, recharged on landing
@@ -332,17 +332,17 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | | Tier 1 | Tier 2 |
 |---|---|---|
 | **Name** | Earth Shard | Earth Shard *(unchanged)* |
-| **Shape** | The vanilla amethyst shard texture, recoloured | Cut gem, turned like the shard, 24×24 |
-| **Colour** | Flat element colour, vanilla-style facet shading — no gradients | Same colour, with a pale cut face and highlight sweep |
+| **Shape** | The vanilla amethyst shard texture, recoloured | The same shard, wrapped in a glow outline |
+| **Colour** | Flat element colour, vanilla-style facet shading — no gradients | Same colours, plus a lighter halo of the element colour |
 
 **Tier 1** is literally the vanilla amethyst shard texture run through a per-element recolour (a luminance gradient map: each flat vanilla colour maps to one flat element colour). Green for Earth, ocean blue for Water, ember orange for Fire, pale white for Air. Nothing is redrawn, so it always reads as "a shard" at a glance.
 
-**Tier 2** is a **cut gem turned like the vanilla shard** — the same diagonal, tip up-right — and shaded in the vanilla texture's own language: full dark outline (no drop shadow), a bright cut face at the top end with the vanilla-style white + cream glint pixels, a thin lit line inside the upper-left edge with a short highlight streak trailing off the face, a flat body with a darker band along the lower-right, and a dim bottom end (light blue on Aqua). Authored at 24×24, centred in the slot. Same flat-colour rule: one hue per element, discrete tones, no gradients.
+**Tier 2** is the **tier 1 shard wrapped in its element's glow**: the identical shard sprite, surrounded by a one-pixel outline in a lighter tone of its own colour — the vanilla 'glowing' entity effect, baked into the texture. Authored on a 2× canvas (32×32) so the outline is exactly one art pixel thick and the shard renders at the same size as tier 1 in the slot. Ascending adds the halo; losing tier 2 strips it off.
 
 > Provenance: Tier 1 derives from the game's own texture, which is standard resource-pack practice. The gem is transcribed from our own reference art, and the ability icons are CC BY 3.0 glyphs from game-icons.net (credited in `resourcepack/README.md`) — nothing is lifted from another plugin.
 
 **Consequences of the fixed name:**
-- Tier is only readable from the texture in-world, so make the two silhouettes genuinely distinct — not just a brightness change
+- Tier is only readable from the texture in-world — the tier 2 glow outline is that signal
 - `/info` remains the authoritative place to check your own tier
 - The action bar HUD may still show tier (`◆ Earth II`) since that's plugin UI, not the item
 - Lore text is optional and configurable, but must not contain the tier if you want ascension to stay visually subtle
