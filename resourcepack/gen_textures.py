@@ -109,87 +109,76 @@ GEM_REFERENCE = {"D": "#1c0c33", "Od": "#371a63", "Ol": "#9f52f0", "B": "#8a30e8
 
 
 def draw_gem(pal):
-    """24x24 upright cut gem: pointy tip up, hard-edged facets, centered.
+    """24x24 cut gem, turned and shaded like the vanilla amethyst shard.
 
-    Silhouette: a 2px point at the top, stepped tapers out to straight
-    vertical sides, tapering back to a 2px point at the bottom. The
-    interior is flat facet regions with crisp boundaries: a pale crown
-    under the tip with its right column in shade, a split girdle seam,
-    a lit left band and shaded right band down the pavilion, a vertical
-    highlight that kinks toward the bottom tip, and a dim lower-left
-    panel. A darkest drop edge wraps the right and bottom for thickness.
+    Same diagonal as the vanilla shard (tip up-right): flat top cap,
+    short vertical right side, staircase down the lower-right, flat
+    bottom cap, vertical left side, staircase back up. Shading follows
+    the vanilla texture's language: a full dark outline (no drop
+    shadow), a bright top cut face with sparkle pixels, a thin lit line
+    inside the upper-left edge with a short highlight streak trailing
+    off the face, a flat body, a darker band along the lower-right, and
+    a dim region at the bottom end (light blue on Aqua).
     """
     pal = {k: c(v) for k, v in pal.items()}
     N = 24
     img = Image.new("RGBA", (N, N), (0, 0, 0, 0))
     px = img.load()
 
-    tip_top = [(11, 1), (12, 1)]
-    taper_ul = [(10, 2), (9, 3), (8, 4), (7, 5)]
-    side_l = [(6, y) for y in range(6, 15)]
-    taper_ll = [(7, 15), (8, 16), (9, 17), (10, 18)]
-    tip_bot = [(11, 19), (12, 19)]
-    taper_lr = [(13, 18), (14, 17), (15, 16), (16, 15)]
-    side_r = [(17, y) for y in range(6, 15)]
-    taper_ur = [(16, 5), (15, 4), (14, 3), (13, 2)]
-    outline = set(tip_top + taper_ul + side_l + taper_ll
-                  + tip_bot + taper_lr + side_r + taper_ur)
+    top = [(x, 1) for x in range(14, 19)]
+    right = [(18, y) for y in range(2, 6)]
+    lr_stairs = [(17, 6), (16, 7), (15, 8), (14, 9), (13, 10),
+                 (12, 11), (11, 12), (10, 13), (9, 14)]
+    bottom = [(x, 15) for x in range(5, 10)]
+    left = [(5, y) for y in range(11, 15)]
+    ul_stairs = [(6, 10), (7, 9), (8, 8), (9, 7), (10, 6),
+                 (11, 5), (12, 4), (13, 3), (14, 2)]
+    outline = set(top + right + lr_stairs + bottom + left + ul_stairs)
 
-    interior, queue = set(), [(11, 10)]
+    interior, queue = set(), [(14, 4)]
     while queue:
         (x, y) = queue.pop()
         if (x, y) in interior or (x, y) in outline or not (0 <= x < N and 0 <= y < N):
             continue
         interior.add((x, y))
         queue += [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
-    shape = outline | interior
 
-    drop = set()
-    for (x, y) in side_r + taper_ur + taper_lr + tip_bot + taper_ll:
-        for (dx, dy) in ((1, 0), (0, 1), (1, 1)):
-            if (x + dx, y + dy) not in shape:
-                drop.add((x + dx, y + dy))
+    # bright top cut face with the vanilla-style sparkle pixels
+    face = {(x, y) for (x, y) in interior if y <= 3}
+    sparkle = {(16, 2)}
+    cream = {(15, 3)}
+    # thin lit line inside the upper-left staircase, and a short
+    # highlight streak trailing down off the face like the vanilla shard
+    lit = {(x + 1, y) for (x, y) in ul_stairs} - face
+    streak = {(13, 4), (12, 5), (11, 6)}
+    # darker band hugging the lower-right staircase and right wall
+    shade = ({(x - 1, y) for (x, y) in lr_stairs}
+             | {(17, y) for y in range(2, 6)}) & interior
+    # dim bottom end (Aqua turns this light blue)
+    dim = {(x, y) for (x, y) in interior if y >= 12 and x <= 8}
 
-    hot = {(11, 2), (12, 2)}
-    notch = {(11, 5), (12, 5)}
-    sweep = ({(9, y) for y in range(7, 13)} | {(10, 13), (11, 14), (11, 15)})
-    accents = {(8, 15), (9, 16), (12, 18)}
-
-    for (x, y) in drop:
-        if 0 <= x < N and 0 <= y < N:
-            px[x, y] = pal["D"]
     for (x, y) in outline:
         px[x, y] = pal["Od"]
     for (x, y) in interior:
-        if (x, y) in hot:
+        if (x, y) in sparkle:
             px[x, y] = pal["W"]
-        elif (x, y) in sweep:
+        elif (x, y) in cream:
+            px[x, y] = (255, 253, 213, 255)  # the vanilla shard's warm glint
+        elif (x, y) in face:
             px[x, y] = pal["H"]
-        elif (x, y) in accents:
+        elif (x, y) in streak:
             px[x, y] = pal["L"]
-        elif (x, y) in notch:
+        elif (x, y) in lit:
+            px[x, y] = pal["Ol"]
+        elif (x, y) in dim:
+            px[x, y] = pal["M"]
+        elif (x, y) in shade:
+            px[x, y] = pal["S"]
+        else:
             px[x, y] = pal["B"]
-        elif 3 <= y <= 5:              # crown: pale, right column in shade
-            px[x, y] = pal["H"] if x <= 12 else pal["S"]
-        elif y == 6:                   # girdle seam, split lit/shade
-            px[x, y] = pal["Ol"] if x <= 11 else pal["S"]
-        elif 7 <= y <= 14:             # pavilion bands
-            if x <= 8:
-                px[x, y] = pal["Ol"]
-            elif x >= 14:
-                px[x, y] = pal["S"]
-            else:
-                px[x, y] = pal["B"]
-        else:                          # bottom: dim left, shade right
-            if x <= 10:
-                px[x, y] = pal["M"]
-            elif x >= 13:
-                px[x, y] = pal["S"]
-            else:
-                px[x, y] = pal["B"]
-    # content spans y 1..20 — drop one row so it sits dead centre
+    # content spans x 5..18, y 1..15 - recentre on the canvas
     centered = Image.new("RGBA", (N, N), (0, 0, 0, 0))
-    centered.alpha_composite(img, (0, 1))
+    centered.alpha_composite(img, (0, 3))
     return centered
 
 
