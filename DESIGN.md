@@ -371,7 +371,7 @@ Reaching Tier 2 by **either** route grants a hidden purple advancement, a server
 | 🟦 Water | **Eye of the Storm** | Ascend to a tier 2 element Shard! |
 | 🟥 Fire | **Inferno** | Ascend to a tier 2 element Shard! |
 | ⬜ Air | **Skybound** | Ascend to a tier 2 element Shard! |
-| 🩵 Aqua | **Rainmaker** | Ascend to a tier 2 element Shard! |
+| 🩵 Aqua | **Cold Front** | Ascend to a tier 2 element Shard! |
 
 All five share the same description. Only the title and icon differ.
 
