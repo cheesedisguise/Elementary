@@ -109,35 +109,33 @@ GEM_REFERENCE = {"D": "#1c0c33", "Od": "#371a63", "Ol": "#9f52f0", "B": "#8a30e8
 
 
 def draw_gem(pal):
-    """24x24 transcription of the reference gem.
+    """24x24 upright cut gem: pointy tip up, hard-edged facets, centered.
 
-    The silhouette is a sheared bar: flat horizontal top, straight
-    vertical right side, a 1:1 staircase down the lower-right, flat
-    bottom, vertical left side, and a staircase back up the upper-left.
-    Inside: a big pale arch across the top end (with a V notch of body),
-    a pale Z sweep down the lit side that kinks across to the dark edge,
-    a lit bevel inside the upper-left/left/bottom rim, an echo streak
-    fencing off the dim bottom-left panel, and a darkest drop edge
-    outside the right/lower-right/bottom for thickness.
+    Silhouette: a 2px point at the top, stepped tapers out to straight
+    vertical sides, tapering back to a 2px point at the bottom. The
+    interior is flat facet regions with crisp boundaries: a pale crown
+    under the tip with its right column in shade, a split girdle seam,
+    a lit left band and shaded right band down the pavilion, a vertical
+    highlight that kinks toward the bottom tip, and a dim lower-left
+    panel. A darkest drop edge wraps the right and bottom for thickness.
     """
     pal = {k: c(v) for k, v in pal.items()}
     N = 24
     img = Image.new("RGBA", (N, N), (0, 0, 0, 0))
     px = img.load()
 
-    top = [(x, 1) for x in range(11, 20)]
-    right = [(19, y) for y in range(2, 10)]
-    lr_stairs = [(18, 10), (17, 11), (16, 12), (15, 13),
-                 (14, 14), (13, 15), (12, 16), (11, 17)]
-    bottom = [(x, 18) for x in range(2, 11)]
-    left = [(2, y) for y in range(10, 18)]
-    ul_stairs = [(10, 2), (9, 3), (8, 4), (7, 5),
-                 (6, 6), (5, 7), (4, 8), (3, 9)]
-    outline = set(top + right + lr_stairs + bottom + left + ul_stairs)
+    tip_top = [(11, 1), (12, 1)]
+    taper_ul = [(10, 2), (9, 3), (8, 4), (7, 5)]
+    side_l = [(6, y) for y in range(6, 15)]
+    taper_ll = [(7, 15), (8, 16), (9, 17), (10, 18)]
+    tip_bot = [(11, 19), (12, 19)]
+    taper_lr = [(13, 18), (14, 17), (15, 16), (16, 15)]
+    side_r = [(17, y) for y in range(6, 15)]
+    taper_ur = [(16, 5), (15, 4), (14, 3), (13, 2)]
+    outline = set(tip_top + taper_ul + side_l + taper_ll
+                  + tip_bot + taper_lr + side_r + taper_ur)
 
-    # interior = flood fill from the centre; 1:1 stairs are tight for a
-    # 4-connected fill, so no leaks
-    interior, queue = set(), [(11, 9)]
+    interior, queue = set(), [(11, 10)]
     while queue:
         (x, y) = queue.pop()
         if (x, y) in interior or (x, y) in outline or not (0 <= x < N and 0 <= y < N):
@@ -147,38 +145,15 @@ def draw_gem(pal):
     shape = outline | interior
 
     drop = set()
-    for (x, y) in right + lr_stairs + bottom + [(19, 1)]:
+    for (x, y) in side_r + taper_ur + taper_lr + tip_bot + taper_ll:
         for (dx, dy) in ((1, 0), (0, 1), (1, 1)):
             if (x + dx, y + dy) not in shape:
                 drop.add((x + dx, y + dy))
 
-    # pale arch across the top end: two full rows, then legs down each
-    # side leaving a V notch of body in the middle
-    face = ({(x, 2) for x in range(11, 19)}
-            | {(x, 3) for x in range(11, 19) if x != 14}
-            | {(11, 4), (12, 4), (11, 5), (12, 5), (17, 4), (18, 4), (18, 5)})
-    # Z sweep: pale 1px line floating ~2 cells inside the lit edge,
-    # kinking at mid-height into one crossing stroke that lands on the
-    # dark staircase, with a short tail riding up it
-    leg = [(10, 5), (9, 6), (8, 7), (7, 8), (7, 9), (6, 10), (6, 11), (6, 12)]
-    crossing = [(7, 13), (8, 14), (9, 15), (10, 16), (11, 16)]
-    sweep = set(leg + crossing)
-    # lit facet: the filled strip between the upper-left staircase/wall
-    # and the leg, plus a 1px rim inside the wall and bottom edge
-    strip_rows = {3: (10, 10), 4: (9, 10), 5: (8, 9), 6: (7, 8), 7: (6, 7),
-                  8: (5, 6), 9: (4, 6), 10: (3, 5), 11: (3, 5), 12: (3, 5)}
-    bevel = ({(x, y) for y, (a, b) in strip_rows.items() for x in range(a, b + 1)}
-             | {(3, y) for y in range(13, 18)} | {(x, 17) for x in range(4, 9)})
-    # small pale accent where the dim panel meets the kink
-    echo = {(4, 13), (5, 14)}
-    # dim panel pinned under the crossing stroke
-    dim = {(x, y) for y in range(13, 17) for x in range(4, 10) if x < y - 6}
-    # shading like the reference: a near-white hot spot in the face's
-    # top-left corner, and a darker inner rim inside the right wall and
-    # lower-right staircase — the shadow side of the light direction
-    hot = {(11, 2), (12, 2), (11, 3)}
-    rim = ({(18, y) for y in range(6, 10)}
-           | {(x - 1, y) for (x, y) in lr_stairs} | {(9, 17), (10, 17)})
+    hot = {(11, 2), (12, 2)}
+    notch = {(11, 5), (12, 5)}
+    sweep = ({(9, y) for y in range(7, 13)} | {(10, 13), (11, 14), (11, 15)})
+    accents = {(8, 15), (9, 16), (12, 18)}
 
     for (x, y) in drop:
         if 0 <= x < N and 0 <= y < N:
@@ -188,19 +163,34 @@ def draw_gem(pal):
     for (x, y) in interior:
         if (x, y) in hot:
             px[x, y] = pal["W"]
-        elif (x, y) in face or (x, y) in sweep:
+        elif (x, y) in sweep:
             px[x, y] = pal["H"]
-        elif (x, y) in echo:
+        elif (x, y) in accents:
             px[x, y] = pal["L"]
-        elif (x, y) in bevel:
-            px[x, y] = pal["Ol"]
-        elif (x, y) in dim:
-            px[x, y] = pal["M"]
-        elif (x, y) in rim:
-            px[x, y] = pal["S"]
-        else:
+        elif (x, y) in notch:
             px[x, y] = pal["B"]
-    return img
+        elif 3 <= y <= 5:              # crown: pale, right column in shade
+            px[x, y] = pal["H"] if x <= 12 else pal["S"]
+        elif y == 6:                   # girdle seam, split lit/shade
+            px[x, y] = pal["Ol"] if x <= 11 else pal["S"]
+        elif 7 <= y <= 14:             # pavilion bands
+            if x <= 8:
+                px[x, y] = pal["Ol"]
+            elif x >= 14:
+                px[x, y] = pal["S"]
+            else:
+                px[x, y] = pal["B"]
+        else:                          # bottom: dim left, shade right
+            if x <= 10:
+                px[x, y] = pal["M"]
+            elif x >= 13:
+                px[x, y] = pal["S"]
+            else:
+                px[x, y] = pal["B"]
+    # content spans y 1..20 — drop one row so it sits dead centre
+    centered = Image.new("RGBA", (N, N), (0, 0, 0, 0))
+    centered.alpha_composite(img, (0, 1))
+    return centered
 
 
 # ------------------------------------------------------------------- icons

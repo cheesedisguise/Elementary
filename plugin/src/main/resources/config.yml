@@ -1,0 +1,18 @@
+# Elementary configuration.
+
+# Players locked to a specific element. Keys are player UUIDs (never
+# names - names change). These players skip the random roll on every
+# assignment path and always receive their bound element; Shard Traders
+# refuse them. Resolve the UUID once (e.g. https://mcuuid.net) and
+# paste it here.
+#
+# aqudr -> AQUA. Replace the placeholder below with aqudr's real UUID.
+bound-players:
+  "00000000-0000-0000-0000-000000000000": AQUA
+
+# Server-wide announcement when someone reaches tier 2.
+announce-ascension: true
+
+# Ability messages are always caster-only; this just turns the default
+# on or off for new players (each player can /info toggle).
+ability-messages-default: true

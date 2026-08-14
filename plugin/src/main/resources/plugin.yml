@@ -1,0 +1,17 @@
+name: Elementary
+version: "0.1.0"
+main: dev.elementary.ElementaryPlugin
+api-version: "1.21"
+description: Elemental shards - four elements plus the player-bound Aqua Shard.
+softdepend: [packetevents]
+commands:
+  info:
+    description: Show your shard, tier, challenge progress and cooldowns.
+    usage: /info [toggle]
+  elementary:
+    description: Admin utilities.
+    usage: /elementary <set|reload> ...
+    permission: elementary.admin
+permissions:
+  elementary.admin:
+    default: op

@@ -1,0 +1,70 @@
+package dev.elementary.shard;
+
+import dev.elementary.element.Element;
+import java.util.List;
+import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.components.CustomModelDataComponent;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
+
+/** Factory and inspector for shard items. */
+public final class Shards {
+    public static NamespacedKey ELEMENT_KEY;
+    public static NamespacedKey OWNER_KEY;
+    public static NamespacedKey TIER_KEY;
+
+    private Shards() {}
+
+    public static void init(JavaPlugin plugin) {
+        ELEMENT_KEY = new NamespacedKey(plugin, "element");
+        OWNER_KEY = new NamespacedKey(plugin, "owner");
+        TIER_KEY = new NamespacedKey(plugin, "tier");
+    }
+
+    public static ItemStack create(Element element, UUID owner, int tier) {
+        ItemStack item = new ItemStack(Material.AMETHYST_SHARD);
+        ItemMeta meta = item.getItemMeta();
+        meta.displayName(Component.text(element.shardName(), element.color())
+                .decoration(TextDecoration.ITALIC, false));
+        CustomModelDataComponent cmd = meta.getCustomModelDataComponent();
+        cmd.setFloats(List.of((float) element.cmd(tier)));
+        meta.setCustomModelDataComponent(cmd);
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        pdc.set(ELEMENT_KEY, PersistentDataType.STRING, element.name());
+        pdc.set(OWNER_KEY, PersistentDataType.STRING, owner.toString());
+        pdc.set(TIER_KEY, PersistentDataType.INTEGER, tier);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    public static boolean isShard(ItemStack item) {
+        if (item == null || !item.hasItemMeta()) return false;
+        return item.getItemMeta().getPersistentDataContainer()
+                .has(ELEMENT_KEY, PersistentDataType.STRING);
+    }
+
+    public static Element element(ItemStack item) {
+        String name = item.getItemMeta().getPersistentDataContainer()
+                .get(ELEMENT_KEY, PersistentDataType.STRING);
+        return name == null ? null : Element.valueOf(name);
+    }
+
+    public static UUID owner(ItemStack item) {
+        String raw = item.getItemMeta().getPersistentDataContainer()
+                .get(OWNER_KEY, PersistentDataType.STRING);
+        return raw == null ? null : UUID.fromString(raw);
+    }
+
+    public static int tier(ItemStack item) {
+        Integer t = item.getItemMeta().getPersistentDataContainer()
+                .get(TIER_KEY, PersistentDataType.INTEGER);
+        return t == null ? 1 : t;
+    }
+}

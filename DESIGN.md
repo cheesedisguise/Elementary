@@ -4,6 +4,8 @@
 
 This document is the source of truth. If code and this document disagree, the document wins — update it first, then the code.
 
+> **Implementation:** `plugin/` holds the Paper plugin (`gradle build` → jar; see `plugin/README.md`), `resourcepack/` the textures and models.
+
 ---
 
 ## 1. Core rules
@@ -330,12 +332,12 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | | Tier 1 | Tier 2 |
 |---|---|---|
 | **Name** | Earth Shard | Earth Shard *(unchanged)* |
-| **Shape** | The vanilla amethyst shard texture, recoloured | Diagonal cut gem (from the reference art), 24×24 |
+| **Shape** | The vanilla amethyst shard texture, recoloured | Upright cut gem, pointy tip up, 24×24 |
 | **Colour** | Flat element colour, vanilla-style facet shading — no gradients | Same colour, with a pale cut face and highlight sweep |
 
 **Tier 1** is literally the vanilla amethyst shard texture run through a per-element recolour (a luminance gradient map: each flat vanilla colour maps to one flat element colour). Green for Earth, ocean blue for Water, ember orange for Fire, pale white for Air. Nothing is redrawn, so it always reads as "a shard" at a glance.
 
-**Tier 2** is the **cut gem** transcribed from the project's reference art: a sheared bar (flat top, vertical sides, stepped diagonals), a dark drop edge for thickness, a big pale cut face at the top with a notch, a lit facet inside the upper-left edge, and a pale Z-shaped highlight sweep — a raw crystal that has been cut and polished. It's authored at 24×24 (vs the shard's 16×16), so it renders visibly crisper in the inventory. Same flat-colour rule: one hue per element, shading by discrete facet tones, no gradients.
+**Tier 2** is an **upright cut gem** in the reference art's shading language: pointy tip up, straight vertical sides, hard-edged facets — a near-white glint at the tip, a pale crown with its right column in shade, a split girdle seam, a lit left band and shaded right band down the pavilion, a vertical highlight that kinks toward the bottom point, a dim lower-left panel, and a dark drop edge wrapping the right and bottom. Authored at 24×24, centred in the slot. Same flat-colour rule: one hue per element, discrete facet tones, no gradients.
 
 > Provenance: Tier 1 derives from the game's own texture, which is standard resource-pack practice. The gem is transcribed from our own reference art, and the ability icons are CC BY 3.0 glyphs from game-icons.net (credited in `resourcepack/README.md`) — nothing is lifted from another plugin.
 
