@@ -139,7 +139,7 @@ ICONS = {
     "icon_updraft": ("eruption", "Lorc"),
     "icon_gale": ("wind-slap", "Lorc"),
     "icon_tempest": ("tornado", "Lorc"),
-    "icon_mirage": ("shadow-follower", "Lorc"),
+    "icon_frost_nova": ("icicles-aura", "Lorc"),
     "icon_orbital_ice": ("frozen-orb", "Lorc"),
     "icon_subzero": ("frozen-body", "Delapouite"),
     "icon_flash": ("beams-aura", "Lorc"),

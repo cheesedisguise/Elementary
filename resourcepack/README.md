@@ -57,7 +57,7 @@ licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
 | `eruption` | Updraft | Lorc |
 | `wind-slap` | Gale | Lorc |
 | `tornado` | Tempest | Lorc |
-| `shadow-follower` | Mirage | Lorc |
+| `icicles-aura` | Frost Nova | Lorc |
 | `frozen-orb` | Orbital Ice | Lorc |
 | `frozen-body` | Sub-Zero | [Delapouite](https://delapouite.com/) |
 | `teleport` | Shadowstep | Lorc |

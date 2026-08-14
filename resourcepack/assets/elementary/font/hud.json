@@ -135,7 +135,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_mirage.png",
+      "file": "elementary:hud/icon_frost_nova.png",
       "height": 16,
       "ascent": 7,
       "chars": [

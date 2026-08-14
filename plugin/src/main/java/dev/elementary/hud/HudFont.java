@@ -29,7 +29,7 @@ public final class HudFont {
             Map.entry("Updraft", "\uE009"),
             Map.entry("Gale", "\uE00A"),
             Map.entry("Tempest", "\uE00B"),
-            Map.entry("Mirage", "\uE00C"),
+            Map.entry("Frost Nova", "\uE00C"),
             Map.entry("Orbital Ice", "\uE00D"),
             Map.entry("Sub-Zero", "\uE00E"),
             Map.entry("Flash", "\uE00F"),

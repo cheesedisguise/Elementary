@@ -58,11 +58,8 @@ public class ElementaryPlugin extends JavaPlugin {
         }
     }
 
-    private dev.elementary.ability.ice.Mirage mirage;
     private dev.elementary.tier.Challenges challenges;
 
-    public void setMirage(dev.elementary.ability.ice.Mirage mirage) { this.mirage = mirage; }
-    public dev.elementary.ability.ice.Mirage mirage() { return mirage; }
     public void setChallenges(dev.elementary.tier.Challenges c) { this.challenges = c; }
     public dev.elementary.tier.Challenges challenges() { return challenges; }
 

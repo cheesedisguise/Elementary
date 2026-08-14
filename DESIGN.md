@@ -91,7 +91,7 @@ Icons are glyphs from **game-icons.net** (CC BY 3.0 — Lorc and Delapouite; att
 | Water | Tide Pull — `fishing-hook` | Thunderstorm — `lightning-storm` | Maelstrom — `ink-swirl` |
 | Fire | Fireball — `fireball` | Pyre — `fire-ring` | Meteor — `burning-meteor` |
 | Air | Updraft — `eruption` | Gale — `wind-slap` | Tempest — `tornado` |
-| Ice | Mirage — `shadow-follower` | Orbital Ice — `frozen-orb` | Sub-Zero — `frozen-body` |
+| Ice | Frost Nova — `icicles-aura` | Orbital Ice — `frozen-orb` | Sub-Zero — `frozen-body` |
 | Shadow | Shadowstep — `teleport` | Grasp — `shadow-grasp` | Eclipse — `eclipse-flare` |
 | Light | Flash — `beams-aura` | Sunspear — `sunbeams` | Solar Flare — `sun` |
 | Lightning | Arc — `lightning-arc` | Chain Lightning — `chain-lightning` | Supercell — `heavy-lightning` |
@@ -248,7 +248,7 @@ Air's escape, fully directional: the cone follows your exact aim, including pitc
 
 ### 🧊 Ice Shard
 
-*Ice blue. Rain, mirrors and cold — and `aqudr` always spawns with it.*
+*Ice blue. Rain, frost and cold — and `aqudr` always spawns with it.*
 
 **Binding.** Ice rolls like any other element — anyone can get it. On top of that, `bound-players` in the config (store `aqudr`'s **UUID**, not the name — names change) pins specific players to it: every path that hands out a shard — first join, respawn re-issue, integrity check — gives `aqudr` Ice, 100% of the time, and a bound player's shard refuses Shard Traders (§8). The item is named **Ice Shard** at both tiers, custom model data 1041/1042 — an icier, lighter blue than Water so the two never read alike (§6).
 
@@ -261,16 +261,17 @@ Air's escape, fully directional: the cone follows your exact aim, including pitc
 
 *Implementation:* the classic trick — while he's rain-exposed and mid-air-eligible, set `allowFlight(true)`; catch `PlayerToggleFlightEvent`, cancel it, apply the velocity, reset fall distance. Drop `allowFlight` the moment the rain window closes, or anti-cheat and vanilla flight-kick will both complain.
 
-**Ability 1 (RMB) — Mirage** · 30s
-Four clones of aqudr step out of him — **same skin, same armour, same held item, live-synced** (he swaps items, they swap within a tick). They walk out along the four cardinal directions for 4 blocks, all **turn right 90°**, walk 3 more, then wander randomly — short walks, pauses, random turns — for the rest of their 15s lifetime.
+**Ability 1 (RMB) — Frost Nova** · 25s
+A circle of frost **erupts from the caster's body and races outward** to 8 blocks. Everyone the expanding ring sweeps over is **frostbitten** — the powder-snow freeze, inflicted at range:
 
-- One melee hit pops a clone: it **disappears into a cloud**. No damage to the hitter, no knockback, no drops
-- Clones deal no damage, block nothing, trigger nothing; mobs ignore them
-- Recast while active dismisses the survivors
+- **Freeze meter pinned full** for 4s: the frost vignette, the shiver, frozen hearts — exactly as if they were buried in powder snow
+- **Slowness III** for the same 4s — the nova is first and foremost an AoE slow
+- **Freeze damage ticks** while frostbitten (1 damage every 2s, the vanilla frostbite tick — bypasses armour), attributed to the caster
+- Only the caster is spared; the wave hits everything living it touches
 
-*Particles:* a popped clone bursts into dense `CLOUD` with a few `SNOWFLAKE` flecks; each clone trails a faint mist at the feet.
+*Particles:* a two-layer ring of `SNOWFLAKE` (ankle height) and `ITEM_SNOWBALL` (chest height) tracing the wave front as it expands; frostbitten victims shed drifting `SNOWFLAKE` until they thaw. Powder-snow crunch + the freeze hurt sound on cast.
 
-*Implementation:* packet-level fake players carrying aqudr's `GameProfile` — that's what makes the skin correct. Spawn/equipment/relative-move packets only; no real entities. Hits arrive as interaction packets on the fake entity ids; equipment re-sync hooks his held-slot and armour-change events. A packets library (e.g. PacketEvents) earns its keep here.
+*Implementation:* an expanding-radius sweep — each tick, any living entity inside the current radius that hasn't been swept yet gets frostbite; `setFreezeTicks(getMaxFreezeTicks())` pinned every tick for the duration (natural 2/tick decay fades the vignette afterwards), damage delivered via a `FREEZE`-type `DamageSource` with the caster as causing entity for kill credit.
 
 **Ability 2 (⇧LMB) — Orbital Ice** · 30s
 Five ice pellets materialise and **orbit aqudr** — radius 1.5 blocks, one revolution every ~2s, a slight bob. While any pellet survives, **left-click fires one** along his crosshair:
@@ -395,7 +396,7 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | **Water** | Regeneration II near water | Tide Pull hits up to 3 targets | Thunderstorm lasts 15s, 3 true damage |
 | **Fire** | Nether bonus applies everywhere at +1 | Fireball fires 3 in a spread | Pyre radius 5 → 8, adds Regeneration I to caster |
 | **Air** | Speed II | Updraft radius 6 → 9 | Gale cone 8 → 12 blocks, stronger recoil |
-| **Ice** | Double jump gains a second charge (triple jump) during thunderstorms | Mirage cooldown 30s → 20s | Orbital Ice 5 → 7 pellets |
+| **Ice** | Double jump gains a second charge (triple jump) during thunderstorms | Frost Nova radius 8 → 11, frostbite 4s → 6s, Slowness III → IV | Orbital Ice 5 → 7 pellets |
 | **Shadow** | Backstab +2 → +4 | Shadowstep range 8 → 14 | Grasp radius 5 → 8 |
 | **Light** | Lumen regenerates in any daylight, not just open sky | Flash radius 6 → 9 | Sunspear pierces every target in the beam |
 | **Lightning** | Static discharges every 3rd hit | Arc slow 2s → 4s | Chain Lightning 3 → 5 hops |

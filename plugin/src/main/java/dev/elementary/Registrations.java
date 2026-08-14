@@ -5,11 +5,8 @@ import dev.elementary.ability.air.Gale;
 import dev.elementary.ability.air.Tempest;
 import dev.elementary.ability.air.Updraft;
 import dev.elementary.ability.ice.CatchTheRainbow;
-import dev.elementary.ability.ice.Mirage;
-import dev.elementary.ability.ice.MirageSyncListener;
+import dev.elementary.ability.ice.FrostNova;
 import dev.elementary.ability.ice.OrbitalIce;
-import dev.elementary.ability.ice.PlayerCloneRenderer;
-import dev.elementary.ability.ice.StandCloneRenderer;
 import dev.elementary.ability.ice.SubZero;
 import dev.elementary.ability.earth.Bulwark;
 import dev.elementary.ability.light.Flash;
@@ -77,17 +74,11 @@ final class Registrations {
         abilities.register(Element.AIR,
                 new AbilityManager.Kit(updraft, gale, tempest));
 
-        boolean stands = "stands".equalsIgnoreCase(
-                plugin.getConfig().getString("mirage-clones", "players"));
-        Mirage mirage = new Mirage(plugin, null);
-        Mirage.CloneRenderer renderer = stands
-                ? new StandCloneRenderer() : new PlayerCloneRenderer(plugin);
-        mirage.setRenderer(renderer);
-        plugin.setMirage(mirage);
+        FrostNova frostNova = new FrostNova(plugin);
         OrbitalIce orbitalIce = new OrbitalIce(plugin);
         SubZero subZero = new SubZero(plugin);
         abilities.register(Element.ICE,
-                new AbilityManager.Kit(mirage, orbitalIce, subZero));
+                new AbilityManager.Kit(frostNova, orbitalIce, subZero));
 
         abilities.register(Element.SHADOW, new AbilityManager.Kit(
                 new Shadowstep(plugin), new Grasp(plugin), new Eclipse(plugin)));
@@ -95,8 +86,6 @@ final class Registrations {
                 new Flash(plugin), new Sunspear(plugin), new SolarFlare(plugin)));
         abilities.register(Element.LIGHTNING, new AbilityManager.Kit(
                 new Arc(plugin), new ChainLightning(plugin), new Supercell(plugin)));
-        plugin.getSLF4JLogger().info("Mirage clones: {}",
-                stands ? "armour stands (config)" : "real-skin players");
 
         Challenges challenges = new Challenges(plugin);
         plugin.setChallenges(challenges);
@@ -110,7 +99,6 @@ final class Registrations {
         pm.registerEvents(meteor, plugin);
         pm.registerEvents(new CatchTheRainbow(plugin), plugin);
         pm.registerEvents(orbitalIce, plugin);
-        pm.registerEvents(new MirageSyncListener(plugin, mirage), plugin);
         pm.registerEvents(challenges, plugin);
         pm.registerEvents(new TierListener(plugin), plugin);
         BrokerMenu brokerMenu = new BrokerMenu(plugin);

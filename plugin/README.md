@@ -9,12 +9,8 @@ cd plugin && gradle build
 
 Install the jar in `plugins/`, serve the `resourcepack/` folder (zipped)
 as the server resource pack, and set aqudr's real UUID under
-`bound-players` in `plugins/Elementary/config.yml`.
-
-**Optional:** install the [PacketEvents](https://modrinth.com/plugin/packetevents)
-plugin. With it, Mirage clones are packet-level fake players wearing
-aqudr's actual skin; without it they fall back to armour-stand
-mannequins wearing his head and gear.
+`bound-players` in `plugins/Elementary/config.yml`. No other plugins
+are needed.
 
 Commands: `/info` (own shard, progress, cooldowns; `/info toggle` for
 ability messages), `/broker <player> <shard>` (admin: set anyone's
