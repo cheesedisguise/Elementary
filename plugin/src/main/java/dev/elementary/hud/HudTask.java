@@ -22,14 +22,42 @@ import org.bukkit.scheduler.BukkitRunnable;
  * floating on top. "bossbar" keeps the old single-bar HUD for servers
  * without the resource pack; "off" disables it.
  */
-public class HudTask extends BukkitRunnable {
+public class HudTask extends BukkitRunnable implements org.bukkit.event.Listener {
     private final ElementaryPlugin plugin;
     private final String style;
     private final Map<UUID, BossBar> bars = new HashMap<>();
+    private final java.util.Set<UUID> packLoaded = new java.util.HashSet<>();
 
     public HudTask(ElementaryPlugin plugin) {
         this.plugin = plugin;
         this.style = plugin.getConfig().getString("hud-style", "font");
+    }
+
+    /** Players who confirmed the server resource pack get font glyphs;
+     *  everyone else falls back to the boss bar instead of tofu boxes. */
+    @org.bukkit.event.EventHandler
+    public void onPackStatus(org.bukkit.event.player.PlayerResourcePackStatusEvent event) {
+        if (event.getStatus()
+                == org.bukkit.event.player.PlayerResourcePackStatusEvent.Status
+                        .SUCCESSFULLY_LOADED) {
+            packLoaded.add(event.getPlayer().getUniqueId());
+        } else if (event.getStatus()
+                == org.bukkit.event.player.PlayerResourcePackStatusEvent.Status.DECLINED
+                || event.getStatus()
+                == org.bukkit.event.player.PlayerResourcePackStatusEvent.Status
+                        .FAILED_DOWNLOAD) {
+            packLoaded.remove(event.getPlayer().getUniqueId());
+        }
+    }
+
+    @org.bukkit.event.EventHandler
+    public void onQuit(org.bukkit.event.player.PlayerQuitEvent event) {
+        packLoaded.remove(event.getPlayer().getUniqueId());
+    }
+
+    private boolean fontFor(Player player) {
+        if ("font-force".equalsIgnoreCase(style)) return true;
+        return packLoaded.contains(player.getUniqueId());
     }
 
     @Override
@@ -37,10 +65,11 @@ public class HudTask extends BukkitRunnable {
         if ("off".equalsIgnoreCase(style)) return;
         for (Player player : plugin.getServer().getOnlinePlayers()) {
             boolean holding = Shards.isShard(player.getInventory().getItemInMainHand());
-            if ("bossbar".equalsIgnoreCase(style)) {
+            if ("bossbar".equalsIgnoreCase(style) || !fontFor(player)) {
                 bossbar(player, holding);
-            } else if (holding) {
-                player.sendActionBar(fontLine(player));
+            } else {
+                bossbar(player, false); // hide any lingering bar
+                if (holding) player.sendActionBar(fontLine(player));
             }
         }
     }

@@ -33,7 +33,9 @@ public class ElementaryPlugin extends JavaPlugin {
 
         Registrations.registerAll(this);
 
-        new HudTask(this).runTaskTimer(this, 20, 5);
+        HudTask hud = new HudTask(this);
+        getServer().getPluginManager().registerEvents(hud, this);
+        hud.runTaskTimer(this, 20, 5);
         getSLF4JLogger().info("Elementary enabled - {} bound player(s)", boundPlayers.size());
     }
 

@@ -21,7 +21,8 @@ ability-messages-default: true
 mirage-clones: players
 
 # Ability HUD style. "font" (default) draws the ability icons above the
-# hotbar with the remaining cooldown floating on top of each icon -
-# requires the resource pack. "bossbar" is the pack-free fallback bar;
-# "off" disables the HUD.
+# hotbar with the remaining cooldown floating on top of each icon for
+# players who accepted the server resource pack, and shows the boss bar
+# to everyone else. "font-force" sends glyphs to all players,
+# "bossbar" uses only the bar, "off" disables the HUD.
 hud-style: font
