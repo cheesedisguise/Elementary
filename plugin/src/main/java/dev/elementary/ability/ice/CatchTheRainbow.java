@@ -1,4 +1,4 @@
-package dev.elementary.ability.aqua;
+package dev.elementary.ability.ice;
 
 import dev.elementary.ElementaryPlugin;
 import dev.elementary.data.PlayerData;
@@ -46,7 +46,7 @@ public class CatchTheRainbow implements Listener {
             if (!managed(player)) continue;
             if (!Shards.isShard(player.getInventory().getItemInOffHand())) continue;
             PlayerData data = plugin.shards().dataFor(player);
-            if (data.element != Element.AQUA) {
+            if (data.element != Element.ICE) {
                 continue;
             }
             if (player.isOnGround()) {
@@ -68,7 +68,7 @@ public class CatchTheRainbow implements Listener {
         if (!managed(player)) return;
         if (!Shards.isShard(player.getInventory().getItemInOffHand())) return;
         PlayerData data = plugin.shards().dataFor(player);
-        if (data.element != Element.AQUA) return;
+        if (data.element != Element.ICE) return;
         event.setCancelled(true);
         player.setAllowFlight(false);
         player.setFlying(false);

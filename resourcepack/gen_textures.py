@@ -38,8 +38,14 @@ T1_RAMPS = {
     "water": ["#0b2a6e", "#2a7fd6", "#5fd4ee", "#d8f8fc"],
     "fire":  ["#57100a", "#c93c14", "#f5952f", "#ffe9ad"],
     "air":   ["#54677f", "#a7c4de", "#e2eefa", "#ffffff"],
-    # player-bound Aqua (aqudr): icier and lighter than Water
-    "aqua":  ["#134a80", "#3fb2e8", "#8ce4f6", "#f2fdff"],
+    # Ice (aqudr always spawns with it): icier and lighter than Water
+    "ice":    ["#134a80", "#3fb2e8", "#8ce4f6", "#f2fdff"],
+    # Light: pale creamy yellow, softer than Lightning
+    "light":  ["#8a6d1a", "#eed060", "#fff3a8", "#fffdf0"],
+    # Shadow: super dark red, embers in the dark
+    "shadow": ["#1c0409", "#4d0f18", "#8f2030", "#d05868"],
+    # Lightning: vivid electric yellow
+    "lightning": ["#6b5200", "#ecc61a", "#ffee5a", "#ffffd8"],
 }
 
 
@@ -79,11 +85,14 @@ def gradient_map(img, stops):
 # baked into the texture. Drawn on a 2x canvas so the outline is exactly
 # one art pixel thick and the shard renders the same size in the slot.
 GLOW_COLORS = {
-    "earth": "#c8f096",
-    "water": "#a8ecf8",
-    "fire":  "#ffcf70",
-    "air":   "#ffffff",
-    "aqua":  "#d6f6ff",
+    "earth":  "#c8f096",
+    "water":  "#a8ecf8",
+    "fire":   "#ffcf70",
+    "air":    "#ffffff",
+    "ice":    "#d6f6ff",
+    "light":  "#fffce0",
+    "shadow": "#c84a58",
+    "lightning": "#fff26a",
 }
 
 
@@ -133,6 +142,15 @@ ICONS = {
     "icon_mirage": ("shadow-follower", "Lorc"),
     "icon_orbital_ice": ("frozen-orb", "Lorc"),
     "icon_subzero": ("frozen-body", "Delapouite"),
+    "icon_flash": ("beams-aura", "Lorc"),
+    "icon_sunspear": ("sunbeams", "Lorc"),
+    "icon_solar_flare": ("sun", "Lorc"),
+    "icon_shadowstep": ("teleport", "Lorc"),
+    "icon_grasp": ("shadow-grasp", "Lorc"),
+    "icon_eclipse": ("eclipse-flare", "Lorc"),
+    "icon_arc": ("lightning-arc", "Lorc"),
+    "icon_chain_lightning": ("chain-lightning", "Willdabeast"),
+    "icon_supercell": ("heavy-lightning", "Lorc"),
 }
 
 ICON_SIZE = 64

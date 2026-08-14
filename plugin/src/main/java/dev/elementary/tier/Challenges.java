@@ -25,7 +25,10 @@ public class Challenges implements Listener {
             Element.WATER, 1000.0,  // Deep Current: swim submerged
             Element.FIRE, 50.0,     // Kindling: kill burning entities
             Element.AIR, 20.0,      // Untouched Sky: continuous airtime
-            Element.AQUA, 100.0);   // Hailstorm: land Orbital Ice pellets
+            Element.ICE, 100.0,     // Hailstorm: land Orbital Ice pellets
+            Element.SHADOW, 40.0,   // Lights Out: kills in darkness
+            Element.LIGHT, 200.0,   // High Noon: damage dealt in sunlight
+            Element.LIGHTNING, 50.0); // Live Wire: Static discharges
 
     private final ElementaryPlugin plugin;
     private final Map<UUID, Boolean> wasUnderwater = new HashMap<>();
@@ -38,9 +41,13 @@ public class Challenges implements Listener {
         }.runTaskTimer(plugin, 20, 20);
     }
 
+    public void staticDischarge(Player player) {
+        add(player, Element.LIGHTNING, 1); // Live Wire
+    }
+
     public static void pelletHit(ElementaryPlugin plugin, Player shooter) {
         Challenges self = plugin.challenges();
-        if (self != null) self.add(shooter, Element.AQUA, 1);
+        if (self != null) self.add(shooter, Element.ICE, 1);
     }
 
     private void add(Player player, Element expected, double amount) {
@@ -126,7 +133,22 @@ public class Challenges implements Listener {
     public void onKill(EntityDeathEvent event) {
         LivingEntity victim = event.getEntity();
         Player killer = victim.getKiller();
-        if (killer == null || victim.getFireTicks() <= 0) return;
-        add(killer, Element.FIRE, 1);
+        if (killer == null) return;
+        if (victim.getFireTicks() > 0) {
+            add(killer, Element.FIRE, 1);
+        }
+        if (killer.getLocation().getBlock().getLightLevel() <= 7) {
+            add(killer, Element.SHADOW, 1); // Lights Out
+        }
+    }
+
+    /** High Noon: damage dealt while standing in direct sunlight. */
+    @EventHandler(ignoreCancelled = true)
+    public void onSunlitHit(org.bukkit.event.entity.EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player attacker)) return;
+        if (!Shards.isShard(attacker.getInventory().getItemInOffHand())) return;
+        if (!attacker.getWorld().isDayTime()) return;
+        if (attacker.getLocation().getBlock().getLightFromSky() < 15) return;
+        add(attacker, Element.LIGHT, event.getFinalDamage());
     }
 }

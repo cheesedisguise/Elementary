@@ -39,7 +39,10 @@ public class PassiveTask extends BukkitRunnable {
                 case WATER -> water(player, data);
                 case FIRE -> fire(player, data);
                 case AIR -> air(player, data);
-                case AQUA -> aqua(player, data);
+                case ICE -> ice(player, data);
+                case SHADOW -> shadow(player, data);
+                case LIGHT -> light(player, data);
+                case LIGHTNING -> { /* Static lives in CombatListener */ }
             }
         }
     }
@@ -96,7 +99,25 @@ public class PassiveTask extends BukkitRunnable {
         }
     }
 
-    private void aqua(Player player, PlayerData data) {
+    private void ice(Player player, PlayerData data) {
         // movement passive lives in CatchTheRainbow; nothing timed here
+    }
+
+    private void shadow(Player player, PlayerData data) {
+        // Umbra: quick in the dark (backstab lives in CombatListener)
+        if (player.getLocation().getBlock().getLightLevel() <= 7) {
+            give(player, PotionEffectType.SPEED, 0);
+        }
+    }
+
+    private void light(Player player, PlayerData data) {
+        // Lumen: permanent night vision, regeneration in sunlight
+        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,
+                400, 0, true, false, false));
+        boolean day = player.getWorld().isDayTime();
+        boolean openSky = player.getLocation().getBlock().getLightFromSky() >= 15;
+        if (day && (openSky || data.tier >= 2)) {
+            give(player, PotionEffectType.REGENERATION, 0);
+        }
     }
 }

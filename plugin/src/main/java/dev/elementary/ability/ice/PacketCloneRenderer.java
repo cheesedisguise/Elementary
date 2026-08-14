@@ -1,4 +1,4 @@
-package dev.elementary.ability.aqua;
+package dev.elementary.ability.ice;
 
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;

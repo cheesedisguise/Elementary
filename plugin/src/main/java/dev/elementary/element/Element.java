@@ -8,8 +8,11 @@ public enum Element {
     WATER("Water", NamedTextColor.AQUA, 1011, 1012, false),
     FIRE("Fire", NamedTextColor.RED, 1021, 1022, false),
     AIR("Air", NamedTextColor.WHITE, 1031, 1032, false),
-    /** Player-bound one-of-one kit (aqudr). Never in the random pool. */
-    AQUA("Aqua", TextColor.color(0x6FD9F2), 1041, 1042, true);
+    /** In the pool for everyone; aqudr is bound to it and always spawns with it. */
+    ICE("Ice", TextColor.color(0x6FD9F2), 1041, 1042, false),
+    SHADOW("Shadow", TextColor.color(0xC0404E), 1051, 1052, false),
+    LIGHT("Light", TextColor.color(0xFFF3A8), 1061, 1062, false),
+    LIGHTNING("Lightning", TextColor.color(0xFFE21F), 1071, 1072, false);
 
     private final String displayName;
     private final TextColor color;

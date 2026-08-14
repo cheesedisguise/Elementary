@@ -1,4 +1,4 @@
-package dev.elementary.ability.aqua;
+package dev.elementary.ability.ice;
 
 import dev.elementary.ElementaryPlugin;
 import dev.elementary.ability.Ability;

@@ -2,7 +2,7 @@ name: Elementary
 version: "0.1.0"
 main: dev.elementary.ElementaryPlugin
 api-version: "1.21"
-description: Elemental shards - four elements plus the player-bound Aqua Shard.
+description: Elemental shards - eight elements; aqudr always spawns with Ice.
 softdepend: [packetevents]
 commands:
   info:

@@ -20,7 +20,8 @@ import org.bukkit.inventory.PlayerInventory;
 /** Assignment, re-issue, promotion and demotion. */
 public class ShardService {
     private static final List<Element> POOL =
-            List.of(Element.EARTH, Element.WATER, Element.FIRE, Element.AIR);
+            List.of(Element.EARTH, Element.WATER, Element.FIRE, Element.AIR,
+                    Element.ICE, Element.SHADOW, Element.LIGHT, Element.LIGHTNING);
 
     private final ElementaryPlugin plugin;
 

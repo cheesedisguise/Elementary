@@ -12,8 +12,14 @@
       { "threshold": 1022, "model": { "type": "minecraft:model", "model": "elementary:item/fire_shard_tier2" } },
       { "threshold": 1031, "model": { "type": "minecraft:model", "model": "elementary:item/air_shard_tier1" } },
       { "threshold": 1032, "model": { "type": "minecraft:model", "model": "elementary:item/air_shard_tier2" } },
-      { "threshold": 1041, "model": { "type": "minecraft:model", "model": "elementary:item/aqua_shard_tier1" } },
-      { "threshold": 1042, "model": { "type": "minecraft:model", "model": "elementary:item/aqua_shard_tier2" } }
+      { "threshold": 1041, "model": { "type": "minecraft:model", "model": "elementary:item/ice_shard_tier1" } },
+      { "threshold": 1042, "model": { "type": "minecraft:model", "model": "elementary:item/ice_shard_tier2" } },
+      { "threshold": 1051, "model": { "type": "minecraft:model", "model": "elementary:item/shadow_shard_tier1" } },
+      { "threshold": 1052, "model": { "type": "minecraft:model", "model": "elementary:item/shadow_shard_tier2" } },
+      { "threshold": 1061, "model": { "type": "minecraft:model", "model": "elementary:item/light_shard_tier1" } },
+      { "threshold": 1062, "model": { "type": "minecraft:model", "model": "elementary:item/light_shard_tier2" } },
+      { "threshold": 1071, "model": { "type": "minecraft:model", "model": "elementary:item/lightning_shard_tier1" } },
+      { "threshold": 1072, "model": { "type": "minecraft:model", "model": "elementary:item/lightning_shard_tier2" } }
     ]
   }
 }

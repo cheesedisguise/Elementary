@@ -10,26 +10,24 @@ python3 gen_textures.py
 
 ## Contents
 
-- `assets/elementary/textures/item/` — 10 shard textures: 4 elements plus
-  the player-bound Aqua Shard (DESIGN.md §5), × 2 tiers.
+- `assets/elementary/textures/item/` — 16 shard textures: 8 elements × 2 tiers.
   Tier 1 (16×16) is the **vanilla amethyst shard** recoloured per element with
   a luminance gradient map (flat colours, vanilla facet shading). Tier 2
-  (24×24) is the **cut gem** transcribed from the project's reference art —
-  pale cut face, lit facet, Z-highlight sweep, dark drop edge. See
-  DESIGN.md §6.
-- `assets/elementary/textures/hud/` — 15 ability icons (DESIGN.md §3),
+  (32×32) is the tier 1 shard wrapped in a one-art-pixel glow outline of a
+  lighter tone of its own colour. See DESIGN.md §6.
+- `assets/elementary/textures/hud/` — 24 ability icons (DESIGN.md §3),
   rendered from `icons_svg/` as white-on-transparent 64×64 glyphs so the
   HUD can tint them per element and state. These become `elementary:hud`
   font glyphs when the Option B font HUD is built.
-- `icons_svg/` — the game-icons.net SVG sources for the 12 icons (see
+- `icons_svg/` — the game-icons.net SVG sources for the 24 icons (see
   credits below).
 - `vanilla/amethyst_shard.png` — the vanilla 1.21 amethyst shard texture
   (16×16), the recolour base for the tier 1 shards.
 - `assets/minecraft/items/amethyst_shard.json` — 1.21.4+ item model
   definition: `range_dispatch` on `custom_model_data` mapping
   1001/1002 (earth), 1011/1012 (water), 1021/1022 (fire), 1031/1032 (air),
-  1041/1042 (aqua) to the elementary models, falling back to the vanilla
-  shard.
+  1041/1042 (ice), 1051/1052 (shadow), 1061/1062 (light), 1071/1072
+  (lightning) to the elementary models, falling back to the vanilla shard.
 - `contact_sheet.png` — labelled preview of every texture, regenerated on
   each run.
 
@@ -62,6 +60,15 @@ licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
 | `shadow-follower` | Mirage | Lorc |
 | `frozen-orb` | Orbital Ice | Lorc |
 | `frozen-body` | Sub-Zero | [Delapouite](https://delapouite.com/) |
+| `teleport` | Shadowstep | Lorc |
+| `shadow-grasp` | Grasp | Lorc |
+| `eclipse-flare` | Eclipse | Lorc |
+| `beams-aura` | Flash | Lorc |
+| `sunbeams` | Sunspear | Lorc |
+| `sun` | Solar Flare | Lorc |
+| `lightning-arc` | Arc | Lorc |
+| `chain-lightning` | Chain Lightning | Willdabeast |
+| `heavy-lightning` | Supercell | Lorc |
 
 Keep this attribution with the pack when distributing it (the CC BY
 licence requires it — a link to this file from the server's pack listing

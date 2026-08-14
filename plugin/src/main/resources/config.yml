@@ -6,9 +6,9 @@
 # refuse them. Resolve the UUID once (e.g. https://mcuuid.net) and
 # paste it here.
 #
-# aqudr -> AQUA. Replace the placeholder below with aqudr's real UUID.
+# aqudr -> ICE. Replace the placeholder below with aqudr's real UUID.
 bound-players:
-  "00000000-0000-0000-0000-000000000000": AQUA
+  "00000000-0000-0000-0000-000000000000": ICE
 
 # Server-wide announcement when someone reaches tier 2.
 announce-ascension: true

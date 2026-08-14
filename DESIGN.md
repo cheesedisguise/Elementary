@@ -1,6 +1,6 @@
 # Elementary — Design Document
 
-> Paper 1.21.11 plugin. Every player is permanently bound to one of four elemental shards, granting a passive and two activatable abilities. Tier 2 is earned through an element-specific challenge or taken from a fallen player, and unlocks an ultimate.
+> Paper 1.21.11 plugin. Every player is permanently bound to an elemental shard, granting a passive and two activatable abilities. Tier 2 is earned through an element-specific challenge or taken from a fallen player, and unlocks an ultimate.
 
 This document is the source of truth. If code and this document disagree, the document wins — update it first, then the code.
 
@@ -10,7 +10,7 @@ This document is the source of truth. If code and this document disagree, the do
 
 ## 1. Core rules
 
-1. On first join, a player is assigned a **random element** and given their shard. Exception: **bound players** (config `bound-players`, UUID → element) skip the roll and always receive their bound element — `aqudr` gets the **Aqua Shard** 100% of the time (§5).
+1. On first join, a player is assigned a **random element** and given their shard. Exception: **bound players** (config `bound-players`, UUID → element) skip the roll and always receive their bound element — `aqudr` gets the **Ice Shard** 100% of the time (§5); bound elements stay in everyone else's pool.
 2. The shard is a **recoloured amethyst shard** with custom model data.
 3. The shard is **bound to its owner's UUID**. Nobody else can use it.
 4. Passives apply **only while the shard is held in the offhand**.
@@ -89,7 +89,10 @@ Icons are glyphs from **game-icons.net** (CC BY 3.0 — Lorc and Delapouite; att
 | Water | Tide Pull — `fishing-hook` | Thunderstorm — `lightning-storm` | Maelstrom — `ink-swirl` |
 | Fire | Fireball — `fireball` | Pyre — `fire-ring` | Meteor — `burning-meteor` |
 | Air | Updraft — `eruption` | Gale — `wind-slap` | Tempest — `tornado` |
-| Aqua *(player-bound)* | Mirage — `shadow-follower` | Orbital Ice — `frozen-orb` | Sub-Zero — `frozen-body` |
+| Ice | Mirage — `shadow-follower` | Orbital Ice — `frozen-orb` | Sub-Zero — `frozen-body` |
+| Shadow | Shadowstep — `teleport` | Grasp — `shadow-grasp` | Eclipse — `eclipse-flare` |
+| Light | Flash — `beams-aura` | Sunspear — `sunbeams` | Solar Flare — `sun` |
+| Lightning | Arc — `lightning-arc` | Chain Lightning — `chain-lightning` | Supercell — `heavy-lightning` |
 
 ---
 
@@ -111,7 +114,7 @@ Ability messages are **client-sided** — only the caster sees them. Nothing is 
 
 **Rules:**
 
-- Sent only to the caster, coloured to match the element (Earth green, Water aqua, Fire red, Air white)
+- Sent only to the caster, coloured to match the element
 - Nobody else ever receives an ability message — chat stays clean and abilities keep the element of surprise
 - No rate limiting needed: a successful cast cannot repeat inside its own cooldown, and failed casts never produce a chat line
 - Failed activations (on cooldown, wrong tier) send a private action-bar message only
@@ -120,7 +123,7 @@ Ability messages are **client-sided** — only the caster sees them. Nothing is 
 
 ---
 
-## 5. The four elements
+## 5. The elements
 
 **Every ability has a particle signature.** Ability messages are caster-only (§4), so particles and sound are the *public* language of a fight — the thing everyone else reads. Each ability below lists its signature. All of them use vanilla particle types only (they render for every client with no resource-pack support), and each effect should stay under ~200 particles per tick — loud payoffs, cheap idle loops.
 
@@ -241,11 +244,11 @@ Air's escape. Aim at a pursuer to push them off and rocket yourself clear in one
 
 ---
 
-### 🩵 Aqua Shard — player-bound
+### 🧊 Ice Shard
 
-*Ice blue over light blue. A one-of-one kit, bound to the player `aqudr`.*
+*Ice blue. Rain, mirrors and cold — and `aqudr` always spawns with it.*
 
-**Binding.** The Aqua Shard is not in the random pool. It's assigned through `bound-players` in the config (store `aqudr`'s **UUID**, not the name — names change). Every path that hands out a shard — first join, respawn re-issue, integrity check — gives `aqudr` Aqua, always. Nobody else can ever hold it: it can't be rolled, a Shard Trader can't produce it, and shards are UUID-locked anyway (§1). The item is named **Aqua Shard** at both tiers, custom model data 1041/1042 — an icier, lighter blue than Water so the two never read alike (§6).
+**Binding.** Ice rolls like any other element — anyone can get it. On top of that, `bound-players` in the config (store `aqudr`'s **UUID**, not the name — names change) pins specific players to it: every path that hands out a shard — first join, respawn re-issue, integrity check — gives `aqudr` Ice, 100% of the time, and a bound player's shard refuses Shard Traders (§8). The item is named **Ice Shard** at both tiers, custom model data 1041/1042 — an icier, lighter blue than Water so the two never read alike (§6).
 
 **Passive — Catch The Rainbow**
 - **In rain** — the world is raining and the sky above him is open — aqudr can **double jump**: one extra mid-air jump per airborne stretch, recharged on landing
@@ -278,6 +281,67 @@ Five ice pellets materialise and **orbit aqudr** — radius 1.5 blocks, one revo
 
 ---
 
+### ⬛ Shadow Shard
+
+*Super dark red. Ambush — strike from the dark.*
+
+**Passive — Umbra**
+- Speed I while in darkness (light level ≤ 7)
+- **Backstab** — +2 melee damage when striking from behind
+
+**Ability 1 (RMB) — Shadowstep** · 20s
+Teleport up to 8 blocks along your look direction (stops at walls). Invisibility for 2s after landing.
+
+*Particles:* dense `LARGE_SMOKE` and deep-red `DUST` bursts at both ends — the departure puff is the counterplay tell.
+
+**Ability 2 (⇧LMB) — Grasp** · 30s
+Shadow tendrils: every enemy within 5 blocks is rooted (Slowness V, 2s) and withered (Wither I, 4s).
+
+*Particles:* deep-red `DUST` tendrils climb each victim while `SQUID_INK` pools at their feet.
+
+---
+
+### 🟨 Light Shard
+
+*Pale gold. Reveal and punish.*
+
+**Passive — Lumen**
+- Permanent Night Vision
+- Regeneration I in direct sunlight
+- Melee attackers are flash-blinded for 1.5s (once per 3s per attacker)
+
+**Ability 1 (RMB) — Flash** · 20s
+A blinding burst: enemies within 6 blocks get Blindness 4s and Glowing 6s.
+
+*Particles:* a single `FLASH` with an `END_ROD` starburst.
+
+**Ability 2 (⇧LMB) — Sunspear** · 30s
+An instant lance of light, 20 blocks. First target struck takes 5 damage (7 if undead) and Glowing 8s.
+
+*Particles:* a clean `END_ROD` beam ending in a `FIREWORK` burst.
+
+---
+
+### ⚡ Lightning Shard
+
+*Electric yellow. Momentum and burst.*
+
+**Passive — Static**
+- Immune to lightning damage
+- Every 4th melee hit **discharges**: +2 damage and a spark burst
+
+**Ability 1 (RMB) — Arc** · 20s
+An instant electric arc, 16 blocks: first target takes 4 damage and Slowness II for 2s.
+
+*Particles:* a jittery `ELECTRIC_SPARK` beam that crackles rather than draws a line.
+
+**Ability 2 (⇧LMB) — Chain Lightning** · 35s
+Strike a target within 12 blocks for 5 damage, then chain to up to 3 more targets within 6 blocks of each hop, decaying 5 → 4 → 3 → 2.
+
+*Particles:* `ELECTRIC_SPARK` arcs drawn hop to hop, a flash at every node.
+
+---
+
 ## 6. Tier 2
 
 Two routes. Either finish your element's challenge, or take an Upgrader from someone you killed.
@@ -292,7 +356,10 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | **🟦 Water** | **Deep Current** — swim 1,000 blocks fully submerged without surfacing. Breaking the surface resets the attempt. |
 | **🟥 Fire** | **Kindling** — kill 50 entities while they are burning. |
 | **⬜ Air** | **Untouched Sky** — remain continuously airborne for 20 seconds using sneak-Slow Falling. Touching any block, including water, resets the timer. |
-| **🩵 Aqua** | **Hailstorm** — hit players or mobs with 100 Orbital Ice pellets. Misses don't count. |
+| **🧊 Ice** | **Hailstorm** — hit players or mobs with 100 Orbital Ice pellets. Misses don't count. |
+| **⬛ Shadow** | **Lights Out** — kill 40 entities in darkness (light level ≤ 7). |
+| **🟨 Light** | **High Noon** — deal 200 damage while standing in direct sunlight. |
+| **⚡ Lightning** | **Live Wire** — trigger 50 Static discharges. |
 
 ### Route 2 — The Upgrader
 
@@ -323,7 +390,10 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | **Water** | Regeneration II near water | Tide Pull hits up to 3 targets | Thunderstorm lasts 15s, 3 true damage |
 | **Fire** | Nether bonus applies everywhere at +1 | Fireball fires 3 in a spread | Pyre radius 5 → 8, adds Regeneration I to caster |
 | **Air** | Speed II | Updraft radius 6 → 9 | Gale cone 8 → 12 blocks, stronger recoil |
-| **Aqua** | Double jump gains a second charge (triple jump) during thunderstorms | Mirage cooldown 30s → 20s | Orbital Ice 5 → 7 pellets |
+| **Ice** | Double jump gains a second charge (triple jump) during thunderstorms | Mirage cooldown 30s → 20s | Orbital Ice 5 → 7 pellets |
+| **Shadow** | Backstab +2 → +4 | Shadowstep range 8 → 14 | Grasp radius 5 → 8 |
+| **Light** | Lumen regenerates in any daylight, not just open sky | Flash radius 6 → 9 | Sunspear pierces every target in the beam |
+| **Lightning** | Static discharges every 3rd hit | Arc slow 2s → 4s | Chain Lightning 3 → 5 hops |
 
 ### Item appearance across tiers
 
@@ -355,7 +425,10 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | Water | 1011 | 1012 |
 | Fire | 1021 | 1022 |
 | Air | 1031 | 1032 |
-| Aqua *(player-bound)* | 1041 | 1042 |
+| Ice | 1041 | 1042 |
+| Shadow | 1051 | 1052 |
+| Light | 1061 | 1062 |
+| Lightning | 1071 | 1072 |
 
 Leaving gaps between elements means a fifth element slots in without renumbering.
 
@@ -363,7 +436,7 @@ Leaving gaps between elements means a fifth element slots in without renumbering
 
 Reaching Tier 2 by **either** route grants a hidden purple advancement, a server-wide sound, and a chat announcement.
 
-**Five advancements, one per element:**
+**Eight advancements, one per element:**
 
 | Element | Advancement | Description |
 |---|---|---|
@@ -371,9 +444,12 @@ Reaching Tier 2 by **either** route grants a hidden purple advancement, a server
 | 🟦 Water | **Eye of the Storm** | Ascend to a tier 2 element Shard! |
 | 🟥 Fire | **Inferno** | Ascend to a tier 2 element Shard! |
 | ⬜ Air | **Skybound** | Ascend to a tier 2 element Shard! |
-| 🩵 Aqua | **Cold Front** | Ascend to a tier 2 element Shard! |
+| 🧊 Ice | **Cold Front** | Ascend to a tier 2 element Shard! |
+| ⬛ Shadow | **Nightfall** | Ascend to a tier 2 element Shard! |
+| 🟨 Light | **Enlightened** | Ascend to a tier 2 element Shard! |
+| ⚡ Lightning | **High Voltage** | Ascend to a tier 2 element Shard! |
 
-All five share the same description. Only the title and icon differ.
+All eight share the same description. Only the title and icon differ.
 
 **Advancement JSON** (`data/elementary/advancement/earth_ascension.json`):
 
@@ -495,12 +571,27 @@ True flight for 8s. Every enemy within 8 blocks is continuously lifted and takes
 
 *Particles:* a slow cyclone of `CLOUD` particles spirals around the flying caster; each lifted enemy stands in their own small `GUST` column, and the flight's end puffs a falling ring of cloud.
 
-### 🩵 Aqua — Sub-Zero
+### 🧊 Ice — Sub-Zero
 Every player and mob within a **10-block radius** is **flash-frozen for 2.5s**: encased in an ice shell, hoisted just off the ground and **held mid-air**, **frostbitten**, and **camera-locked** — they can't move, can't turn their view, and take **4 true damage** (2 hearts) on trigger. They **can still be hit** the whole time. The caster is unaffected.
 
 *Particles / visuals:* the shells are `BLOCK_DISPLAY` ice — display entities only, nothing real is placed (same rule as Cataclysm) — appearing with an ice `BLOCK` crack burst; on release every shell shatters in a `SNOWFLAKE` + ice-crack shower.
 
 *Implementation:* suspension = lift ~0.5 and zero velocity every tick; frostbite = `setFreezeTicks(max)` refreshed every tick, which gives the vanilla frost vignette and frozen hearts for free; camera lock = re-send position-and-look with pinned yaw/pitch each tick. The lock is deliberately oppressive — it's the ult — but keep it exactly 2.5s and never chain-apply it without the full cooldown between casts.
+
+### ⬛ Shadow — Eclipse
+An 8s, 9-block zone of darkness fixed at the cast point. Enemies inside get Darkness and Weakness II and take 1 damage per second; the caster, while inside, gains Strength II and Speed II.
+
+*Particles:* a `SQUID_INK` dome edge with deep-red `DUST` motes drifting through the interior.
+
+### 🟨 Light — Solar Flare
+Eight seconds of radiance: every second, enemies within 7 blocks take 2 damage and are revealed (Glowing 10s). The caster keeps Absorption II for the duration.
+
+*Particles:* expanding gold `DUST` rings under an `END_ROD` halo.
+
+### ⚡ Lightning — Supercell
+A personal storm for 8s: each second one random enemy within 10 blocks is struck by a visual bolt for 3 damage. The caster has Speed II throughout.
+
+*Particles:* vanilla lightning flashes beneath a crackling `CLOUD` cell that follows the caster.
 
 ---
 
@@ -510,7 +601,7 @@ Every player and mob within a **10-block radius** is **flash-frozen for 2.5s**: 
 - **Recipe:** 4 Amethyst Shard + 1 Ender Eye + 4 Gold Ingot
 - Right-click to reroll into a *different* random element at Tier 1. Consumed on use.
 - **Rerolling wipes Tier 2 and all challenge progress.**
-- **Can never produce Aqua**, and a bound player's shard (§5 — `aqudr`) refuses the reroll entirely; the trader is not consumed.
+- A bound player's shard (§5 — `aqudr`) refuses the reroll entirely; the trader is not consumed.
 
 ### Upgrader
 - **Not craftable.** Dropped by Tier 2 players on death (section 6) — a dying player's tier made physical.

@@ -1,4 +1,4 @@
-package dev.elementary.ability.aqua;
+package dev.elementary.ability.ice;
 
 import org.bukkit.Location;
 import org.bukkit.Material;

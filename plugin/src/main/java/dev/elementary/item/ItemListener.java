@@ -46,7 +46,8 @@ public class ItemListener implements Listener {
                 return;
             }
             List<Element> pool = new ArrayList<>(List.of(Element.EARTH, Element.WATER,
-                    Element.FIRE, Element.AIR));
+                    Element.FIRE, Element.AIR, Element.ICE, Element.SHADOW, Element.LIGHT,
+                    Element.LIGHTNING));
             pool.remove(data.element);
             Element next = pool.get(ThreadLocalRandom.current().nextInt(pool.size()));
             held.subtract();
