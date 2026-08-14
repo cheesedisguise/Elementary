@@ -363,7 +363,7 @@ Leaving gaps between elements means a fifth element slots in without renumbering
 
 Reaching Tier 2 by **either** route grants a hidden purple advancement, a server-wide sound, and a chat announcement.
 
-**Four advancements, one per element:**
+**Five advancements, one per element:**
 
 | Element | Advancement | Description |
 |---|---|---|
@@ -371,8 +371,9 @@ Reaching Tier 2 by **either** route grants a hidden purple advancement, a server
 | 🟦 Water | **Eye of the Storm** | Ascend to a tier 2 element Shard! |
 | 🟥 Fire | **Inferno** | Ascend to a tier 2 element Shard! |
 | ⬜ Air | **Skybound** | Ascend to a tier 2 element Shard! |
+| 🩵 Aqua | **Rainmaker** | Ascend to a tier 2 element Shard! |
 
-All four share the same description. Only the title and icon differ.
+All five share the same description. Only the title and icon differ.
 
 **Advancement JSON** (`data/elementary/advancement/earth_ascension.json`):
 
