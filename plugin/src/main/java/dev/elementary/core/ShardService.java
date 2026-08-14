@@ -105,13 +105,11 @@ public class ShardService {
         plugin.store().save();
         swapShard(player, data);
         player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f);
-        if (plugin.getConfig().getBoolean("announce-ascension", true)) {
-            Bukkit.broadcast(Component.text("\u2726 ", NamedTextColor.LIGHT_PURPLE)
-                    .append(player.displayName())
-                    .append(Component.text(" has ascended \u2014 ", NamedTextColor.LIGHT_PURPLE))
-                    .append(Component.text(data.element.displayName() + " Tier 2",
-                            data.element.color()).decorate(TextDecoration.BOLD)));
-        }
+        // no chat broadcast - ascension announces itself through the
+        // glowing shard, and the toast if the advancement datapack is in
+        player.sendMessage(Component.text("\u2726 Ascended \u2014 ", NamedTextColor.LIGHT_PURPLE)
+                .append(Component.text(data.element.displayName() + " Tier 2",
+                        data.element.color()).decorate(TextDecoration.BOLD)));
     }
 
     /** Reroll or exchange: become this element at tier 1, fresh progress. */

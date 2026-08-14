@@ -79,7 +79,7 @@ The only way to freely position a number above an icon is a **custom font with n
 
 You already need a pack for the shard textures, so this is incremental. It is fiddly to align — expect to iterate on `ascent` and `height` values.
 
-**Build Option A now, Option B once the pack exists.** Keep the HUD behind an interface so swapping is a one-file change.
+**Option B is built and is the default** (`hud-style: font`); Option A survives as the `bossbar` fallback for clients without the pack, and `off` disables the HUD. The font is `elementary:hud`: icons on U+E000+, tall digits floating the cooldown above each icon, space glyphs for pixel alignment.
 
 ### Icon assignments
 
@@ -121,7 +121,7 @@ Ability messages are **client-sided** — only the caster sees them. Nothing is 
 - No rate limiting needed: a successful cast cannot repeat inside its own cooldown, and failed casts never produce a chat line
 - Failed activations (on cooldown, wrong tier) send a private action-bar message only
 - Toggleable per player with `/info` → settings, and globally in `config.yml`
-- The Tier 2 ascension announcement (section 6) is a separate system and stays server-wide — that one is meant to be public
+- Ascension is quiet in chat too: the ascending player gets a personal line and the toast (if the advancement datapack is installed); nothing is broadcast
 
 ---
 
@@ -439,7 +439,7 @@ Leaving gaps between elements means a fifth element slots in without renumbering
 
 ### The Tier 2 advancement
 
-Reaching Tier 2 by **either** route grants a hidden purple advancement, a server-wide sound, and a chat announcement.
+Reaching Tier 2 by **either** route grants a hidden purple advancement and its toast. Nothing is announced in chat — the glowing shard is the public tell.
 
 **Eight advancements, one per element:**
 

@@ -1,0 +1,245 @@
+{
+  "providers": [
+    {
+      "type": "space",
+      "advances": {
+        "\ue100": -1,
+        "\ue101": -2,
+        "\ue102": -4,
+        "\ue103": -8,
+        "\ue104": -16,
+        "\ue105": -32,
+        "\ue108": 1,
+        "\ue109": 2,
+        "\ue10a": 4,
+        "\ue10b": 8,
+        "\ue10c": 16
+      }
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/digits.png",
+      "height": 18,
+      "ascent": 17,
+      "chars": [
+        "0123456789"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_tremor.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue000"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_bulwark.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue001"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_cataclysm.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue002"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_tide_pull.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue003"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_thunderstorm.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue004"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_maelstrom.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue005"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_fireball.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue006"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_pyre.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue007"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_meteor.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue008"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_updraft.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue009"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_gale.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue00a"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_tempest.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue00b"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_mirage.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue00c"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_orbital_ice.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue00d"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_subzero.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue00e"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_flash.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue00f"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_sunspear.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue010"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_solar_flare.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue011"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_shadowstep.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue012"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_grasp.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue013"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_eclipse.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue014"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_arc.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue015"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_chain_lightning.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue016"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_supercell.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue017"
+      ]
+    }
+  ]
+}

@@ -10,9 +10,6 @@
 bound-players:
   "00000000-0000-0000-0000-000000000000": ICE
 
-# Server-wide announcement when someone reaches tier 2.
-announce-ascension: true
-
 # Ability messages are always caster-only; this just turns the default
 # on or off for new players (each player can /info toggle).
 ability-messages-default: true
@@ -22,3 +19,9 @@ ability-messages-default: true
 # classes - no extra plugin needed. "stands" falls back to armour-stand
 # mannequins.
 mirage-clones: players
+
+# Ability HUD style. "font" (default) draws the ability icons above the
+# hotbar with the remaining cooldown floating on top of each icon -
+# requires the resource pack. "bossbar" is the pack-free fallback bar;
+# "off" disables the HUD.
+hud-style: font

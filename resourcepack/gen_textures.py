@@ -164,7 +164,68 @@ def render_icon(svg_name):
     svg = svg.replace('fill="#000"', 'fill="#ffffff"')
     png = cairosvg.svg2png(bytestring=svg.encode(),
                            output_width=ICON_SIZE, output_height=ICON_SIZE)
-    return Image.open(io.BytesIO(png)).convert("RGBA")
+    img = Image.open(io.BytesIO(png)).convert("RGBA")
+    img.load()[ICON_SIZE - 1, ICON_SIZE - 1] = (255, 255, 255, 1)
+    return img
+
+
+# ------------------------------------------------------------------- font
+# The elementary:hud font powers the action-bar HUD: every ability icon
+# on a private-use codepoint, ASCII digits redrawn tall so cooldown
+# numbers sit ABOVE the icons, and space glyphs for pixel positioning.
+# Icon codepoints, in ICONS order starting at U+E000 - keep HudFont.java
+# in the plugin in sync with this list.
+DIGITS = {
+    "0": ["01110","10001","10011","10101","11001","10001","01110"],
+    "1": ["00100","01100","00100","00100","00100","00100","01110"],
+    "2": ["01110","10001","00001","00010","00100","01000","11111"],
+    "3": ["11111","00010","00100","00010","00001","10001","01110"],
+    "4": ["00010","00110","01010","10010","11111","00010","00010"],
+    "5": ["11111","10000","11110","00001","00001","10001","01110"],
+    "6": ["00110","01000","10000","11110","10001","10001","01110"],
+    "7": ["11111","00001","00010","00100","01000","01000","01000"],
+    "8": ["01110","10001","10001","01110","10001","10001","01110"],
+    "9": ["01110","10001","10001","01111","00001","00010","01100"],
+}
+
+
+def write_digits():
+    """60x18 atlas: ten 6x18 cells, digit pixels in the top 7 rows so a
+    17-ascent glyph floats the number above a 7-ascent icon."""
+    img = Image.new("RGBA", (60, 18), (0, 0, 0, 0))
+    px = img.load()
+    for i, ch in enumerate("0123456789"):
+        cell = i * 6
+        for y, row in enumerate(DIGITS[ch]):
+            for x, bit in enumerate(row):
+                if bit == "1":
+                    px[cell + x, y] = (255, 255, 255, 255)
+        # near-invisible pixel pins every advance to a uniform 6px
+        px[cell + 4, 17] = (255, 255, 255, 1)
+    img.save(os.path.join(HUD_DIR, "digits.png"))
+
+
+def write_font():
+    import json
+    advances = {}
+    for i, width in enumerate([1, 2, 4, 8, 16, 32]):
+        advances[chr(0xE100 + i)] = -width
+    for i, width in enumerate([1, 2, 4, 8, 16]):
+        advances[chr(0xE108 + i)] = width
+    providers = [
+        {"type": "space", "advances": advances},
+        {"type": "bitmap", "file": "elementary:hud/digits.png",
+         "height": 18, "ascent": 17, "chars": ["0123456789"]},
+    ]
+    for i, name in enumerate(ICONS):
+        providers.append({"type": "bitmap",
+                          "file": f"elementary:hud/{name}.png",
+                          "height": 16, "ascent": 7,
+                          "chars": [chr(0xE000 + i)]})
+    font_dir = os.path.join(HERE, "assets", "elementary", "font")
+    os.makedirs(font_dir, exist_ok=True)
+    with open(os.path.join(font_dir, "hud.json"), "w") as f:
+        json.dump({"providers": providers}, f, indent=2)
 
 
 # ------------------------------------------------------------------- main
@@ -213,9 +274,12 @@ def main():
         tile.alpha_composite(big, (off, off))
         sheet.alpha_composite(tile, (gx + pad, gy + pad))
         draw.text((gx + pad, gy + pad + tile_px + 2), name, fill=c("#c8cdd8"))
+    write_digits()
+    write_font()
+
     sheet_path = os.path.join(HERE, "contact_sheet.png")
     sheet.save(sheet_path)
-    print(f"wrote {len(out)} textures + {sheet_path}")
+    print(f"wrote {len(out)} textures + digits + font + {sheet_path}")
 
 
 if __name__ == "__main__":
