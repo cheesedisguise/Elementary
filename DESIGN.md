@@ -603,6 +603,13 @@ A personal storm for 8s: each second one random enemy within 10 blocks is struck
 - **Rerolling wipes Tier 2 and all challenge progress.**
 - A bound player's shard (§5 — `aqudr`) refuses the reroll entirely; the trader is not consumed.
 
+### Shard Broker
+- **Recipe:** 4 Diamonds in the corners, 4 Gold Ingots on the sides, and a Barrel in the centre. The result is an **enchanted barrel** — glint on, named.
+- Right-click to open the exchange and **choose your element** — no gamble. Clicking an element rerolls you into it at Tier 1 and consumes the Broker. Closing the menu without choosing costs nothing.
+- Same rules as any reroll: **wipes Tier 2 and all challenge progress**, your current element can't be re-picked, and a bound player's shard (§5 — `aqudr`) refuses the exchange.
+
+> The Trader is the cheap gamble; the Broker is the expensive certainty. Diamonds buy you the right to stop rolling.
+
 ### Upgrader
 - **Not craftable.** Dropped by Tier 2 players on death (section 6) — a dying player's tier made physical.
 - Right-click while holding your shard to promote it to Tier 2.

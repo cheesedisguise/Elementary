@@ -16,9 +16,11 @@ import org.bukkit.inventory.ItemStack;
 
 public class ItemListener implements Listener {
     private final ElementaryPlugin plugin;
+    private final BrokerMenu brokerMenu;
 
-    public ItemListener(ElementaryPlugin plugin) {
+    public ItemListener(ElementaryPlugin plugin, BrokerMenu brokerMenu) {
         this.plugin = plugin;
+        this.brokerMenu = brokerMenu;
     }
 
     @EventHandler
@@ -38,6 +40,13 @@ public class ItemListener implements Listener {
             }
             held.subtract();
             plugin.shards().promote(player);
+        } else if (Items.isBroker(held)) {
+            event.setCancelled(true);
+            if (plugin.shards().boundElement(player.getUniqueId()) != null) {
+                Msg.fail(player, "Your shard refuses the trade");
+                return;
+            }
+            brokerMenu.open(player);
         } else if (Items.isTrader(held)) {
             event.setCancelled(true);
             PlayerData data = plugin.shards().dataFor(player);
@@ -51,21 +60,7 @@ public class ItemListener implements Listener {
             pool.remove(data.element);
             Element next = pool.get(ThreadLocalRandom.current().nextInt(pool.size()));
             held.subtract();
-            data.element = next;
-            data.tier = 1;
-            data.challengeProgress = 0;
-            data.challengeMilestone = 0;
-            plugin.store().save();
-            // replace the shard item to match
-            for (int i = 0; i < player.getInventory().getSize(); i++) {
-                if (dev.elementary.shard.Shards.isShard(player.getInventory().getItem(i))) {
-                    player.getInventory().setItem(i, null);
-                }
-            }
-            if (dev.elementary.shard.Shards.isShard(player.getInventory().getItemInOffHand())) {
-                player.getInventory().setItemInOffHand(null);
-            }
-            plugin.shards().reissue(player);
+            plugin.shards().applyElement(player, next);
             player.sendMessage(net.kyori.adventure.text.Component
                     .text("The trade is made: ", net.kyori.adventure.text.format
                             .NamedTextColor.GRAY)

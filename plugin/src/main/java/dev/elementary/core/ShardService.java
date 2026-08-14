@@ -115,6 +115,25 @@ public class ShardService {
         }
     }
 
+    /** Reroll or exchange: become this element at tier 1, fresh progress. */
+    public void applyElement(Player player, Element element) {
+        PlayerData data = dataFor(player);
+        data.element = element;
+        data.tier = 1;
+        data.challengeProgress = 0;
+        data.challengeMilestone = 0;
+        plugin.store().save();
+        for (int i = 0; i < player.getInventory().getSize(); i++) {
+            if (dev.elementary.shard.Shards.isShard(player.getInventory().getItem(i))) {
+                player.getInventory().setItem(i, null);
+            }
+        }
+        if (dev.elementary.shard.Shards.isShard(player.getInventory().getItemInOffHand())) {
+            player.getInventory().setItemInOffHand(null);
+        }
+        reissue(player);
+    }
+
     /** Death demotion: tier 2 collapses back to a raw shard. */
     public void demote(Player player) {
         PlayerData data = dataFor(player);

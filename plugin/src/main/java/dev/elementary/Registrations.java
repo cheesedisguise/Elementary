@@ -33,6 +33,7 @@ import dev.elementary.command.AdminCommand;
 import dev.elementary.command.InfoCommand;
 import dev.elementary.core.LockdownListener;
 import dev.elementary.element.Element;
+import dev.elementary.item.BrokerMenu;
 import dev.elementary.item.ItemListener;
 import dev.elementary.item.Items;
 import dev.elementary.listener.CombatListener;
@@ -111,7 +112,9 @@ final class Registrations {
         pm.registerEvents(new MirageSyncListener(plugin, mirage), plugin);
         pm.registerEvents(challenges, plugin);
         pm.registerEvents(new TierListener(plugin), plugin);
-        pm.registerEvents(new ItemListener(plugin), plugin);
+        BrokerMenu brokerMenu = new BrokerMenu(plugin);
+        pm.registerEvents(brokerMenu, plugin);
+        pm.registerEvents(new ItemListener(plugin, brokerMenu), plugin);
 
         new PassiveTask(plugin).runTaskTimer(plugin, 20, 20);
 
