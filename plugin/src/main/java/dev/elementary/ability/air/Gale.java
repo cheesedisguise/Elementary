@@ -21,26 +21,28 @@ public class Gale implements Ability {
     @Override
     public boolean cast(Player caster, int tier) {
         double length = tier >= 2 ? 12 : 8;
-        Vector dir = caster.getLocation().getDirection().setY(0).normalize();
+        // fully directional: the cone follows the exact look vector, so
+        // aiming down rocket-jumps you and aiming up slams you to earth
+        Vector dir = caster.getEyeLocation().getDirection().normalize();
         for (LivingEntity target : caster.getLocation().getNearbyLivingEntities(length)) {
             if (target.equals(caster)) continue;
-            Vector to = target.getLocation().toVector()
-                    .subtract(caster.getLocation().toVector());
+            Vector to = target.getEyeLocation().toVector()
+                    .subtract(caster.getEyeLocation().toVector());
             if (to.lengthSquared() < 0.01) continue;
             if (to.clone().normalize().angle(dir) > Math.toRadians(30)) continue;
             double push = tier >= 2 ? 2.0 : 1.6;
-            target.setVelocity(dir.clone().multiply(push).setY(0.45));
+            target.setVelocity(dir.clone().multiply(push).add(new Vector(0, 0.12, 0)));
             target.damage(2, caster);
             target.addPotionEffect(new PotionEffect(PotionEffectType.NAUSEA, 60, 0));
         }
-        // the recoil: launched hard away from where they aimed
+        // the recoil: launched hard opposite to wherever they aimed
         double recoil = tier >= 2 ? 1.7 : 1.3;
-        caster.setVelocity(dir.clone().multiply(-recoil).setY(0.55));
+        caster.setVelocity(dir.clone().multiply(-recoil).add(new Vector(0, 0.15, 0)));
         caster.setFallDistance(0);
         for (int ray = -2; ray <= 2; ray++) {
             Vector spread = dir.clone().rotateAroundY(Math.toRadians(ray * 12));
             for (double d = 1; d < length; d += 0.8) {
-                org.bukkit.Location at = caster.getLocation().clone().add(0, 1, 0)
+                org.bukkit.Location at = caster.getEyeLocation().clone()
                         .add(spread.clone().multiply(d));
                 caster.getWorld().spawnParticle(Particle.CLOUD, at, 1, 0.1, 0.1, 0.1, 0.02);
                 if (ray == 0 && d < 4) {

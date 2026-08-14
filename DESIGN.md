@@ -242,7 +242,7 @@ A cone of wind 8 blocks long and 60° wide in the aimed direction:
 
 *Particles:* the cone sweeps visibly with `GUST` and streaking `CLOUD` particles out to its full length; the caster's recoil pops a white `SWEEP_ATTACK` flash and leaves a short cloud wake.
 
-Air's escape. Aim at a pursuer to push them off and rocket yourself clear in one motion. Aim at the ground to launch upward.
+Air's escape, fully directional: the cone follows your exact aim, including pitch. Aim at a pursuer to push them off and rocket yourself clear in one motion; aim at the ground to rocket-jump; aim at the sky to slam yourself back down.
 
 ---
 
