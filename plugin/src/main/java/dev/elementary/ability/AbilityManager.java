@@ -30,13 +30,24 @@ public class AbilityManager implements Listener {
 
     public Kit kit(Element element) { return kits.get(element); }
 
+    private final Map<java.util.UUID, Integer> handledTick = new java.util.HashMap<>();
+
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
-        // interact events fire once per hand; only act on the main-hand one
-        if (event.getHand() != null
-                && event.getHand() != org.bukkit.inventory.EquipmentSlot.HAND) return;
         Player player = event.getPlayer();
-        if (!Shards.isShard(player.getInventory().getItemInMainHand())) return;
+        // the shard casts from either hand
+        if (!Shards.isShard(player.getInventory().getItemInMainHand())
+                && !Shards.isShard(player.getInventory().getItemInOffHand())) return;
+        // interact fires once per hand - handle one cast per tick
+        Integer last = handledTick.put(player.getUniqueId(),
+                org.bukkit.Bukkit.getCurrentTick());
+        if (last != null && last == org.bukkit.Bukkit.getCurrentTick()) {
+            Action repeat = event.getAction();
+            if (repeat == Action.RIGHT_CLICK_AIR || repeat == Action.RIGHT_CLICK_BLOCK) {
+                event.setCancelled(true);
+            }
+            return;
+        }
         Action action = event.getAction();
         boolean right = action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK;
         boolean left = action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK;

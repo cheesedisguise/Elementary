@@ -56,20 +56,25 @@ public class HudTask extends BukkitRunnable implements org.bukkit.event.Listener
     }
 
     private boolean fontFor(Player player) {
-        if ("font-force".equalsIgnoreCase(style)) return true;
-        return packLoaded.contains(player.getUniqueId());
+        // "font" always sends glyphs; "auto" waits for the client to
+        // confirm the server pack and boss-bars everyone else
+        if ("auto".equalsIgnoreCase(style)) {
+            return packLoaded.contains(player.getUniqueId());
+        }
+        return true;
     }
 
     @Override
     public void run() {
         if ("off".equalsIgnoreCase(style)) return;
+        // the HUD is always on - every player has an element, whatever
+        // hand (or pocket) the shard is in
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            boolean holding = Shards.isShard(player.getInventory().getItemInMainHand());
             if ("bossbar".equalsIgnoreCase(style) || !fontFor(player)) {
-                bossbar(player, holding);
+                bossbar(player, true);
             } else {
                 bossbar(player, false); // hide any lingering bar
-                if (holding) player.sendActionBar(fontLine(player));
+                player.sendActionBar(fontLine(player));
             }
         }
     }
