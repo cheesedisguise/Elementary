@@ -13,7 +13,7 @@ This document is the source of truth. If code and this document disagree, the do
 1. On first join, a player is assigned a **random element** and given their shard. Exception: **bound players** (config `bound-players`, UUID → element) skip the roll and always receive their bound element — `aqudr` gets the **Ice Shard** 100% of the time (§5); bound elements stay in everyone else's pool.
 2. The shard is a **recoloured amethyst shard** with custom model data.
 3. The shard is **bound to its owner's UUID**. Nobody else can use it.
-4. Passives apply **only while the shard is held in the offhand**.
+4. Passives and abilities apply **only while the shard is held in the main hand**.
 5. Abilities are on **individual cooldowns**. No shared energy resource.
 6. **Shards cannot be dropped, stored, traded, or lost.** They are returned automatically on respawn.
 7. A player has exactly one shard at a time.
@@ -37,7 +37,7 @@ On respawn, verify the player still holds their shard. If not, silently re-issue
 
 | Input | Result |
 |---|---|
-| Shard in offhand | Passive active |
+| Shard in main hand | Passive active |
 | Right-click | **Ability 1** |
 | Sneak + left-click | **Ability 2** |
 | Sneak + right-click | **Ultimate** (Tier 2 only) |
@@ -61,7 +61,7 @@ One BossBar per ability slot, stacked vertically at the top of the screen.
 - **Title:** the ability's icon glyph, plus remaining seconds when on cooldown
 - **Progress:** fills from 0 → 1 as the cooldown recharges, so the bar *is* the timer
 - **Colour:** green when ready, red while recharging
-- Show only while the shard is in the offhand; hide otherwise
+- Show only while the shard is in the main hand; hide otherwise
 
 This is maybe 80 lines and works with no resource pack at all (fall back to `◆ ▲ ✦` style symbols until the pack exists).
 

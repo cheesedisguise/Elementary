@@ -28,7 +28,7 @@ public class HudTask extends BukkitRunnable {
     @Override
     public void run() {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            boolean holding = Shards.isShard(player.getInventory().getItemInOffHand());
+            boolean holding = Shards.isShard(player.getInventory().getItemInMainHand());
             BossBar bar = bars.get(player.getUniqueId());
             if (!holding) {
                 if (bar != null) {

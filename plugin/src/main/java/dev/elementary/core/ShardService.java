@@ -72,14 +72,10 @@ public class ShardService {
                 found = true;
             }
         }
-        ItemStack off = inv.getItemInOffHand();
-        if (Shards.isShard(off)) {
-            found = true;
-        }
         if (!found) {
             ItemStack shard = Shards.create(data.element, player.getUniqueId(), data.tier);
-            if (off.getType().isAir()) {
-                inv.setItemInOffHand(shard);
+            if (inv.getItemInMainHand().getType().isAir()) {
+                inv.setItemInMainHand(shard);
             } else {
                 inv.addItem(shard);
             }
@@ -92,8 +88,8 @@ public class ShardService {
             if (Shards.isShard(item)) return;
         }
         ItemStack shard = Shards.create(data.element, player.getUniqueId(), data.tier);
-        if (player.getInventory().getItemInOffHand().getType().isAir()) {
-            player.getInventory().setItemInOffHand(shard);
+        if (player.getInventory().getItemInMainHand().getType().isAir()) {
+            player.getInventory().setItemInMainHand(shard);
         } else {
             player.getInventory().addItem(shard);
         }
@@ -153,9 +149,9 @@ public class ShardService {
                 return;
             }
         }
-        ItemStack off = inv.getItemInOffHand();
-        if (Shards.isShard(off)) {
-            inv.setItemInOffHand(Shards.create(data.element, player.getUniqueId(), data.tier));
+        ItemStack main = inv.getItemInMainHand();
+        if (Shards.isShard(main)) {
+            inv.setItemInMainHand(Shards.create(data.element, player.getUniqueId(), data.tier));
         }
     }
 }

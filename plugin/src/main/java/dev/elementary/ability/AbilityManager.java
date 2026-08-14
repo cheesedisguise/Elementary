@@ -32,8 +32,11 @@ public class AbilityManager implements Listener {
 
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
+        // interact events fire once per hand; only act on the main-hand one
+        if (event.getHand() != null
+                && event.getHand() != org.bukkit.inventory.EquipmentSlot.HAND) return;
         Player player = event.getPlayer();
-        if (!Shards.isShard(player.getInventory().getItemInOffHand())) return;
+        if (!Shards.isShard(player.getInventory().getItemInMainHand())) return;
         Action action = event.getAction();
         boolean right = action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK;
         boolean left = action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK;

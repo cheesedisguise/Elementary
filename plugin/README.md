@@ -21,6 +21,6 @@ ability messages), `/broker <player> <shard>` (admin: set anyone's
 element), `/elementary set <player> <element> <1|2>` and
 `/elementary reload` (admin).
 
-Inputs, offhand shard required: RMB = ability 1, sneak+LMB = ability 2,
+Inputs, shard in the main hand: RMB = ability 1, sneak+LMB = ability 2,
 sneak+RMB = ultimate (Tier 2). Orbital Ice pellets fire on plain left
 click while the ring is up.

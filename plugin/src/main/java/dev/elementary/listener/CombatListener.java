@@ -22,7 +22,7 @@ public class CombatListener implements Listener {
     }
 
     private PlayerData holdingData(Player player) {
-        if (!Shards.isShard(player.getInventory().getItemInOffHand())) return null;
+        if (!Shards.isShard(player.getInventory().getItemInMainHand())) return null;
         return plugin.shards().dataFor(player);
     }
 

@@ -77,7 +77,9 @@ final class Registrations {
         abilities.register(Element.AIR,
                 new AbilityManager.Kit(updraft, gale, tempest));
 
-        boolean packets = pm.getPlugin("packetevents") != null;
+        boolean packetsWanted = "packets".equalsIgnoreCase(
+                plugin.getConfig().getString("mirage-clones", "stands"));
+        boolean packets = packetsWanted && pm.getPlugin("packetevents") != null;
         Mirage mirage = new Mirage(plugin, null);
         Mirage.CloneRenderer renderer = packets
                 ? new PacketCloneRenderer(plugin, mirage)

@@ -47,22 +47,27 @@ public class PacketCloneRenderer implements Mirage.CloneRenderer {
                 new PacketListenerAbstract(PacketListenerPriority.NORMAL) {
                     @Override
                     public void onPacketReceive(PacketReceiveEvent event) {
-                        if (event.getPacketType() != PacketType.Play.Client.INTERACT_ENTITY) {
-                            return;
+                        try {
+                            if (event.getPacketType()
+                                    != PacketType.Play.Client.INTERACT_ENTITY) {
+                                return;
+                            }
+                            WrapperPlayClientInteractEntity wrapper =
+                                    new WrapperPlayClientInteractEntity(event);
+                            if (wrapper.getAction()
+                                    != WrapperPlayClientInteractEntity.InteractAction.ATTACK) {
+                                return;
+                            }
+                            int id = wrapper.getEntityId();
+                            Player attacker = (Player) event.getPlayer();
+                            plugin.getServer().getScheduler().runTask(plugin, () -> {
+                                Mirage mirage = mirageAccessor != null ? mirageAccessor
+                                        : plugin.mirage();
+                                if (mirage != null) mirage.handleHit(attacker, id);
+                            });
+                        } catch (Throwable ignored) {
+                            // never let a wrapper decode failure into the pipeline
                         }
-                        WrapperPlayClientInteractEntity wrapper =
-                                new WrapperPlayClientInteractEntity(event);
-                        if (wrapper.getAction()
-                                != WrapperPlayClientInteractEntity.InteractAction.ATTACK) {
-                            return;
-                        }
-                        int id = wrapper.getEntityId();
-                        Player attacker = (Player) event.getPlayer();
-                        plugin.getServer().getScheduler().runTask(plugin, () -> {
-                            Mirage mirage = mirageAccessor != null ? mirageAccessor
-                                    : plugin.mirage();
-                            if (mirage != null) mirage.handleHit(attacker, id);
-                        });
                     }
                 });
     }

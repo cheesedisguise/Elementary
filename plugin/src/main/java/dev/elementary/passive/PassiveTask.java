@@ -29,7 +29,7 @@ public class PassiveTask extends BukkitRunnable {
     @Override
     public void run() {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            boolean holding = Shards.isShard(player.getInventory().getItemInOffHand());
+            boolean holding = Shards.isShard(player.getInventory().getItemInMainHand());
             PlayerData data = plugin.shards().dataFor(player);
             applyEarthHealth(player, holding && data.element == dev.elementary.element.Element.EARTH
                     ? (data.tier >= 2 ? 6.0 : 4.0) : 0.0);
