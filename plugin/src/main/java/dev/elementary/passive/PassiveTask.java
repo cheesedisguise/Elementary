@@ -41,7 +41,7 @@ public class PassiveTask extends BukkitRunnable {
                 case ICE -> ice(player, data);
                 case SHADOW -> shadow(player, data);
                 case LIGHT -> light(player, data);
-                case LIGHTNING -> { /* Static lives in CombatListener */ }
+                case LIGHTNING -> lightning(player, data);
             }
         }
     }
@@ -106,6 +106,34 @@ public class PassiveTask extends BukkitRunnable {
         // Umbra: quick in the dark (backstab lives in CombatListener)
         if (player.getLocation().getBlock().getLightLevel() <= 7) {
             give(player, PotionEffectType.SPEED, 0);
+        }
+    }
+
+    private final java.util.Map<java.util.UUID, org.bukkit.util.Vector> lastPos =
+            new java.util.HashMap<>();
+    private final java.util.Map<java.util.UUID, Long> lastMoved = new java.util.HashMap<>();
+    private final java.util.Map<java.util.UUID, Integer> momentum = new java.util.HashMap<>();
+
+    /** Momentum: moving builds Speed, standing still for 2s drains it. */
+    private void lightning(Player player, PlayerData data) {
+        org.bukkit.util.Vector now = player.getLocation().toVector().setY(0);
+        org.bukkit.util.Vector previous = lastPos.put(player.getUniqueId(), now);
+        long ms = System.currentTimeMillis();
+        boolean moved = previous != null && previous.distanceSquared(now) > 0.06;
+        if (moved) {
+            lastMoved.put(player.getUniqueId(), ms);
+            int stacks = Math.min(3, momentum.merge(player.getUniqueId(), 1, Integer::sum));
+            momentum.put(player.getUniqueId(), stacks);
+            give(player, PotionEffectType.SPEED, stacks - 1);
+            if (stacks >= 2) {
+                player.getWorld().spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
+                        player.getLocation().add(0, 0.2, 0), 2, 0.2, 0.05, 0.2, 0.01);
+            }
+        } else if (ms - lastMoved.getOrDefault(player.getUniqueId(), 0L) > 2000) {
+            momentum.remove(player.getUniqueId());
+        } else {
+            int stacks = momentum.getOrDefault(player.getUniqueId(), 0);
+            if (stacks > 0) give(player, PotionEffectType.SPEED, stacks - 1);
         }
     }
 

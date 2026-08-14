@@ -331,6 +331,9 @@ An instant lance of light, 20 blocks. First target struck takes 5 damage (7 if u
 **Passive — Static**
 - Immune to lightning damage
 - Every 4th melee hit **discharges**: +2 damage and a spark burst
+- **Momentum** — moving builds Speed, one step per second up to Speed III; stand still for 2 seconds and it drains away
+
+*Particles:* faint `ELECTRIC_SPARK` crackle at the feet while Momentum is charged.
 
 **Ability 1 (RMB) — Arc** · 20s
 An instant electric arc, 16 blocks: first target takes 4 damage and Slowness II for 2s.
