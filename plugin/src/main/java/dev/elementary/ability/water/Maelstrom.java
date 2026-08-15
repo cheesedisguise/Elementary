@@ -55,14 +55,18 @@ public class Maelstrom implements Ability {
                 center.getWorld().spawnParticle(Particle.NAUTILUS, edge, 0,
                         inward.getX(), inward.getY(), inward.getZ(), 0.6);
 
+                // a firm current, not a tractor beam: sprint-jumping
+                // outward beats it at the rim, the centre is the trap
                 for (LivingEntity target : center.getNearbyLivingEntities(radius)) {
                     if (!dev.elementary.util.Targets.hostile(caster, target)) continue;
                     Vector pull = center.toVector().subtract(target.getLocation().toVector());
                     double dist = Math.max(pull.length(), 0.5);
-                    target.setVelocity(target.getVelocity()
-                            .add(pull.normalize().multiply(Math.min(0.55, 2.5 / dist))));
+                    if (ticks % 2 == 0) {
+                        target.setVelocity(target.getVelocity()
+                                .add(pull.normalize().multiply(Math.min(0.26, 1.3 / dist))));
+                    }
                     target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,
-                            30, 2, true, false));
+                            30, 1, true, false));
                     if (ticks % 20 == 0) {
                         TrueDamage.apply(target, 1, caster);
                         target.getWorld().spawnParticle(Particle.BUBBLE_POP,

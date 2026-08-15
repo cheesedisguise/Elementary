@@ -70,7 +70,7 @@ public class FireballAbility implements Ability, Listener {
             if (shooter != null && !dev.elementary.util.Targets.hostile(shooter, target)) {
                 continue;
             }
-            target.damage(6, shooter);
+            target.damage(5, shooter);
             target.setFireTicks(Math.max(target.getFireTicks(), 60));
         }
     }

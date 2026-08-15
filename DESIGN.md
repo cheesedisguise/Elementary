@@ -90,12 +90,12 @@ Icons are glyphs from **game-icons.net** (CC BY 3.0 — Lorc and Delapouite; att
 
 | Element | Ability 1 | Ability 2 | Ultimate |
 |---|---|---|---|
-| Earth | Tremor — `quake-stomp` | Bulwark — `stone-wall` | Cataclysm — `spiky-explosion` |
+| Earth | Fissure — `quake-stomp` | Bulwark — `stone-wall` | Cataclysm — `spiky-explosion` |
 | Water | Tide Pull — `fishing-hook` | Healing Spring — `waterfall` | Maelstrom — `ink-swirl` |
 | Fire | Fireball — `fireball` | Pyre — `fire-ring` | Meteor — `burning-meteor` |
 | Air | Updraft — `eruption` | Gale — `wind-slap` | Tempest — `tornado` |
 | Ice | Frozen Over — `frozen-ring` | Orbital Ice — `frozen-orb` | Sub-Zero — `frozen-body` |
-| Shadow | Shadowstep — `teleport` | Grasp — `shadow-grasp` | Eclipse — `eclipse-flare` |
+| Shadow | Shadowstep — `teleport` | Mark for Death — `human-target` | Eclipse — `eclipse-flare` |
 | Light | Sunspear — `sunbeams` | Consecrate — `beams-aura` | Solar Flare — `sun` |
 | Lightning | Volt Rush — `sonic-lightning` | Overcharge — `lightning-slashes` | Supercell — `heavy-lightning` |
 
@@ -138,13 +138,14 @@ Ability messages are **client-sided** — only the caster sees them. Nothing is 
 
 **Passive — Stoneskin**
 - +4 max health (2 extra hearts)
-- Haste I while standing on stone, deepslate, or dirt-family blocks
 - Fall damage reduced by 50%
+- **Unshakeable** — 60% knockback resistance while standing on stone, deepslate, or dirt-family blocks. Rooted like the ground itself: hits that send others flying barely rock you
+- **Stone plates** — go 5 seconds without taking damage and Absorption armour (2 amber hearts) grows over you; it shatters when struck and regrows in the calm
 
-**Ability 1 (RMB) — Tremor** · 25s
-Ground slam. Enemies within 6 blocks are launched upward, take 4 damage, and get Slowness II for 4s. Does not affect the caster.
+**Ability 1 (RMB) — Fissure** · 20s
+Punch the ground: a **crack races 12 blocks along your aim** — fast, directional, climbing slopes and dying at cliff edges. Anyone standing over it as it passes is **erupted**: launched upward, 5 damage, Slowness II. Tremor's launch, made into a skill shot you aim.
 
-*Particles:* an expanding ground ring of stone `BLOCK` crack particles racing from the caster to the 6-block edge, with a burst of dust kicked up under each launched enemy.
+*Particles:* the ground splits open in **its own material** — each step of the crack bursts `BLOCK` particles of whatever block it crosses, with stone-break crunches racing along the line and a final eruption where it ends.
 
 **Ability 2 (⇧LMB) — Bulwark** · 35s
 Summons a 5-wide × 3-tall stone wall 3 blocks in front of the player. The wall **continuously repositions to face wherever the caster looks**, orbiting them at a fixed 3-block distance. It blocks projectiles and bodies.
@@ -188,18 +189,18 @@ Enemies standing in it get nothing. Tide Pull is the rescue rope — yank a woun
 
 **Passive — Emberheart**
 - Full fire and lava immunity
-- Melee attacks ignite the target for 3s
-- +2 damage dealt while in the Nether
+- Melee attacks ignite the target for 2s
+- +1 damage dealt while in the Nether
 
 **Ability 1 (RMB) — Fireball** · 20s
-Explosive projectile. 6 damage, 1.5-block blast, ignites on hit. **Does not break blocks.**
+Explosive projectile. 5 damage, 1.5-block blast, ignites on hit. **Does not break blocks.**
 
 *Particles:* a `FLAME` + `LAVA` spark trail in flight; the blast is a single `EXPLOSION` followed by a shower of ember-orange `DUST`.
 
 **Ability 2 (⇧LMB) — Pyre** · 30s
 Ignites a 5-block-radius ring of flame at the caster's feet that **stays there for 10s**. It does not follow the caster.
 
-- **Caster inside:** Strength I and Speed I
+- **Caster inside:** Speed I — quickness to hold the ground, not a duel steroid
 - **Enemies inside:** 1 damage per second and set alight
 - Visual flame only — no real fire blocks, no spread
 
@@ -295,14 +296,26 @@ Five ice pellets materialise and **orbit aqudr** — radius 1.5 blocks, one revo
 - **Backstab** — +2 melee damage when striking from behind
 
 **Ability 1 (RMB) — Shadowstep** · 20s
-Teleport up to 8 blocks along your look direction (stops at walls). Invisibility for 2s after landing.
+Two steps in one:
+
+- **Aimed at prey** (a target within 10 blocks): you step **directly behind them**, arriving facing their back, knife-ready — the backstab is served by positioning
+- **Aimed at nothing:** the classic blink — up to 8 blocks along your look direction, stopping at walls
+
+Either way, Invisibility for 2s after landing.
 
 *Particles:* dense `LARGE_SMOKE` and deep-red `DUST` bursts at both ends — the departure puff is the counterplay tell.
 
-**Ability 2 (⇧LMB) — Grasp** · 30s
-Shadow tendrils: every enemy within 5 blocks is rooted (Slowness V, 2s) and withered (Wither I, 4s).
+**Ability 2 (⇧LMB) — Mark for Death** · 25s
+Pick your prey: aim at a player or mob within 20 blocks. For 8 seconds they are **marked**:
 
-*Particles:* deep-red `DUST` tendrils climb each victim while `SQUID_INK` pools at their feet.
+- **Revealed** — Glowing, visible through walls, a dark-red sigil circling their head
+- **Your backstab bonus against them doubles** (+4; +8 at Tier 2)
+- You gain Speed I for the hunt
+- **If the mark dies while it burns, Shadowstep's cooldown resets on the spot**
+
+The assassin's loop, mechanised: mark → step behind → knife → vanish → next victim.
+
+*Particles / sound:* the elder-guardian curse toll when the mark lands; a slow ring of deep-red `DUST` orbits the victim's head until it expires.
 
 ---
 
@@ -421,12 +434,12 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 
 | Element | Passive | Ability 1 | Ability 2 |
 |---|---|---|---|
-| **Earth** | +6 max health; Resistance I on stone | Tremor radius 6 → 9, adds 3s root | Bulwark travels 25 blocks, 6 damage |
+| **Earth** | +6 max health; Unshakeable 60% → 90%; plates become Absorption II | Fissure length 12 → 18; erupted enemies are rooted 2s | Bulwark travels 25 blocks, 6 damage |
 | **Water** | Regeneration II near water | Tide Pull hits up to 3 targets | Healing Spring radius 4 → 6, adds Absorption |
 | **Fire** | Nether bonus applies everywhere at +1 | Fireball fires 3 in a spread | Pyre radius 5 → 8, adds Regeneration I to caster |
 | **Air** | Speed II | Updraft radius 6 → 9 | Gale cone 8 → 12 blocks, stronger recoil |
 | **Ice** | Double jump gains a second charge (triple jump) during thunderstorms | Frozen Over lasts 8s → 12s; the cold seeps up — enemies on the ice are chilled | Orbital Ice 5 → 7 pellets |
-| **Shadow** | Backstab +2 → +4 | Shadowstep range 8 → 14 | Grasp radius 5 → 8 |
+| **Shadow** | Backstab +2 → +4 | Shadowstep range 8 → 14 (behind-blink 10 → 16) | Mark lasts 8s → 12s |
 | **Light** | Lumen regenerates in any daylight, not just open sky | Sunspear pierces every target in the beam | Consecrate radius 6 → 8 |
 | **Lightning** | Static discharges every 3rd hit | Volt Rush range 7 → 10 | Overcharge forks to 2 extra targets per hit |
 
@@ -592,7 +605,7 @@ Stone spikes erupt in a 10-block radius. 8 damage, enemies rooted 3s, caster gai
 *Particles:* every spike erupts through a geyser of stone `BLOCK` crack particles; one `EXPLOSION_EMITTER` at the epicentre, and rooted enemies shed a slow drip of dust for the root duration.
 
 ### 🟦 Water — Maelstrom
-A whirlpool at the caster's position for 6s, 12-block radius. Enemies inside are pulled continuously toward the centre, given Slowness III, and take drowning damage regardless of water.
+A whirlpool at the caster's position for 6s, 12-block radius. Enemies inside are dragged toward the centre — **a firm current, not a tractor beam**: sprint-jumping outward beats it near the rim, but the centre is the trap. Slowness II inside, and drowning damage regardless of water.
 
 *Particles:* **a spinning whirlpool around the player** — two helical arms of `SPLASH` and `BUBBLE_COLUMN_UP` particles rotating around the caster and tightening toward the centre, while `NAUTILUS` particles stream inward along the pull, so victims can read both the edge and the direction of the drag.
 

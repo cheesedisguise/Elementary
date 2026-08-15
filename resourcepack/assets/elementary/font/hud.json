@@ -27,7 +27,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_tremor.png",
+      "file": "elementary:hud/icon_fissure.png",
       "height": 16,
       "ascent": 7,
       "chars": [
@@ -198,7 +198,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_grasp.png",
+      "file": "elementary:hud/icon_mark_for_death.png",
       "height": 16,
       "ascent": 7,
       "chars": [

@@ -17,7 +17,7 @@ public final class HudFont {
     public static final int DIGIT_ADVANCE = 6;
 
     private static final Map<String, String> ICONS = Map.ofEntries(
-            Map.entry("Tremor", "\uE000"),
+            Map.entry("Fissure", "\uE000"),
             Map.entry("Bulwark", "\uE001"),
             Map.entry("Cataclysm", "\uE002"),
             Map.entry("Tide Pull", "\uE003"),
@@ -36,7 +36,7 @@ public final class HudFont {
             Map.entry("Sunspear", "\uE010"),
             Map.entry("Solar Flare", "\uE011"),
             Map.entry("Shadowstep", "\uE012"),
-            Map.entry("Grasp", "\uE013"),
+            Map.entry("Mark for Death", "\uE013"),
             Map.entry("Eclipse", "\uE014"),
             Map.entry("Volt Rush", "\uE015"),
             Map.entry("Overcharge", "\uE016"),

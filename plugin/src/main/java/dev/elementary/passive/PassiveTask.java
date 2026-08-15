@@ -20,10 +20,12 @@ public class PassiveTask extends BukkitRunnable {
 
     private final ElementaryPlugin plugin;
     private final NamespacedKey healthKey;
+    private final NamespacedKey rootedKey;
 
     public PassiveTask(ElementaryPlugin plugin) {
         this.plugin = plugin;
         this.healthKey = new NamespacedKey(plugin, "earth_health");
+        this.rootedKey = new NamespacedKey(plugin, "earth_rooted");
     }
 
     @Override
@@ -31,8 +33,12 @@ public class PassiveTask extends BukkitRunnable {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
             // passives are always on - the shard grants them by being yours
             PlayerData data = plugin.shards().dataFor(player);
-            applyEarthHealth(player, data.element == dev.elementary.element.Element.EARTH
-                    ? (data.tier >= 2 ? 6.0 : 4.0) : 0.0);
+            boolean earth = data.element == dev.elementary.element.Element.EARTH;
+            applyModifier(player, Attribute.MAX_HEALTH, healthKey,
+                    earth ? (data.tier >= 2 ? 6.0 : 4.0) : 0.0);
+            // Unshakeable: rooted like stone while standing on it
+            applyModifier(player, Attribute.KNOCKBACK_RESISTANCE, rootedKey,
+                    earth && onStone(player) ? (data.tier >= 2 ? 0.9 : 0.6) : 0.0);
             switch (data.element) {
                 case EARTH -> earth(player, data);
                 case WATER -> water(player, data);
@@ -50,31 +56,42 @@ public class PassiveTask extends BukkitRunnable {
         player.addPotionEffect(new PotionEffect(type, DURATION, amplifier, true, false, false));
     }
 
-    private void applyEarthHealth(Player player, double bonus) {
-        AttributeInstance attr = player.getAttribute(Attribute.MAX_HEALTH);
+    private void applyModifier(Player player, Attribute attribute, NamespacedKey key,
+                               double amount) {
+        AttributeInstance attr = player.getAttribute(attribute);
         if (attr == null) return;
         for (AttributeModifier mod : attr.getModifiers()) {
-            if (mod.getKey().equals(healthKey)) {
-                if (mod.getAmount() == bonus) return;
+            if (mod.getKey().equals(key)) {
+                if (mod.getAmount() == amount) return;
                 attr.removeModifier(mod);
             }
         }
-        if (bonus > 0) {
-            attr.addModifier(new AttributeModifier(healthKey, bonus,
+        if (amount > 0) {
+            attr.addModifier(new AttributeModifier(key, amount,
                     AttributeModifier.Operation.ADD_NUMBER));
         }
     }
 
-    private void earth(Player player, PlayerData data) {
-        Block below = player.getLocation().subtract(0, 1, 0).getBlock();
-        Material type = below.getType();
+    private boolean onStone(Player player) {
+        Material type = player.getLocation().subtract(0, 1, 0).getBlock().getType();
         String name = type.name();
-        boolean stony = org.bukkit.Tag.BASE_STONE_OVERWORLD.isTagged(type)
+        return org.bukkit.Tag.BASE_STONE_OVERWORLD.isTagged(type)
                 || org.bukkit.Tag.DIRT.isTagged(type)
                 || name.contains("DEEPSLATE") || name.contains("STONE");
-        if (stony) {
-            give(player, PotionEffectType.HASTE, 0);
-            if (data.tier >= 2) give(player, PotionEffectType.RESISTANCE, 0);
+    }
+
+    private final java.util.Map<java.util.UUID, Long> lastHurt = new java.util.HashMap<>();
+
+    /** CombatListener reports every hit a player takes. */
+    public void notePain(Player player) {
+        lastHurt.put(player.getUniqueId(), System.currentTimeMillis());
+    }
+
+    private void earth(Player player, PlayerData data) {
+        // stone plates: absorption armour that regrows after 5s unhurt
+        Long hurt = lastHurt.get(player.getUniqueId());
+        if (hurt == null || System.currentTimeMillis() - hurt > 5000) {
+            give(player, PotionEffectType.ABSORPTION, data.tier >= 2 ? 1 : 0);
         }
     }
 

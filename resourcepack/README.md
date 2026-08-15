@@ -45,7 +45,7 @@ licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
 
 | Icon | Used for | Author |
 |---|---|---|
-| `quake-stomp` | Tremor | [Lorc](https://lorcblog.blogspot.com/) |
+| `quake-stomp` | Fissure | [Lorc](https://lorcblog.blogspot.com/) |
 | `stone-wall` | Bulwark | [Delapouite](https://delapouite.com/) |
 | `spiky-explosion` | Cataclysm | Lorc |
 | `fishing-hook` | Tide Pull | Lorc |
@@ -61,7 +61,7 @@ licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
 | `frozen-orb` | Orbital Ice | Lorc |
 | `frozen-body` | Sub-Zero | [Delapouite](https://delapouite.com/) |
 | `teleport` | Shadowstep | Lorc |
-| `shadow-grasp` | Grasp | Lorc |
+| `human-target` | Mark for Death | Delapouite |
 | `eclipse-flare` | Eclipse | Lorc |
 | `beams-aura` | Consecrate | Lorc |
 | `sunbeams` | Sunspear | Lorc |

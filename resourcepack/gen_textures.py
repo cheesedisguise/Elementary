@@ -127,7 +127,7 @@ def glow_wrap(t1, glow_hex):
 # game-icons.net glyphs (CC BY 3.0). Keys are our texture names; values are
 # the icon name in icons_svg/ and its author for the credits list.
 ICONS = {
-    "icon_tremor": ("quake-stomp", "Lorc"),
+    "icon_fissure": ("quake-stomp", "Lorc"),
     "icon_bulwark": ("stone-wall", "Delapouite"),
     "icon_cataclysm": ("spiky-explosion", "Lorc"),
     "icon_tide_pull": ("fishing-hook", "Lorc"),
@@ -146,7 +146,7 @@ ICONS = {
     "icon_sunspear": ("sunbeams", "Lorc"),
     "icon_solar_flare": ("sun", "Lorc"),
     "icon_shadowstep": ("teleport", "Lorc"),
-    "icon_grasp": ("shadow-grasp", "Lorc"),
+    "icon_mark_for_death": ("human-target", "Delapouite"),
     "icon_eclipse": ("eclipse-flare", "Lorc"),
     "icon_volt_rush": ("sonic-lightning", "Lorc"),
     "icon_overcharge": ("lightning-slashes", "Lorc"),

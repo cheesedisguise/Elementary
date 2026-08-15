@@ -29,6 +29,14 @@ public class CombatListener implements Listener {
     private final java.util.Map<java.util.UUID, Integer> staticCharge =
             new java.util.HashMap<>();
 
+    /** Earth's stone plates listen for every wound. */
+    @EventHandler(ignoreCancelled = true)
+    public void onHurt(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player player) {
+            plugin.passives().notePain(player);
+        }
+    }
+
     /** Charged: lightning never hurts a Lightning player. */
     @EventHandler(ignoreCancelled = true)
     public void onLightning(EntityDamageEvent event) {
@@ -86,7 +94,12 @@ public class CombatListener implements Listener {
                     .subtract(attacker.getLocation().toVector()).setY(0);
             if (facing.lengthSquared() > 0.01 && toVictim.lengthSquared() > 0.01
                     && facing.normalize().dot(toVictim.normalize()) > 0.35) {
-                event.setDamage(event.getDamage() + (data.tier >= 2 ? 4.0 : 2.0));
+                double bonus = data.tier >= 2 ? 4.0 : 2.0;
+                // a marked victim takes the knife twice as deep
+                if (dev.elementary.ability.shadow.MarkForDeath.marked(victim, attacker)) {
+                    bonus *= 2;
+                }
+                event.setDamage(event.getDamage() + bonus);
                 victim.getWorld().spawnParticle(org.bukkit.Particle.CRIT,
                         victim.getEyeLocation(), 10, 0.2, 0.2, 0.2, 0.1);
             }
@@ -114,10 +127,10 @@ public class CombatListener implements Listener {
             }
         }
         if (data.element == Element.FIRE && event.getEntity() instanceof LivingEntity victim) {
-            victim.setFireTicks(Math.max(victim.getFireTicks(), 60));
+            victim.setFireTicks(Math.max(victim.getFireTicks(), 40));
             boolean nether = attacker.getWorld().getEnvironment() == World.Environment.NETHER;
             if (nether || data.tier >= 2) {
-                event.setDamage(event.getDamage() + (nether ? 2.0 : 1.0));
+                event.setDamage(event.getDamage() + 1.0);
             }
         }
     }

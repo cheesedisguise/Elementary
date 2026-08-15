@@ -5,6 +5,7 @@ import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -12,7 +13,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
-/** Vanish and reappear along your look direction. */
+/** Vanish and reappear along your look direction - or, aimed at prey,
+ *  directly at their back. */
 public class Shadowstep implements Ability {
     private final JavaPlugin plugin;
 
@@ -25,6 +27,31 @@ public class Shadowstep implements Ability {
     public boolean cast(Player caster, int tier) {
         double range = tier >= 2 ? 14 : 8;
         Vector dir = caster.getEyeLocation().getDirection();
+        // aimed at someone? step out of their shadow instead
+        double stalkRange = tier >= 2 ? 16 : 10;
+        RayTraceResult prey = caster.getWorld().rayTrace(caster.getEyeLocation(), dir,
+                stalkRange, FluidCollisionMode.NEVER, true, 0.9,
+                e -> e instanceof LivingEntity le
+                        && dev.elementary.util.Targets.hostile(caster, le));
+        if (prey != null && prey.getHitEntity() instanceof LivingEntity victim) {
+            Vector facing = victim.getLocation().getDirection().setY(0);
+            if (facing.lengthSquared() < 0.01) facing = new Vector(0, 0, 1);
+            Location behind = victim.getLocation().clone()
+                    .subtract(facing.clone().normalize().multiply(1.6));
+            if (behind.getBlock().getType().isSolid()) behind.add(0, 1, 0);
+            if (behind.getBlock().getType().isSolid()) behind = victim.getLocation().clone();
+            // arrive facing their back, knife-ready
+            behind.setYaw(victim.getLocation().getYaw());
+            behind.setPitch(0);
+            smoke(caster.getLocation());
+            caster.teleport(behind);
+            caster.setFallDistance(0);
+            smoke(behind);
+            caster.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 40, 0));
+            caster.getWorld().playSound(behind,
+                    org.bukkit.Sound.ENTITY_ENDERMAN_TELEPORT, 0.8f, 0.5f);
+            return true;
+        }
         RayTraceResult ray = caster.getWorld().rayTraceBlocks(caster.getEyeLocation(), dir,
                 range, FluidCollisionMode.NEVER, true);
         double distance = ray != null

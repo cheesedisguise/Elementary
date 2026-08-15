@@ -16,10 +16,10 @@ import dev.elementary.ability.lightning.VoltRush;
 import dev.elementary.ability.light.SolarFlare;
 import dev.elementary.ability.light.Sunspear;
 import dev.elementary.ability.shadow.Eclipse;
-import dev.elementary.ability.shadow.Grasp;
+import dev.elementary.ability.shadow.MarkForDeath;
 import dev.elementary.ability.shadow.Shadowstep;
 import dev.elementary.ability.earth.Cataclysm;
-import dev.elementary.ability.earth.Tremor;
+import dev.elementary.ability.earth.Fissure;
 import dev.elementary.ability.fire.FireballAbility;
 import dev.elementary.ability.fire.Meteor;
 import dev.elementary.ability.fire.Pyre;
@@ -51,11 +51,11 @@ final class Registrations {
 
         Items.init(plugin);
 
-        Tremor tremor = new Tremor(plugin);
+        Fissure fissure = new Fissure(plugin);
         Bulwark bulwark = new Bulwark(plugin);
         Cataclysm cataclysm = new Cataclysm(plugin);
         abilities.register(Element.EARTH,
-                new AbilityManager.Kit(tremor, bulwark, cataclysm));
+                new AbilityManager.Kit(fissure, bulwark, cataclysm));
 
         TidePull tidePull = new TidePull(plugin);
         HealingSpring healingSpring = new HealingSpring(plugin);
@@ -81,8 +81,9 @@ final class Registrations {
         abilities.register(Element.ICE,
                 new AbilityManager.Kit(frozenOver, orbitalIce, subZero));
 
+        MarkForDeath markForDeath = new MarkForDeath(plugin);
         abilities.register(Element.SHADOW, new AbilityManager.Kit(
-                new Shadowstep(plugin), new Grasp(plugin), new Eclipse(plugin)));
+                new Shadowstep(plugin), markForDeath, new Eclipse(plugin)));
         Sunspear sunspear = new Sunspear(plugin);
         Consecrate consecrate = new Consecrate(plugin);
         SolarFlare solarFlare = new SolarFlare(plugin);
@@ -104,6 +105,7 @@ final class Registrations {
         pm.registerEvents(orbitalIce, plugin);
         pm.registerEvents(consecrate, plugin);
         pm.registerEvents(solarFlare, plugin);
+        pm.registerEvents(markForDeath, plugin);
         pm.registerEvents(challenges, plugin);
         pm.registerEvents(new TierListener(plugin), plugin);
         BrokerMenu brokerMenu = new BrokerMenu(plugin);

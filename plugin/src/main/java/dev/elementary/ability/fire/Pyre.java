@@ -64,8 +64,8 @@ public class Pyre implements Ability {
                         boolean inside = target.getLocation().distance(center) <= radius;
                         if (!inside) continue;
                         if (target.equals(caster)) {
-                            caster.addPotionEffect(new PotionEffect(
-                                    PotionEffectType.STRENGTH, 30, 0, true, false));
+                            // territory, not a duel steroid: quickness
+                            // to hold the ground, no Strength
                             caster.addPotionEffect(new PotionEffect(
                                     PotionEffectType.SPEED, 30, 0, true, false));
                             if (tier >= 2) {
