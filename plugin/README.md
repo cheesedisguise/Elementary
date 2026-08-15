@@ -4,7 +4,7 @@ Paper 1.21.11 plugin implementing DESIGN.md. Build:
 
 ```
 cd plugin && gradle build
-# -> build/libs/elementary-0.1.0.jar
+# -> build/libs/elementary-2.0.0.jar
 ```
 
 Install the jar in `plugins/`, serve the `resourcepack/` folder (zipped)
@@ -13,8 +13,10 @@ as the server resource pack, and set aqudr's real UUID under
 are needed.
 
 Commands: `/info` (own shard, progress, cooldowns; `/info toggle` for
-ability messages), `/broker <player> <shard>` (admin: set anyone's
-element), `/elementary set <player> <element> <1|2>` and
+ability messages), `/trust [player]` and `/untrust <player>` (your ally
+list: harmful abilities spare allies, support includes them),
+`/broker <player> <shard>` (admin: set anyone's element),
+`/elementary set <player> <element> <1|2>` and
 `/elementary reload` (admin).
 
 Passives are always on and the HUD is always visible — it draws ability

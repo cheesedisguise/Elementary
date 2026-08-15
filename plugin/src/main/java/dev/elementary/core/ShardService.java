@@ -112,11 +112,11 @@ public class ShardService {
                         data.element.color()).decorate(TextDecoration.BOLD)));
     }
 
-    /** Reroll or exchange: become this element at tier 1, fresh progress. */
+    /** Reroll or exchange: swap element - your tier travels with you.
+     *  A new element means a new challenge, so progress restarts. */
     public void applyElement(Player player, Element element) {
         PlayerData data = dataFor(player);
         data.element = element;
-        data.tier = 1;
         data.challengeProgress = 0;
         data.challengeMilestone = 0;
         plugin.store().save();

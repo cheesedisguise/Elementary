@@ -19,6 +19,8 @@ public class ElementaryPlugin extends JavaPlugin {
     private ShardService shardService;
     private Cooldowns cooldowns;
     private AbilityManager abilities;
+    private dev.elementary.trust.TrustService trust;
+    private dev.elementary.passive.PassiveTask passives;
     private final Map<UUID, Element> boundPlayers = new HashMap<>();
 
     @Override
@@ -30,6 +32,8 @@ public class ElementaryPlugin extends JavaPlugin {
         shardService = new ShardService(this);
         cooldowns = new Cooldowns();
         abilities = new AbilityManager(this);
+        trust = new dev.elementary.trust.TrustService(this);
+        dev.elementary.util.Targets.init(trust);
 
         Registrations.registerAll(this);
 
@@ -41,6 +45,8 @@ public class ElementaryPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        // put every Pyre / Frozen Over floor back before we go
+        dev.elementary.util.GroundCover.restoreAllNow();
         if (store != null) store.save();
     }
 
@@ -67,5 +73,8 @@ public class ElementaryPlugin extends JavaPlugin {
     public ShardService shards() { return shardService; }
     public Cooldowns cooldowns() { return cooldowns; }
     public AbilityManager abilities() { return abilities; }
+    public dev.elementary.trust.TrustService trust() { return trust; }
+    public void setPassives(dev.elementary.passive.PassiveTask p) { this.passives = p; }
+    public dev.elementary.passive.PassiveTask passives() { return passives; }
     public Map<UUID, Element> boundPlayers() { return boundPlayers; }
 }

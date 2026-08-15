@@ -114,6 +114,15 @@ public class PassiveTask extends BukkitRunnable {
     private final java.util.Map<java.util.UUID, Long> lastMoved = new java.util.HashMap<>();
     private final java.util.Map<java.util.UUID, Integer> momentum = new java.util.HashMap<>();
 
+    /** Volt Rush connects: the meter snaps straight to full. */
+    public void maxMomentum(Player player) {
+        momentum.put(player.getUniqueId(), 3);
+        lastMoved.put(player.getUniqueId(), System.currentTimeMillis());
+        give(player, PotionEffectType.SPEED, 2);
+        player.getWorld().spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
+                player.getLocation().add(0, 0.2, 0), 12, 0.3, 0.1, 0.3, 0.05);
+    }
+
     /** Momentum: moving builds Speed, standing still for 2s drains it. */
     private void lightning(Player player, PlayerData data) {
         org.bukkit.util.Vector now = player.getLocation().toVector().setY(0);
@@ -145,6 +154,17 @@ public class PassiveTask extends BukkitRunnable {
         boolean openSky = player.getLocation().getBlock().getLightFromSky() >= 15;
         if (day && (openSky || data.tier >= 2)) {
             give(player, PotionEffectType.REGENERATION, 0);
+        }
+        // the harvest comes to the harvester: drops and XP drift over
+        org.bukkit.util.Vector to = player.getLocation().add(0, 0.6, 0).toVector();
+        for (org.bukkit.entity.Entity e : player.getNearbyEntities(6, 4, 6)) {
+            if (!(e instanceof org.bukkit.entity.Item)
+                    && !(e instanceof org.bukkit.entity.ExperienceOrb)) continue;
+            org.bukkit.util.Vector pull = to.clone().subtract(e.getLocation().toVector());
+            double dist = pull.length();
+            if (dist < 1.1) continue;
+            e.setVelocity(e.getVelocity().multiply(0.4)
+                    .add(pull.normalize().multiply(0.35)));
         }
     }
 }

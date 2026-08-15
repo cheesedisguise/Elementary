@@ -38,7 +38,9 @@ public class Supercell implements Ability {
                     List<LivingEntity> targets = new ArrayList<>();
                     for (LivingEntity target : caster.getLocation()
                             .getNearbyLivingEntities(10)) {
-                        if (!target.equals(caster)) targets.add(target);
+                        if (dev.elementary.util.Targets.hostile(caster, target)) {
+                            targets.add(target);
+                        }
                     }
                     if (!targets.isEmpty()) {
                         LivingEntity victim = targets.get(

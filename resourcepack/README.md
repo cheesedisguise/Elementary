@@ -49,7 +49,7 @@ licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
 | `stone-wall` | Bulwark | [Delapouite](https://delapouite.com/) |
 | `spiky-explosion` | Cataclysm | Lorc |
 | `fishing-hook` | Tide Pull | Lorc |
-| `lightning-storm` | Thunderstorm | Lorc |
+| `waterfall` | Healing Spring | Delapouite |
 | `ink-swirl` | Maelstrom | Lorc |
 | `fireball` | Fireball | Lorc |
 | `fire-ring` | Pyre | Lorc |
@@ -57,17 +57,17 @@ licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
 | `eruption` | Updraft | Lorc |
 | `wind-slap` | Gale | Lorc |
 | `tornado` | Tempest | Lorc |
-| `icicles-aura` | Frost Nova | Lorc |
+| `frozen-ring` | Frozen Over | Delapouite |
 | `frozen-orb` | Orbital Ice | Lorc |
 | `frozen-body` | Sub-Zero | [Delapouite](https://delapouite.com/) |
 | `teleport` | Shadowstep | Lorc |
 | `shadow-grasp` | Grasp | Lorc |
 | `eclipse-flare` | Eclipse | Lorc |
-| `beams-aura` | Flash | Lorc |
+| `beams-aura` | Consecrate | Lorc |
 | `sunbeams` | Sunspear | Lorc |
 | `sun` | Solar Flare | Lorc |
-| `lightning-arc` | Arc | Lorc |
-| `chain-lightning` | Chain Lightning | Willdabeast |
+| `sonic-lightning` | Volt Rush | Lorc |
+| `lightning-slashes` | Overcharge | Lorc |
 | `heavy-lightning` | Supercell | Lorc |
 
 Keep this attribution with the pack when distributing it (the CC BY

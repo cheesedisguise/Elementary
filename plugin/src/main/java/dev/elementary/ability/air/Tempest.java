@@ -58,7 +58,7 @@ public class Tempest implements Ability {
                 if (ticks % 20 == 0) {
                     for (LivingEntity target : caster.getLocation()
                             .getNearbyLivingEntities(8)) {
-                        if (target.equals(caster)) continue;
+                        if (!dev.elementary.util.Targets.hostile(caster, target)) continue;
                         target.setVelocity(target.getVelocity().clone().setY(
                                 Math.max(target.getVelocity().getY(), 0.45)));
                         target.damage(1, caster);

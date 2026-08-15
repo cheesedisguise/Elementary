@@ -5,14 +5,14 @@ import dev.elementary.ability.air.Gale;
 import dev.elementary.ability.air.Tempest;
 import dev.elementary.ability.air.Updraft;
 import dev.elementary.ability.ice.CatchTheRainbow;
-import dev.elementary.ability.ice.FrostNova;
+import dev.elementary.ability.ice.FrozenOver;
 import dev.elementary.ability.ice.OrbitalIce;
 import dev.elementary.ability.ice.SubZero;
 import dev.elementary.ability.earth.Bulwark;
-import dev.elementary.ability.light.Flash;
-import dev.elementary.ability.lightning.Arc;
-import dev.elementary.ability.lightning.ChainLightning;
+import dev.elementary.ability.light.Consecrate;
+import dev.elementary.ability.lightning.Overcharge;
 import dev.elementary.ability.lightning.Supercell;
+import dev.elementary.ability.lightning.VoltRush;
 import dev.elementary.ability.light.SolarFlare;
 import dev.elementary.ability.light.Sunspear;
 import dev.elementary.ability.shadow.Eclipse;
@@ -23,12 +23,13 @@ import dev.elementary.ability.earth.Tremor;
 import dev.elementary.ability.fire.FireballAbility;
 import dev.elementary.ability.fire.Meteor;
 import dev.elementary.ability.fire.Pyre;
+import dev.elementary.ability.water.HealingSpring;
 import dev.elementary.ability.water.Maelstrom;
-import dev.elementary.ability.water.Thunderstorm;
 import dev.elementary.ability.water.TidePull;
 import dev.elementary.command.AdminCommand;
 import dev.elementary.command.BrokerCommand;
 import dev.elementary.command.InfoCommand;
+import dev.elementary.command.TrustCommand;
 import dev.elementary.core.LockdownListener;
 import dev.elementary.element.Element;
 import dev.elementary.item.BrokerMenu;
@@ -57,10 +58,10 @@ final class Registrations {
                 new AbilityManager.Kit(tremor, bulwark, cataclysm));
 
         TidePull tidePull = new TidePull(plugin);
-        Thunderstorm thunderstorm = new Thunderstorm(plugin);
+        HealingSpring healingSpring = new HealingSpring(plugin);
         Maelstrom maelstrom = new Maelstrom(plugin);
         abilities.register(Element.WATER,
-                new AbilityManager.Kit(tidePull, thunderstorm, maelstrom));
+                new AbilityManager.Kit(tidePull, healingSpring, maelstrom));
 
         FireballAbility fireball = new FireballAbility(plugin);
         Pyre pyre = new Pyre(plugin);
@@ -74,18 +75,21 @@ final class Registrations {
         abilities.register(Element.AIR,
                 new AbilityManager.Kit(updraft, gale, tempest));
 
-        FrostNova frostNova = new FrostNova(plugin);
+        FrozenOver frozenOver = new FrozenOver(plugin);
         OrbitalIce orbitalIce = new OrbitalIce(plugin);
         SubZero subZero = new SubZero(plugin);
         abilities.register(Element.ICE,
-                new AbilityManager.Kit(frostNova, orbitalIce, subZero));
+                new AbilityManager.Kit(frozenOver, orbitalIce, subZero));
 
         abilities.register(Element.SHADOW, new AbilityManager.Kit(
                 new Shadowstep(plugin), new Grasp(plugin), new Eclipse(plugin)));
+        Sunspear sunspear = new Sunspear(plugin);
+        Consecrate consecrate = new Consecrate(plugin);
+        SolarFlare solarFlare = new SolarFlare(plugin);
         abilities.register(Element.LIGHT, new AbilityManager.Kit(
-                new Flash(plugin), new Sunspear(plugin), new SolarFlare(plugin)));
+                sunspear, consecrate, solarFlare));
         abilities.register(Element.LIGHTNING, new AbilityManager.Kit(
-                new Arc(plugin), new ChainLightning(plugin), new Supercell(plugin)));
+                new VoltRush(plugin), new Overcharge(plugin), new Supercell(plugin)));
 
         Challenges challenges = new Challenges(plugin);
         plugin.setChallenges(challenges);
@@ -94,23 +98,31 @@ final class Registrations {
         pm.registerEvents(abilities, plugin);
         pm.registerEvents(new CombatListener(plugin), plugin);
         pm.registerEvents(bulwark, plugin);
-        pm.registerEvents(thunderstorm, plugin);
         pm.registerEvents(fireball, plugin);
         pm.registerEvents(meteor, plugin);
         pm.registerEvents(new CatchTheRainbow(plugin), plugin);
         pm.registerEvents(orbitalIce, plugin);
+        pm.registerEvents(consecrate, plugin);
+        pm.registerEvents(solarFlare, plugin);
         pm.registerEvents(challenges, plugin);
         pm.registerEvents(new TierListener(plugin), plugin);
         BrokerMenu brokerMenu = new BrokerMenu(plugin);
         pm.registerEvents(brokerMenu, plugin);
         pm.registerEvents(new ItemListener(plugin, brokerMenu), plugin);
 
-        new PassiveTask(plugin).runTaskTimer(plugin, 20, 20);
+        PassiveTask passives = new PassiveTask(plugin);
+        plugin.setPassives(passives);
+        passives.runTaskTimer(plugin, 20, 20);
 
         plugin.getCommand("info").setExecutor(new InfoCommand(plugin));
         plugin.getCommand("elementary").setExecutor(new AdminCommand(plugin));
         BrokerCommand brokerCommand = new BrokerCommand(plugin);
         plugin.getCommand("broker").setExecutor(brokerCommand);
         plugin.getCommand("broker").setTabCompleter(brokerCommand);
+        TrustCommand trustCommand = new TrustCommand(plugin);
+        plugin.getCommand("trust").setExecutor(trustCommand);
+        plugin.getCommand("trust").setTabCompleter(trustCommand);
+        plugin.getCommand("untrust").setExecutor(trustCommand);
+        plugin.getCommand("untrust").setTabCompleter(trustCommand);
     }
 }

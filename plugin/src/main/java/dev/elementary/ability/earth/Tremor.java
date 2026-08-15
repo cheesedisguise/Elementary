@@ -23,7 +23,7 @@ public class Tremor implements Ability {
     public boolean cast(Player caster, int tier) {
         double radius = tier >= 2 ? 9 : 6;
         for (LivingEntity target : caster.getLocation().getNearbyLivingEntities(radius)) {
-            if (target.equals(caster)) continue;
+            if (!dev.elementary.util.Targets.hostile(caster, target)) continue;
             target.damage(4, caster);
             target.setVelocity(target.getVelocity().clone().setY(0.9));
             target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 80, 1));

@@ -45,7 +45,8 @@ public class TidePull implements Ability {
             if (tier >= 2) { // hits up to 3 targets: drag nearby company along
                 int extra = 0;
                 for (LivingEntity other : victim.getLocation().getNearbyLivingEntities(3)) {
-                    if (other.equals(caster) || other.equals(victim) || extra >= 2) continue;
+                    if (other.equals(victim) || extra >= 2
+                            || !dev.elementary.util.Targets.hostile(caster, other)) continue;
                     other.setVelocity(caster.getLocation().toVector()
                             .subtract(other.getLocation().toVector()).normalize()
                             .multiply(1.4).setY(0.4));

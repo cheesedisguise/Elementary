@@ -114,7 +114,7 @@ public class OrbitalIce implements Ability, Listener {
                         at.getWorld().spawnParticle(Particle.SNOWFLAKE, at, 2,
                                 0.05, 0.05, 0.05, 0.01);
                         for (LivingEntity target : at.getNearbyLivingEntities(0.9)) {
-                            if (target.equals(owner)) continue;
+                            if (!dev.elementary.util.Targets.hostile(owner, target)) continue;
                             TrueDamage.apply(target, 1, owner);
                             Challenges.pelletHit(plugin, owner);
                             impact(at);

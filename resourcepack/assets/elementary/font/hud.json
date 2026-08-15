@@ -63,7 +63,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_thunderstorm.png",
+      "file": "elementary:hud/icon_healing_spring.png",
       "height": 16,
       "ascent": 7,
       "chars": [
@@ -135,7 +135,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_frost_nova.png",
+      "file": "elementary:hud/icon_frozen_over.png",
       "height": 16,
       "ascent": 7,
       "chars": [
@@ -162,7 +162,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_flash.png",
+      "file": "elementary:hud/icon_consecrate.png",
       "height": 16,
       "ascent": 7,
       "chars": [
@@ -216,7 +216,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_arc.png",
+      "file": "elementary:hud/icon_volt_rush.png",
       "height": 16,
       "ascent": 7,
       "chars": [
@@ -225,7 +225,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_chain_lightning.png",
+      "file": "elementary:hud/icon_overcharge.png",
       "height": 16,
       "ascent": 7,
       "chars": [

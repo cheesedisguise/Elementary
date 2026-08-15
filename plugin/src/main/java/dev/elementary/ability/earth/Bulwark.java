@@ -138,7 +138,7 @@ public class Bulwark implements Ability, Listener {
             owner.getWorld().spawnParticle(Particle.BLOCK, center, 8, 2, 1, 0.3,
                     Material.STONE_BRICKS.createBlockData());
             for (LivingEntity target : center.getNearbyLivingEntities(2.6, 1.8, 2.6)) {
-                if (target.equals(owner)) continue;
+                if (!dev.elementary.util.Targets.hostile(owner, target)) continue;
                 target.setVelocity(direction.clone().multiply(1.1).setY(0.25));
                 if (!shoved.contains(target.getUniqueId())) {
                     shoved.add(target.getUniqueId());

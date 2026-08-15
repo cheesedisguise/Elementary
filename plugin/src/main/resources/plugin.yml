@@ -1,5 +1,5 @@
 name: Elementary
-version: "0.1.0"
+version: "2.0.0"
 main: dev.elementary.ElementaryPlugin
 api-version: "1.21"
 description: Elemental shards - eight elements; aqudr always spawns with Ice.
@@ -15,6 +15,12 @@ commands:
     description: Change any player's shard to a chosen element.
     usage: /broker <player> <shard>
     permission: elementary.admin
+  trust:
+    description: Treat a player as an ally - your abilities spare them, your support includes them.
+    usage: /trust [player]
+  untrust:
+    description: Remove a player from your ally list.
+    usage: /untrust <player>
 permissions:
   elementary.admin:
     default: op

@@ -67,7 +67,9 @@ public class FireballAbility implements Ability, Listener {
         at.getWorld().playSound(at, org.bukkit.Sound.ENTITY_GENERIC_EXPLODE, 1f, 1.1f);
         Player shooter = projectile.getShooter() instanceof Player p ? p : null;
         for (LivingEntity target : at.getNearbyLivingEntities(1.5 + 1.0)) {
-            if (target.equals(shooter)) continue;
+            if (shooter != null && !dev.elementary.util.Targets.hostile(shooter, target)) {
+                continue;
+            }
             target.damage(6, shooter);
             target.setFireTicks(Math.max(target.getFireTicks(), 60));
         }

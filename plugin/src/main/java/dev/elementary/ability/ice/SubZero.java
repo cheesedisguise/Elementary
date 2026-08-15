@@ -34,7 +34,7 @@ public class SubZero implements Ability {
     public boolean cast(Player caster, int tier) {
         List<LivingEntity> victims = new ArrayList<>();
         for (LivingEntity target : caster.getLocation().getNearbyLivingEntities(10)) {
-            if (!target.equals(caster)) victims.add(target);
+            if (dev.elementary.util.Targets.hostile(caster, target)) victims.add(target);
         }
         caster.getWorld().playSound(caster.getLocation(),
                 org.bukkit.Sound.BLOCK_GLASS_PLACE, 1.5f, 0.5f);

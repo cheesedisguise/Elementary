@@ -91,13 +91,15 @@ public class CombatListener implements Listener {
                         victim.getEyeLocation(), 10, 0.2, 0.2, 0.2, 0.1);
             }
         }
-        if (data.element == Element.LIGHTNING
+        if (data.element == Element.LIGHTNING && !discharging
                 && event.getEntity() instanceof LivingEntity victim
                 && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-            // Static: every 4th melee hit (3rd at tier 2) discharges
+            // Static: every 4th melee hit (3rd at tier 2) discharges.
+            // Overcharged, EVERY hit does - and each one arcs onward.
+            boolean overcharged = dev.elementary.ability.lightning.Overcharge.active(attacker);
             int threshold = data.tier >= 2 ? 3 : 4;
             int count = staticCharge.merge(attacker.getUniqueId(), 1, Integer::sum);
-            if (count >= threshold) {
+            if (overcharged || count >= threshold) {
                 staticCharge.put(attacker.getUniqueId(), 0);
                 event.setDamage(event.getDamage() + 2.0);
                 victim.getWorld().spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
@@ -105,6 +107,7 @@ public class CombatListener implements Listener {
                 victim.getWorld().playSound(victim.getLocation(),
                         org.bukkit.Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.5f, 2f);
                 plugin.challenges().staticDischarge(attacker);
+                if (overcharged) arcOnward(attacker, victim, data.tier);
             } else {
                 victim.getWorld().spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
                         victim.getEyeLocation(), 3, 0.2, 0.3, 0.2, 0.04);
@@ -116,6 +119,47 @@ public class CombatListener implements Listener {
             if (nether || data.tier >= 2) {
                 event.setDamage(event.getDamage() + (nether ? 2.0 : 1.0));
             }
+        }
+    }
+
+    private boolean discharging = false;
+
+    /** Overcharged hits jump to the victim's nearest neighbours. */
+    private void arcOnward(Player attacker, LivingEntity victim, int tier) {
+        int jumps = tier >= 2 ? 2 : 1;
+        java.util.List<LivingEntity> nearby = new java.util.ArrayList<>();
+        for (LivingEntity candidate : victim.getLocation().getNearbyLivingEntities(4)) {
+            if (candidate.equals(victim)
+                    || !dev.elementary.util.Targets.hostile(attacker, candidate)) continue;
+            nearby.add(candidate);
+        }
+        nearby.sort(java.util.Comparator.comparingDouble(
+                c -> c.getLocation().distanceSquared(victim.getLocation())));
+        discharging = true;
+        try {
+            for (LivingEntity next : nearby.subList(0, Math.min(jumps, nearby.size()))) {
+                sparkLine(victim.getEyeLocation().toVector(),
+                        next.getEyeLocation().toVector(), victim.getWorld());
+                next.damage(2.0, attacker);
+                next.getWorld().spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
+                        next.getEyeLocation(), 12, 0.3, 0.4, 0.3, 0.08);
+            }
+        } finally {
+            discharging = false;
+        }
+    }
+
+    private void sparkLine(org.bukkit.util.Vector from, org.bukkit.util.Vector to,
+                           World world) {
+        org.bukkit.util.Vector step = to.clone().subtract(from);
+        double length = step.length();
+        if (length < 0.01) return;
+        step.normalize().multiply(0.4);
+        org.bukkit.util.Vector cursor = from.clone();
+        for (double d = 0; d < length; d += 0.4) {
+            cursor.add(step);
+            world.spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
+                    cursor.toLocation(world), 1, 0.1, 0.1, 0.1, 0.01);
         }
     }
 }

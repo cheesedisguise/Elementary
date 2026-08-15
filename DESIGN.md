@@ -18,6 +18,7 @@ This document is the source of truth. If code and this document disagree, the do
 6. **Shards cannot be dropped, stored, traded, or lost.** They are returned automatically on respawn.
 7. A player has exactly one shard at a time.
 8. **No ability breaks or permanently places blocks.** Everything is entity-based or reverts.
+9. **Allies are chosen, not assumed.** `/trust <player>` marks an ally: your harmful abilities spare them, your supportive ones include them. Trust is **one-way and per-player** — their abilities still hit you until they trust you back. `/untrust` revokes it; deliberate melee swings are never filtered.
 
 ### Shard binding enforcement
 
@@ -43,8 +44,10 @@ On respawn, verify the player still holds their shard. If not, silently re-issue
 | Right-click | **Ability 1** |
 | Sneak + left-click | **Ability 2** |
 | Sneak + right-click | **Ultimate** (Tier 2 only) |
+| Hold right-click | **Charged abilities** (Sunspear) draw while held, fire on release |
 | `/info` | Your shard: element, tier, abilities, controls, challenge progress |
 | `/recipes` | Craftable items and their recipes |
+| `/trust`, `/untrust` | Manage your ally list (§1 rule 9) |
 
 ---
 
@@ -88,13 +91,13 @@ Icons are glyphs from **game-icons.net** (CC BY 3.0 — Lorc and Delapouite; att
 | Element | Ability 1 | Ability 2 | Ultimate |
 |---|---|---|---|
 | Earth | Tremor — `quake-stomp` | Bulwark — `stone-wall` | Cataclysm — `spiky-explosion` |
-| Water | Tide Pull — `fishing-hook` | Thunderstorm — `lightning-storm` | Maelstrom — `ink-swirl` |
+| Water | Tide Pull — `fishing-hook` | Healing Spring — `waterfall` | Maelstrom — `ink-swirl` |
 | Fire | Fireball — `fireball` | Pyre — `fire-ring` | Meteor — `burning-meteor` |
 | Air | Updraft — `eruption` | Gale — `wind-slap` | Tempest — `tornado` |
-| Ice | Frost Nova — `icicles-aura` | Orbital Ice — `frozen-orb` | Sub-Zero — `frozen-body` |
+| Ice | Frozen Over — `frozen-ring` | Orbital Ice — `frozen-orb` | Sub-Zero — `frozen-body` |
 | Shadow | Shadowstep — `teleport` | Grasp — `shadow-grasp` | Eclipse — `eclipse-flare` |
-| Light | Flash — `beams-aura` | Sunspear — `sunbeams` | Solar Flare — `sun` |
-| Lightning | Arc — `lightning-arc` | Chain Lightning — `chain-lightning` | Supercell — `heavy-lightning` |
+| Light | Sunspear — `sunbeams` | Consecrate — `beams-aura` | Solar Flare — `sun` |
+| Lightning | Volt Rush — `sonic-lightning` | Overcharge — `lightning-slashes` | Supercell — `heavy-lightning` |
 
 ---
 
@@ -154,7 +157,7 @@ Summons a 5-wide × 3-tall stone wall 3 blocks in front of the player. The wall 
 
 ### 🟦 Water Shard
 
-*Ocean blue. Sustained melee damage. Wants to be in your face.*
+*Ocean blue. The medic — sustain, rescue and renewal. The one gem that keeps other people alive.*
 
 **Passive — Tidebound**
 - Permanent water breathing and Dolphin's Grace
@@ -166,16 +169,16 @@ Fires a 15-block hook. Hits a player or mob → yanks them to you. Hits a block 
 
 *Particles:* the hook line is drawn in `DRIPPING_WATER` + `BUBBLE_POP` particles as it flies; on impact a `SPLASH` burst, and a bubble stream trails whoever gets yanked.
 
-**Ability 2 (⇧LMB) — Thunderstorm** · 40s
-A storm cloud forms above the caster and **follows them for 10s**. While active, every melee hit the caster lands calls a lightning strike on the target dealing **2 true damage** (bypasses armour, absorption, and i-frames) on top of normal weapon damage.
+**Ability 2 (⇧LMB) — Healing Spring** · 35s
+A pool of renewal, fixed at the cast spot, 4-block radius for 8s. Every second, **the caster and every trusted ally standing in it** are:
 
-- **No internal cooldown per target** — every hit procs
-- Lightning is visual only (`strikeLightningEffect`) — no fires, no collateral damage
-- Only affects entities the caster hits. No AoE, no friendly fire
+- Healed — **Regeneration II** while they stay in the water
+- **Extinguished** — burning stops instantly
+- **Cleansed** — poison, wither, blindness and nausea removed
 
-*Particles:* the cloud itself is drawn from `CLOUD` particles crackling with `ELECTRIC_SPARK`; each proc uses the vanilla lightning flash, so it needs no extra effects.
+Enemies standing in it get nothing. Tide Pull is the rescue rope — yank a wounded friend into the spring.
 
-> This is the highest sustained damage in the plugin by design. Watch it in playtesting; if it dominates, raise the cooldown to 60s before touching the damage.
+*Particles:* a `SPLASH` ring marks the pool's edge with `DRIPPING_WATER` falling inside and `BUBBLE_POP` fizz across the surface; healed players shed the odd `HEART`.
 
 ---
 
@@ -208,7 +211,7 @@ Ignites a 5-block-radius ring of flame at the caster's feet that **stays there f
 | Basalt | 25% |
 | Magma Block | 15% |
 
-Only the **topmost solid block of each column** is converted — raycast down from the caster's Y level, one block per column, no digging into terrain. Every original `BlockData` is stored and **restored exactly when the effect expires.**
+Only the **topmost solid block of each column** is converted — raycast down from the caster's Y level, one block per column, no digging into terrain. Every original `BlockData` is stored, the scorch **spreads outward from the caster** on cast, and when the effect expires **the border recedes back to the centre**, restoring ring by ring until nothing is left (the shared `GroundCover` engine — Frozen Over uses it too).
 
 **Never convert:** bedrock, obsidian, any block with an inventory or tile entity (chests, furnaces, hoppers, shulkers, spawners, signs, beds), any block with something standing on it that would suffocate, liquids, or air.
 
@@ -261,22 +264,21 @@ Air's escape, fully directional: the cone follows your exact aim, including pitc
 
 *Implementation:* the classic trick — while he's rain-exposed and mid-air-eligible, set `allowFlight(true)`; catch `PlayerToggleFlightEvent`, cancel it, apply the velocity, reset fall distance. Drop `allowFlight` the moment the rain window closes, or anti-cheat and vanilla flight-kick will both complain.
 
-**Ability 1 (RMB) — Frost Nova** · 25s
-A circle of frost **erupts from the caster's body and races outward** to 8 blocks. Everyone the expanding ring sweeps over is **frostbitten** — the powder-snow freeze, inflicted at range:
+**Ability 1 (RMB) — Frozen Over** · 30s
+The floor itself freezes: a sheet of ice **spreads outward from the caster to 15 blocks** — the same terrain trick as Pyre, but cold. The topmost block of every column becomes a patchwork of **ice (55%), packed ice (30%) and blue ice (15%)**, with real vanilla slide physics.
 
-- **Freeze meter pinned full** for 4s: the frost vignette, the shiver, frozen hearts — exactly as if they were buried in powder snow
-- **Slowness III** for the same 4s — the nova is first and foremost an AoE slow
-- **Freeze damage ticks** while frostbitten (1 damage every 2s, the vanilla frostbite tick — bypasses armour), attributed to the caster
-- Only the caster is spared; the wave hits everything living it touches
+- **Enemies skid.** Ice under their feet means overshot strafes, missed jumps, sliding into range
+- **The caster skates** — Speed III while standing on their own rink
+- Lasts 8s. When it ends, **the border thaws inward** — the sheet shrinks ring by ring until nothing is left, every original block restored exactly (Pyre's ground now recedes the same way)
 
-*Particles:* a two-layer ring of `SNOWFLAKE` (ankle height) and `ITEM_SNOWBALL` (chest height) tracing the wave front as it expands; frostbitten victims shed drifting `SNOWFLAKE` until they thaw. Powder-snow crunch + the freeze hurt sound on cast.
+*Particles / sound:* `SNOWFLAKE` glitter drifting over the field, glass-crack sounds as it spreads and creaks, a glass-break shatter as it melts away.
 
-*Implementation:* an expanding-radius sweep — each tick, any living entity inside the current radius that hasn't been swept yet gets frostbite; `setFreezeTicks(getMaxFreezeTicks())` pinned every tick for the duration (natural 2/tick decay fades the vignette afterwards), damage delivered via a `FREEZE`-type `DamageSource` with the caster as causing entity for kill credit.
+*Implementation:* shared `GroundCover` engine (Pyre uses it too) — columns sorted by distance, converted band-by-band as the radius grows, restored border-first as it recedes; same never-convert rules as Pyre (no tile entities, bedrock, obsidian), instant rollback on plugin disable.
 
 **Ability 2 (⇧LMB) — Orbital Ice** · 30s
 Five ice pellets materialise and **orbit aqudr** — radius 1.5 blocks, one revolution every ~2s, a slight bob. While any pellet survives, **left-click fires one** along his crosshair:
 
-- **1 true damage** per pellet (bypasses armour, absorption, and i-frames — same rule as Thunderstorm)
+- **1 true damage** per pellet (bypasses armour, absorption, and i-frames)
 - Pellets fly flat and fast, no gravity, up to 24 blocks
 - The ring lasts 20s; unfired pellets melt away
 
@@ -306,28 +308,47 @@ Shadow tendrils: every enemy within 5 blocks is rooted (Slowness V, 2s) and with
 
 ### 🟨 Light Shard
 
-*Pale gold. Reveal and punish.*
+*Pale gold. The harvester — the grinding gem. Light feeds the farm: XP, loot, undead ash.*
 
 **Passive — Lumen**
 - Permanent Night Vision
 - Regeneration I in direct sunlight
 - Melee attackers are flash-blinded for 1.5s (once per 3s per attacker)
+- **The magnet:** item drops and XP orbs within 6 blocks drift to you on their own
 
-**Ability 1 (RMB) — Flash** · 20s
-A blinding burst: enemies within 6 blocks get Blindness 4s and Glowing 6s.
+**Ability 1 (RMB) — Sunspear** · 30s
+The lance of light, **drawn like a bow**: hold right-click to charge, release to fire. Fires the instant you let go — a tap is a jab, a full 1.5s draw is the real spear:
 
-*Particles:* a single `FLASH` with an `END_ROD` starburst.
+| | Tap | Full draw |
+|---|---|---|
+| Damage | 3 | 8 |
+| vs undead (smite) | 5 | 12 |
+| Range | 12 | 24 |
+| Glowing | 4s | 8s |
 
-**Ability 2 (⇧LMB) — Sunspear** · 30s
-An instant lance of light, 20 blocks. First target struck takes 5 damage (7 if undead) and Glowing 8s.
+- Drawing slows you (Slowness II) and gathers `END_ROD` sparks at your hand; a chime pitches up as it charges and dings at full power
+- Undead detection uses the vanilla smite tag — zombies, skeletons, phantoms, withers all take the bonus. The mob-farm lane nuker
+- **Tier 2 pierces every target in the line**, whatever the charge
 
-*Particles:* a clean `END_ROD` beam ending in a `FIREWORK` burst.
+*Particles:* an `END_ROD` beam (denser at full draw) ending in a `FIREWORK` burst per victim.
+
+**Ability 2 (⇧LMB) — Consecrate** · 30s
+Sanctify the ground: a 6-block circle at the cast spot for 10s. Holy ground works the farm for you:
+
+- **The undead burn** inside it, as if under the noon sun
+- Everything inside is lit with Glowing — count your spawner's output at a glance
+- **Mobs inside take +30% damage; enemy players +15%**
+- **Mobs slain inside drop double XP**
+
+Drop it over the spawner floor, on the drop tube, in the ritual circle.
+
+*Particles:* a gold `DUST` boundary ring with `END_ROD` motes drifting up from the blessed ground; beacon hum on cast, fading when it expires.
 
 ---
 
 ### ⚡ Lightning Shard
 
-*Electric yellow. Momentum and burst.*
+*Electric yellow. The duelist — speed becomes power. Every ability feeds the Momentum engine.*
 
 **Passive — Static**
 - Immune to lightning damage
@@ -336,15 +357,23 @@ An instant lance of light, 20 blocks. First target struck takes 5 damage (7 if u
 
 *Particles:* faint `ELECTRIC_SPARK` crackle at the feet while Momentum is charged.
 
-**Ability 1 (RMB) — Arc** · 20s
-An instant electric arc, 16 blocks: first target takes 4 damage and Slowness II for 2s.
+**Ability 1 (RMB) — Volt Rush** · 20s
+You **become the bolt**: an instant dash 7 blocks along your exact aim — pitch included — passing **straight through** anyone in the way. Stops at walls.
 
-*Particles:* a jittery `ELECTRIC_SPARK` beam that crackles rather than draws a line.
+- Everyone passed through takes 3 damage and a shock burst
+- Touch at least one enemy and **Momentum snaps instantly to max** — dash in, come out at full speed
+- No invisibility, no subtlety: this is an engage, not an escape (that's Shadow's trick)
 
-**Ability 2 (⇧LMB) — Chain Lightning** · 35s
-Strike a target within 12 blocks for 5 damage, then chain to up to 3 more targets within 6 blocks of each hop, decaying 5 → 4 → 3 → 2.
+*Particles:* a solid `ELECTRIC_SPARK` line down the dash path, thunder-crack and riptide sounds.
 
-*Particles:* `ELECTRIC_SPARK` arcs drawn hop to hop, a flash at every node.
+**Ability 2 (⇧LMB) — Overcharge** · 35s
+A six-second **stance**: while it lasts, **every** melee hit discharges Static (not every 4th) and each hit **arcs to the nearest enemy** within 4 blocks of your victim for 2 damage.
+
+- The chain-lightning fantasy lives on your sword now — wade into a crowd and every swing forks
+- You crackle loudly the whole six seconds: the counterplay is to kite the window out
+- Discharges triggered this way still count for the Live Wire challenge
+
+*Particles:* twin `ELECTRIC_SPARK` orbits around the caster for the duration; spark arcs drawn victim-to-victim on every fork.
 
 ---
 
@@ -393,13 +422,13 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | Element | Passive | Ability 1 | Ability 2 |
 |---|---|---|---|
 | **Earth** | +6 max health; Resistance I on stone | Tremor radius 6 → 9, adds 3s root | Bulwark travels 25 blocks, 6 damage |
-| **Water** | Regeneration II near water | Tide Pull hits up to 3 targets | Thunderstorm lasts 15s, 3 true damage |
+| **Water** | Regeneration II near water | Tide Pull hits up to 3 targets | Healing Spring radius 4 → 6, adds Absorption |
 | **Fire** | Nether bonus applies everywhere at +1 | Fireball fires 3 in a spread | Pyre radius 5 → 8, adds Regeneration I to caster |
 | **Air** | Speed II | Updraft radius 6 → 9 | Gale cone 8 → 12 blocks, stronger recoil |
-| **Ice** | Double jump gains a second charge (triple jump) during thunderstorms | Frost Nova radius 8 → 11, frostbite 4s → 6s, Slowness III → IV | Orbital Ice 5 → 7 pellets |
+| **Ice** | Double jump gains a second charge (triple jump) during thunderstorms | Frozen Over lasts 8s → 12s; the cold seeps up — enemies on the ice are chilled | Orbital Ice 5 → 7 pellets |
 | **Shadow** | Backstab +2 → +4 | Shadowstep range 8 → 14 | Grasp radius 5 → 8 |
-| **Light** | Lumen regenerates in any daylight, not just open sky | Flash radius 6 → 9 | Sunspear pierces every target in the beam |
-| **Lightning** | Static discharges every 3rd hit | Arc slow 2s → 4s | Chain Lightning 3 → 5 hops |
+| **Light** | Lumen regenerates in any daylight, not just open sky | Sunspear pierces every target in the beam | Consecrate radius 6 → 8 |
+| **Lightning** | Static discharges every 3rd hit | Volt Rush range 7 → 10 | Overcharge forks to 2 extra targets per hit |
 
 ### Item appearance across tiers
 
@@ -590,7 +619,7 @@ An 8s, 9-block zone of darkness fixed at the cast point. Enemies inside get Dark
 *Particles:* a `SQUID_INK` dome edge with deep-red `DUST` motes drifting through the interior.
 
 ### 🟨 Light — Solar Flare
-Eight seconds of radiance: every second, enemies within 7 blocks take 2 damage and are revealed (Glowing 10s). The caster keeps Absorption II for the duration.
+Eight seconds of radiance: every second, enemies within 7 blocks take 2 damage and are revealed (Glowing 10s). The caster keeps Absorption II for the duration — and it's the golden hour: **mobs the caster kills during the flare drop double loot.**
 
 *Particles:* expanding gold `DUST` rings under an `END_ROD` halo.
 
@@ -605,18 +634,27 @@ A personal storm for 8s: each second one random enemy within 10 blocks is struck
 
 ### Shard Trader
 - **Recipe:** 4 Amethyst Shard + 1 Ender Eye + 4 Gold Ingot
-- Right-click to reroll into a *different* random element at Tier 1. Consumed on use.
-- **Rerolling wipes Tier 2 and all challenge progress.**
+- Right-click to reroll into a *different* random element. Consumed on use.
+- **Rerolling keeps your tier** — a Tier 2 player rerolls into Tier 2 of the new element. Challenge progress resets (it's a different challenge).
 - A bound player's shard (§5 — `aqudr`) refuses the reroll entirely; the trader is not consumed.
 
 ### Shard Broker
 - **Recipe:** 4 Diamonds in the corners, 4 Gold Ingots on the sides, and a Barrel in the centre. The result is an **enchanted barrel** — glint on, named.
-- Right-click to open the exchange and **choose your element** — no gamble. Clicking an element rerolls you into it at Tier 1 and consumes the Broker. Closing the menu without choosing costs nothing.
-- Same rules as any reroll: **wipes Tier 2 and all challenge progress**, your current element can't be re-picked, and a bound player's shard (§5 — `aqudr`) refuses the exchange.
+- Right-click to open the exchange and **choose your element** — no gamble. Clicking an element rerolls you into it and consumes the Broker. Closing the menu without choosing costs nothing.
+- Same rules as any reroll: **your tier travels with you** (challenge progress resets), your current element can't be re-picked, and a bound player's shard (§5 — `aqudr`) refuses the exchange.
 
 > The Trader is the cheap gamble; the Broker is the expensive certainty. Diamonds buy you the right to stop rolling.
 
 **Admin:** `/broker <player> <shard>` applies the exchange to anyone, free — no item, no menu. Bound players still refuse it (edit `bound-players` first).
+
+### `/trust` and `/untrust`
+
+Your personal ally list (§1 rule 9), persisted per player:
+
+- `/trust` — list your allies
+- `/trust <player>` — add one (they must be online); your harmful abilities now spare them, Healing Spring heals them, Tide Pull still works on them (rescue is intentional)
+- `/untrust <player>` — revoke; works on offline players by name
+- One-way: trusting someone does nothing to *their* abilities. Mutual protection needs mutual trust. Deliberate melee hits are never filtered — a sword swing is a choice.
 
 ### Upgrader
 - **Not craftable.** Dropped by Tier 2 players on death (section 6) — a dying player's tier made physical.
@@ -737,8 +775,7 @@ Adding a fifth element = one power file, one challenge file, one enum constant, 
 ## 13. Balance notes
 
 - **Roles:** Earth denies space, Fire controls it, Water out-damages you in melee, Air decides whether the fight happens at all.
-- **No element heals allies.** Teamfights are pure damage races. If that plays badly, Thunderstorm is where an ally component naturally goes.
-- **Thunderstorm is intentionally the strongest damage tool.** Watch it. If Water wins every duel, raise the cooldown to 60s — don't cut the damage.
+- **Water is the only healer.** Healing Spring + /trust makes teams real. If organised groups with a pocket medic dominate solo players, shorten the spring's duration before touching the regen level.
 - **Tier 2 churns by design.** It's a crown to defend, not a rank to keep — the total number of Tier 2s only grows through challenges, and every death puts one back in play. If churn feels too punishing, restrict demotion to player kills before adding any drop cooldown.
 - **Updraft is now disruption, not execution.** Resist raising the height; Air's fall immunity makes every extra block worth more to Air than to anyone else.
 - **Fire has zero mobility** and will be kited by Air. If Fire never gets to use Pyre, add a brief slow on Fireball hit rather than giving Fire a dash.

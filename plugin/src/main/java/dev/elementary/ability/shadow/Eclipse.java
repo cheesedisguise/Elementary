@@ -46,7 +46,7 @@ public class Eclipse implements Ability {
                         new Particle.DustOptions(Color.fromRGB(0x4D0F18), 1.6f));
                 if (ticks % 20 == 0) {
                     for (LivingEntity target : center.getNearbyLivingEntities(radius)) {
-                        if (target.equals(caster)) continue;
+                        if (!dev.elementary.util.Targets.hostile(caster, target)) continue;
                         target.damage(1, caster);
                         target.addPotionEffect(new PotionEffect(
                                 PotionEffectType.DARKNESS, 60, 0));

@@ -56,7 +56,7 @@ public class Maelstrom implements Ability {
                         inward.getX(), inward.getY(), inward.getZ(), 0.6);
 
                 for (LivingEntity target : center.getNearbyLivingEntities(radius)) {
-                    if (target.equals(caster)) continue;
+                    if (!dev.elementary.util.Targets.hostile(caster, target)) continue;
                     Vector pull = center.toVector().subtract(target.getLocation().toVector());
                     double dist = Math.max(pull.length(), 0.5);
                     target.setVelocity(target.getVelocity()

@@ -25,7 +25,7 @@ public class Gale implements Ability {
         // aiming down rocket-jumps you and aiming up slams you to earth
         Vector dir = caster.getEyeLocation().getDirection().normalize();
         for (LivingEntity target : caster.getLocation().getNearbyLivingEntities(length)) {
-            if (target.equals(caster)) continue;
+            if (!dev.elementary.util.Targets.hostile(caster, target)) continue;
             Vector to = target.getEyeLocation().toVector()
                     .subtract(caster.getEyeLocation().toVector());
             if (to.lengthSquared() < 0.01) continue;

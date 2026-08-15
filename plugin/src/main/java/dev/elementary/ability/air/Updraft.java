@@ -22,7 +22,7 @@ public class Updraft implements Ability {
         caster.getWorld().playSound(caster.getLocation(),
                 org.bukkit.Sound.ENTITY_BREEZE_SHOOT, 1f, 1f);
         for (LivingEntity target : caster.getLocation().getNearbyLivingEntities(radius)) {
-            if (target.equals(caster)) continue;
+            if (!dev.elementary.util.Targets.hostile(caster, target)) continue;
             target.setVelocity(target.getVelocity().clone().setY(1.0)); // ~5 blocks
             new BukkitRunnable() {
                 int ticks = 0;

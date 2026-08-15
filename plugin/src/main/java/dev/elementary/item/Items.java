@@ -49,8 +49,8 @@ public final class Items {
                 .decoration(TextDecoration.ITALIC, false));
         meta.lore(List.of(Component.text("Right-click to choose your element.",
                         NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
-                Component.text("Wipes Tier 2 and challenge progress.", NamedTextColor.GRAY)
-                        .decoration(TextDecoration.ITALIC, false)));
+                Component.text("Your tier travels with you; challenge progress resets.",
+                        NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
         meta.setEnchantmentGlintOverride(true);
         meta.getPersistentDataContainer().set(BROKER_KEY, PersistentDataType.BYTE, (byte) 1);
         item.setItemMeta(meta);
@@ -84,8 +84,8 @@ public final class Items {
                 .decoration(TextDecoration.ITALIC, false));
         meta.lore(List.of(Component.text("Right-click to reroll into a different element.",
                         NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false),
-                Component.text("Wipes Tier 2 and challenge progress.", NamedTextColor.GRAY)
-                        .decoration(TextDecoration.ITALIC, false)));
+                Component.text("Your tier travels with you; challenge progress resets.",
+                        NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
         meta.getPersistentDataContainer().set(TRADER_KEY, PersistentDataType.BYTE, (byte) 1);
         item.setItemMeta(meta);
         return item;

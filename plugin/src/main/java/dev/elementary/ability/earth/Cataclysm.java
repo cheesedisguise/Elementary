@@ -53,7 +53,7 @@ public class Cataclysm implements Ability {
         caster.getWorld().playSound(caster.getLocation(),
                 org.bukkit.Sound.ENTITY_WITHER_BREAK_BLOCK, 1f, 0.7f);
         for (LivingEntity target : caster.getLocation().getNearbyLivingEntities(radius)) {
-            if (target.equals(caster)) continue;
+            if (!dev.elementary.util.Targets.hostile(caster, target)) continue;
             target.damage(8, caster);
             target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 60, 9));
         }

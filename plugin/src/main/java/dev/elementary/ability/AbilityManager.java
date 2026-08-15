@@ -57,6 +57,15 @@ public class AbilityManager implements Listener {
         Kit kit = kits.get(data.element);
         if (kit == null) return;
 
+        // a held-down right click feeds the charging ability, whatever
+        // the sneak state - releasing the button is what fires it
+        if (right && kit.primary() instanceof ChargedAbility charged
+                && charged.charging(player)) {
+            charged.feed(player);
+            event.setCancelled(true);
+            return;
+        }
+
         Ability ability;
         if (right && player.isSneaking()) {
             ability = kit.ultimate();

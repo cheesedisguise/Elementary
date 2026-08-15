@@ -23,7 +23,7 @@ public class Grasp implements Ability {
     public boolean cast(Player caster, int tier) {
         double radius = tier >= 2 ? 8 : 5;
         for (LivingEntity target : caster.getLocation().getNearbyLivingEntities(radius)) {
-            if (target.equals(caster)) continue;
+            if (!dev.elementary.util.Targets.hostile(caster, target)) continue;
             target.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 40, 4));
             target.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 80, 0));
             tendril(target);
