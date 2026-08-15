@@ -46,14 +46,14 @@ licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
 | Icon | Used for | Author |
 |---|---|---|
 | `quake-stomp` | Fissure | [Lorc](https://lorcblog.blogspot.com/) |
-| `stone-wall` | Bulwark | [Delapouite](https://delapouite.com/) |
+| `thrown-charcoal` | Boulder | Lorc |
 | `spiky-explosion` | Cataclysm | Lorc |
 | `fishing-hook` | Tide Pull | Lorc |
 | `waterfall` | Healing Spring | Delapouite |
 | `ink-swirl` | Maelstrom | Lorc |
 | `fireball` | Fireball | Lorc |
 | `fire-ring` | Pyre | Lorc |
-| `burning-meteor` | Meteor | Lorc |
+| `burning-meteor` | Meteor Shower | Lorc |
 | `eruption` | Updraft | Lorc |
 | `wind-slap` | Gale | Lorc |
 | `tornado` | Tempest | Lorc |

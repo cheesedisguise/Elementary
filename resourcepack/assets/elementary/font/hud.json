@@ -36,7 +36,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_bulwark.png",
+      "file": "elementary:hud/icon_boulder.png",
       "height": 16,
       "ascent": 7,
       "chars": [

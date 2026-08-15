@@ -8,7 +8,7 @@ import dev.elementary.ability.ice.CatchTheRainbow;
 import dev.elementary.ability.ice.FrozenOver;
 import dev.elementary.ability.ice.OrbitalIce;
 import dev.elementary.ability.ice.SubZero;
-import dev.elementary.ability.earth.Bulwark;
+import dev.elementary.ability.earth.Boulder;
 import dev.elementary.ability.light.Consecrate;
 import dev.elementary.ability.lightning.Overcharge;
 import dev.elementary.ability.lightning.Supercell;
@@ -21,7 +21,7 @@ import dev.elementary.ability.shadow.Shadowstep;
 import dev.elementary.ability.earth.Cataclysm;
 import dev.elementary.ability.earth.Fissure;
 import dev.elementary.ability.fire.FireballAbility;
-import dev.elementary.ability.fire.Meteor;
+import dev.elementary.ability.fire.MeteorShower;
 import dev.elementary.ability.fire.Pyre;
 import dev.elementary.ability.water.HealingSpring;
 import dev.elementary.ability.water.Maelstrom;
@@ -52,10 +52,10 @@ final class Registrations {
         Items.init(plugin);
 
         Fissure fissure = new Fissure(plugin);
-        Bulwark bulwark = new Bulwark(plugin);
+        Boulder boulder = new Boulder(plugin);
         Cataclysm cataclysm = new Cataclysm(plugin);
         abilities.register(Element.EARTH,
-                new AbilityManager.Kit(fissure, bulwark, cataclysm));
+                new AbilityManager.Kit(fissure, boulder, cataclysm));
 
         TidePull tidePull = new TidePull(plugin);
         HealingSpring healingSpring = new HealingSpring(plugin);
@@ -65,7 +65,7 @@ final class Registrations {
 
         FireballAbility fireball = new FireballAbility(plugin);
         Pyre pyre = new Pyre(plugin);
-        Meteor meteor = new Meteor(plugin);
+        MeteorShower meteor = new MeteorShower(plugin);
         abilities.register(Element.FIRE,
                 new AbilityManager.Kit(fireball, pyre, meteor));
 
@@ -98,7 +98,7 @@ final class Registrations {
         pm.registerEvents(new LockdownListener(plugin), plugin);
         pm.registerEvents(abilities, plugin);
         pm.registerEvents(new CombatListener(plugin), plugin);
-        pm.registerEvents(bulwark, plugin);
+        pm.registerEvents(boulder, plugin);
         pm.registerEvents(fireball, plugin);
         pm.registerEvents(meteor, plugin);
         pm.registerEvents(new CatchTheRainbow(plugin), plugin);

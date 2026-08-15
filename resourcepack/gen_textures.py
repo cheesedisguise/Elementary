@@ -128,7 +128,7 @@ def glow_wrap(t1, glow_hex):
 # the icon name in icons_svg/ and its author for the credits list.
 ICONS = {
     "icon_fissure": ("quake-stomp", "Lorc"),
-    "icon_bulwark": ("stone-wall", "Delapouite"),
+    "icon_boulder": ("thrown-charcoal", "Lorc"),
     "icon_cataclysm": ("spiky-explosion", "Lorc"),
     "icon_tide_pull": ("fishing-hook", "Lorc"),
     "icon_healing_spring": ("waterfall", "Delapouite"),

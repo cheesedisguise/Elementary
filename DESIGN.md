@@ -90,9 +90,9 @@ Icons are glyphs from **game-icons.net** (CC BY 3.0 — Lorc and Delapouite; att
 
 | Element | Ability 1 | Ability 2 | Ultimate |
 |---|---|---|---|
-| Earth | Fissure — `quake-stomp` | Bulwark — `stone-wall` | Cataclysm — `spiky-explosion` |
+| Earth | Fissure — `quake-stomp` | Boulder — `thrown-charcoal` | Cataclysm — `spiky-explosion` |
 | Water | Tide Pull — `fishing-hook` | Healing Spring — `waterfall` | Maelstrom — `ink-swirl` |
-| Fire | Fireball — `fireball` | Pyre — `fire-ring` | Meteor — `burning-meteor` |
+| Fire | Fireball — `fireball` | Pyre — `fire-ring` | Meteor Shower — `burning-meteor` |
 | Air | Updraft — `eruption` | Gale — `wind-slap` | Tempest — `tornado` |
 | Ice | Frozen Over — `frozen-ring` | Orbital Ice — `frozen-orb` | Sub-Zero — `frozen-body` |
 | Shadow | Shadowstep — `teleport` | Mark for Death — `human-target` | Eclipse — `eclipse-flare` |
@@ -134,7 +134,7 @@ Ability messages are **client-sided** — only the caster sees them. Nothing is 
 
 ### 🟫 Earth Shard
 
-*Moss green. Zone denial and a shield you can weaponise.*
+*Moss green. The fortress — unshakeable, and the ground itself fights for you.*
 
 **Passive — Stoneskin**
 - +4 max health (2 extra hearts)
@@ -147,12 +147,14 @@ Punch the ground: a **crack races 12 blocks along your aim** — fast, direction
 
 *Particles:* the ground splits open in **its own material** — each step of the crack bursts `BLOCK` particles of whatever block it crosses, with stone-break crunches racing along the line and a final eruption where it ends.
 
-**Ability 2 (⇧LMB) — Bulwark** · 35s
-Summons a 5-wide × 3-tall stone wall 3 blocks in front of the player. The wall **continuously repositions to face wherever the caster looks**, orbiting them at a fixed 3-block distance. It blocks projectiles and bodies.
+**Ability 2 (⇧LMB) — Boulder** · 20s
+Rip a slab of stone out of the ground and **hurl it**. The boulder is a real falling-block projectile flying a true arc along your aim — lob it over walls, skim it flat, drop it on heads.
 
-**Punch the wall** and it launches forward at ~8 blocks/second for up to 15 blocks, shoving any player or mob it contacts along with it and dealing 3 damage. It dissipates on hitting terrain or reaching max range. Lifetime 12s either way. Recast dismisses early.
+- **On impact** (first enemy touched, or the ground): 6 damage in a 2.6-block crater, everyone caught is **shoved back** from the impact and slowed (Slowness II, 3s)
+- The rock never becomes a real block — it shatters into debris on landing
+- The fortress that throws rocks: your peel, your poke, your "get away from the medic"
 
-*Particles:* the wall sheds a light drizzle of its own `BLOCK` dust while orbiting; launched, it plows a bow-wave of stone crack + `CRIT` particles and dissipates in a dust burst.
+*Particles / sound:* a cobble `BLOCK` burst as the ground gives the rock up, a debris trail in flight, and a deepslate crunch + `CRIT` shower at the crater.
 
 ---
 
@@ -434,7 +436,7 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 
 | Element | Passive | Ability 1 | Ability 2 |
 |---|---|---|---|
-| **Earth** | +6 max health; Unshakeable 60% → 90%; plates become Absorption II | Fissure length 12 → 18; erupted enemies are rooted 2s | Bulwark travels 25 blocks, 6 damage |
+| **Earth** | +6 max health; Unshakeable 60% → 90%; plates become Absorption II | Fissure length 12 → 18; erupted enemies are rooted 2s | Boulder 6 → 8 damage, crater 2.6 → 3.4 blocks |
 | **Water** | Regeneration II near water | Tide Pull hits up to 3 targets | Healing Spring radius 4 → 6, adds Absorption |
 | **Fire** | Nether bonus applies everywhere at +1 | Fireball fires 3 in a spread | Pyre radius 5 → 8, adds Regeneration I to caster |
 | **Air** | Speed II | Updraft radius 6 → 9 | Gale cone 8 → 12 blocks, stronger recoil |
@@ -609,10 +611,12 @@ A whirlpool at the caster's position for 6s, 12-block radius. Enemies inside are
 
 *Particles:* **a spinning whirlpool around the player** — two helical arms of `SPLASH` and `BUBBLE_COLUMN_UP` particles rotating around the caster and tightening toward the centre, while `NAUTILUS` particles stream inward along the pull, so victims can read both the edge and the direction of the drag.
 
-### 🟥 Fire — Meteor
-Call a meteor at the crosshair, up to 30 blocks. 12 damage in a 6-block radius, ignites everything hit, burning ground for 8s. **No terrain damage.**
+### 🟥 Fire — Meteor Shower
+Mark a 6-block zone at the crosshair, up to 30 blocks out, and **the sky opens**: after a one-second ember-ring telegraph, **eight meteors hammer the zone over four seconds**. Each rock deals 5 damage in a 3-block burst, ignites, and leaves a small patch of burning ground (4s). **No terrain damage.**
 
-*Particles:* the meteor falls as a `FLAME` + `LAVA` comet trailing a smoke column; impact fires an `EXPLOSION_EMITTER` and rains ember `DUST` over the radius, and the burning ground shimmers with `SMALL_FLAME` for its 8 seconds.
+Each meteor is survivable; standing in the zone while it falls is not. The telegraph makes it a zoning tool as much as a kill button — drop it on the point they need to hold.
+
+*Particles:* the ember `DUST` ring with `LAVA` pops marks the doomed ground; each rock falls as a `FLAME` + `LAVA` comet and lands in an `EXPLOSION` + ember shower, the patches shimmering with `SMALL_FLAME`.
 
 ### ⬜ Air — Tempest
 True flight for 8s. Every enemy within 8 blocks is continuously lifted and takes 1 damage per second. Flight ends abruptly — safe, since Air ignores falling.
@@ -627,9 +631,11 @@ Every player and mob within a **10-block radius** is **flash-frozen for 2.5s**: 
 *Implementation:* suspension = lift ~0.5 and zero velocity every tick; frostbite = `setFreezeTicks(max)` refreshed every tick, which gives the vanilla frost vignette and frozen hearts for free; camera lock = re-send position-and-look with pinned yaw/pitch each tick. The lock is deliberately oppressive — it's the ult — but keep it exactly 2.5s and never chain-apply it without the full cooldown between casts.
 
 ### ⬛ Shadow — Eclipse
-An 8s, 9-block zone of darkness fixed at the cast point. Enemies inside get Darkness and Weakness II and take 1 damage per second; the caster, while inside, gains Strength II and Speed II.
+An 8s, 9-block zone of darkness fixed at the cast point. Enemies inside get Darkness and Weakness II and take 1 damage per second; the caster, while inside, gains Strength II, Speed II — and **true invisibility**: not the vanilla ghost-with-floating-armour, but *gone*. Other clients are told the caster's armour and held items don't exist, so nothing renders at all. Step outside the dark and every piece snaps back into view.
 
-*Particles:* a `SQUID_INK` dome edge with deep-red `DUST` motes drifting through the interior.
+*Particles:* a `SQUID_INK` dome edge with deep-red `DUST` motes drifting through the interior — inside it, the only trace of the caster.
+
+*Implementation:* Invisibility effect plus `sendEquipmentChange` — every other client is sent empty equipment for all six visible slots while the caster stays in the zone, and the real gear on exit. Pure API, no packets library.
 
 ### 🟨 Light — Solar Flare
 Eight seconds of radiance: every second, enemies within 7 blocks take 2 damage and are revealed (Glowing 10s). The caster keeps Absorption II for the duration — and it's the golden hour: **mobs the caster kills during the flare drop double loot.**

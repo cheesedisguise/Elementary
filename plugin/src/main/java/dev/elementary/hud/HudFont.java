@@ -18,14 +18,14 @@ public final class HudFont {
 
     private static final Map<String, String> ICONS = Map.ofEntries(
             Map.entry("Fissure", "\uE000"),
-            Map.entry("Bulwark", "\uE001"),
+            Map.entry("Boulder", "\uE001"),
             Map.entry("Cataclysm", "\uE002"),
             Map.entry("Tide Pull", "\uE003"),
             Map.entry("Healing Spring", "\uE004"),
             Map.entry("Maelstrom", "\uE005"),
             Map.entry("Fireball", "\uE006"),
             Map.entry("Pyre", "\uE007"),
-            Map.entry("Meteor", "\uE008"),
+            Map.entry("Meteor Shower", "\uE008"),
             Map.entry("Updraft", "\uE009"),
             Map.entry("Gale", "\uE00A"),
             Map.entry("Tempest", "\uE00B"),
