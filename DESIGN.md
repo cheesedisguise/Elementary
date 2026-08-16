@@ -13,7 +13,7 @@ This document is the source of truth. If code and this document disagree, the do
 1. On first join, a player is assigned a **random element** and given their shard. Exception: **bound players** (config `bound-players`, UUID → element) skip the roll and always receive their bound element — `aqudr` gets the **Ice Shard** 100% of the time (§5); bound elements stay in everyone else's pool.
 2. The shard is a **recoloured amethyst shard** with custom model data.
 3. The shard is **bound to its owner's UUID**. Nobody else can use it.
-4. **Passives are always active** — your element is you, whatever you're holding. Abilities fire while the shard is in **either hand** (main or off-hand).
+4. **Passives are always active** — your element is you, wherever the shard sits in your inventory. Casting is different: the three abilities fire **only with the shard in your main hand**. Passives follow you; power demands a grip.
 5. Abilities are on **individual cooldowns**. No shared energy resource.
 6. **Shards cannot be dropped, stored, traded, or lost.** They are returned automatically on respawn.
 7. A player has exactly one shard at a time.
@@ -40,7 +40,7 @@ On respawn, verify the player still holds their shard. If not, silently re-issue
 | Input | Result |
 |---|---|
 | Always | Passive active |
-| Shard in either hand | Abilities castable |
+| Shard in main hand | Abilities castable |
 | Right-click | **Ability 1** |
 | Sneak + left-click | **Ability 2** |
 | Sneak + right-click | **Ultimate** (Tier 2 only) |
