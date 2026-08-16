@@ -281,7 +281,7 @@ The floor itself freezes: a sheet of ice **spreads outward from the caster to 15
 **Ability 2 (⇧LMB) — Orbital Ice** · 30s
 Five ice pellets materialise and **orbit aqudr** — radius 1.5 blocks, one revolution every ~2s, a slight bob. While any pellet survives, **left-click fires one** along his crosshair:
 
-- **1 true damage** per pellet (bypasses armour, absorption, and i-frames)
+- **2 damage** per pellet — honest damage now, armour applies (true damage is Light's business)
 - Pellets fly flat and fast, no gravity, up to 24 blocks
 - The ring lasts 20s; unfired pellets melt away
 
@@ -332,20 +332,14 @@ The assassin's loop, mechanised: mark → step behind → knife → vanish → n
 - **The magnet:** item drops and XP orbs within 6 blocks drift to you on their own
 
 **Ability 1 (RMB) — Sunspear** · 30s
-The lance of light, **drawn like a bow**: hold right-click to charge, release to fire. Fires the instant you let go — a tap is a jab, a full 1.5s draw is the real spear:
+Hold right-click and **the light builds: one charge per second, five charges in all.** Every charge pops an **expanding ring of light in front of you** — small, then wide — with a chime pitching higher each time. At five charges **the spear fires itself**, and it sounds like something that should not be pointed at a person: thunder-crack, blast, beacon wail, a `FLASH` at the muzzle.
 
-| | Tap | Full draw |
-|---|---|---|
-| Damage | 3 | 8 |
-| vs undead (smite) | 5 | 12 |
-| Range | 12 | 24 |
-| Glowing | 4s | 8s |
-
-- Drawing slows you (Slowness II) and gathers `END_ROD` sparks at your hand; a chime pitches up as it charges and dings at full power
-- Undead detection uses the vanilla smite tag — zombies, skeletons, phantoms, withers all take the bonus. The mob-farm lane nuker
+- **Damage: 4 base (+3 vs undead, vanilla smite tag) plus 1 TRUE damage per charge** — a full spear lands 4 + 5 true, armour be damned
+- Release early and it fires with whatever you banked; a bare tap is just the base jab
+- Range 24 blocks; victims glow 8s; charging slows you (Slowness II) — you are a lighthouse, commit to it
 - **Tier 2 pierces every target in the line**, whatever the charge
 
-*Particles:* an `END_ROD` beam (denser at full draw) ending in a `FIREWORK` burst per victim.
+*Particles:* the five telegraph rings in gold `DUST` + `END_ROD`; the beam itself densifies with charges and ends in a `FIREWORK` burst per victim.
 
 **Ability 2 (⇧LMB) — Consecrate** · 30s
 Sanctify the ground: a 6-block circle at the cast spot for 10s. Holy ground works the farm for you:

@@ -3,7 +3,6 @@ package dev.elementary.ability.ice;
 import dev.elementary.ElementaryPlugin;
 import dev.elementary.ability.Ability;
 import dev.elementary.tier.Challenges;
-import dev.elementary.util.TrueDamage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +26,7 @@ import org.bukkit.util.Vector;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-/** Five orbiting ice pellets; click to fire, one true damage each. */
+/** Five orbiting ice pellets; click to fire, 2 damage each. */
 public class OrbitalIce implements Ability, Listener {
     private final ElementaryPlugin plugin;
     private final Map<UUID, Ring> rings = new HashMap<>();
@@ -115,7 +114,8 @@ public class OrbitalIce implements Ability, Listener {
                                 0.05, 0.05, 0.05, 0.01);
                         for (LivingEntity target : at.getNearbyLivingEntities(0.9)) {
                             if (!dev.elementary.util.Targets.hostile(owner, target)) continue;
-                            TrueDamage.apply(target, 1, owner);
+                            // honest damage now - armour applies, no true bypass
+                            target.damage(2, owner);
                             Challenges.pelletHit(plugin, owner);
                             impact(at);
                             pellet.remove();
