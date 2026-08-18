@@ -67,8 +67,11 @@ public class AbilityManager implements Listener {
             return;
         }
         if (ability == null) return;
-        // only claim the click once we know this is an ability attempt
-        if (right) event.setCancelled(true);
+        // claim the click - EXCEPT for charged abilities, whose hold
+        // detection needs the vanilla item-use to actually begin
+        if (right && !(ability instanceof ChargedAbility)) {
+            event.setCancelled(true);
+        }
 
         if (ability.ultimate() && data.tier < 2) {
             Msg.fail(player, "Tier 2 required");

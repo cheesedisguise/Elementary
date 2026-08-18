@@ -105,6 +105,7 @@ final class Registrations {
         pm.registerEvents(orbitalIce, plugin);
         pm.registerEvents(consecrate, plugin);
         pm.registerEvents(solarFlare, plugin);
+        pm.registerEvents(sunspear, plugin);
         pm.registerEvents(markForDeath, plugin);
         pm.registerEvents(challenges, plugin);
         pm.registerEvents(new TierListener(plugin), plugin);

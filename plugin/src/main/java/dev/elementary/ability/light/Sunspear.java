@@ -30,14 +30,17 @@ import org.bukkit.util.Vector;
  * front of you. At five charges it fires ITSELF, and it hits like the
  * sun: solid base damage plus one TRUE damage per charge banked.
  * Release early to loose whatever you've gathered. Tier 2 pierces.
+ *
+ * The hold works because the Light shard is an unfinishable consumable
+ * (Shards.create): the client keeps the use active while the button is
+ * down, and Paper reports the release as PlayerStopUsingItemEvent.
  */
-public class Sunspear implements ChargedAbility {
+public class Sunspear implements ChargedAbility, org.bukkit.event.Listener {
     private static final int TICKS_PER_CHARGE = 20;
     private static final int MAX_CHARGES = 5;
 
     private class Draw {
         final int startTick = Bukkit.getCurrentTick();
-        int lastFeed = startTick;
         int charges = 0;
         final int tier;
         Draw(int tier) { this.tier = tier; }
@@ -58,8 +61,14 @@ public class Sunspear implements ChargedAbility {
 
     @Override
     public void feed(Player player) {
-        Draw draw = drawing.get(player.getUniqueId());
-        if (draw != null) draw.lastFeed = Bukkit.getCurrentTick();
+        // holds are tracked through the item-use state, not repeats
+    }
+
+    /** Button released: loose the spear with whatever is banked. */
+    @org.bukkit.event.EventHandler
+    public void onRelease(io.papermc.paper.event.player.PlayerStopUsingItemEvent event) {
+        Draw draw = drawing.remove(event.getPlayer().getUniqueId());
+        if (draw != null) fire(event.getPlayer(), draw.tier, draw.charges);
     }
 
     @Override
@@ -70,14 +79,26 @@ public class Sunspear implements ChargedAbility {
                 Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 0.7f);
         new BukkitRunnable() {
             @Override public void run() {
+                if (drawing.get(caster.getUniqueId()) != draw) {
+                    cancel(); // released - the stop event already fired it
+                    return;
+                }
                 int now = Bukkit.getCurrentTick();
+                int age = now - draw.startTick;
                 if (!caster.isOnline() || caster.isDead()) {
                     drawing.remove(caster.getUniqueId());
                     cancel();
                     return;
                 }
-                int due = Math.min(MAX_CHARGES,
-                        (now - draw.startTick) / TICKS_PER_CHARGE);
+                // older shard without the consumable component (or the
+                // use never started): behave like the old tap
+                if (age >= 4 && !caster.hasActiveItem()) {
+                    drawing.remove(caster.getUniqueId());
+                    cancel();
+                    fire(caster, draw.tier, draw.charges);
+                    return;
+                }
+                int due = Math.min(MAX_CHARGES, age / TICKS_PER_CHARGE);
                 while (draw.charges < due) {
                     draw.charges++;
                     chargeRing(caster, draw.charges);
@@ -86,13 +107,8 @@ public class Sunspear implements ChargedAbility {
                 if (draw.charges >= MAX_CHARGES) {
                     drawing.remove(caster.getUniqueId());
                     cancel();
+                    caster.clearActiveItem();
                     fire(caster, draw.tier, MAX_CHARGES);
-                    return;
-                }
-                if (now - draw.lastFeed > 6) {
-                    drawing.remove(caster.getUniqueId());
-                    cancel();
-                    fire(caster, draw.tier, draw.charges);
                     return;
                 }
                 caster.addPotionEffect(new PotionEffect(
