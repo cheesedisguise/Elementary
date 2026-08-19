@@ -653,11 +653,13 @@ Every player and mob within a **10-block radius** is **flash-frozen for 2.5s**: 
 *Implementation:* suspension = lift ~0.5 and zero velocity every tick; frostbite = `setFreezeTicks(max)` refreshed every tick, which gives the vanilla frost vignette and frozen hearts for free; camera lock = re-send position-and-look with pinned yaw/pitch each tick. The lock is deliberately oppressive — it's the ult — but keep it exactly 2.5s and never chain-apply it without the full cooldown between casts.
 
 ### ⬛ Shadow — Hunt
-For **20 seconds a 35-block storm of dread follows the caster**. Every enemy inside is held in **Fear** (rolling reapply), **the sky turns to midnight on their screens** — per-player time, scrolling back the moment they escape the radius — the **caster's heartbeat pounds in their ears** (warden heartbeat every 2s), and the caster hits everyone inside **+10% harder**. Twenty seconds of being prey.
+For **20 seconds a 35-block storm of dread follows the caster**. Every enemy inside is held in **Fear** (rolling reapply), **the sky turns to midnight on their screens** — per-player time, scrolling back the moment they escape the radius — the **caster's heartbeat pounds in their ears** (warden heartbeat every 2s), and the caster hits everyone inside **+10% harder**.
+
+And the hunter himself is *gone*: **fully invisible for the duration** — armour and held items hidden from every client — with nothing left of him but a **red glow outline** stalking through the dark. The prey always knows the hunter is coming; they never see the man. Twenty seconds of being prey.
 
 *Particles / sound:* drifting `SQUID_INK` motes through the whole volume, a deep-red `DUST` ring at the border, cave-ambience moans.
 
-*Implementation:* `setPlayerTime(18000, false)` per victim inside / `resetPlayerTime()` on exit, end and plugin shutdown. Forced first-person and true sound-muffling are client-side-only — the per-player midnight, Fear's bundled blindness/darkness and the heartbeat carry the dread instead.
+*Implementation:* `setPlayerTime(18000, false)` per victim inside / `resetPlayerTime()` on exit, end and plugin shutdown. The red outline is pure vanilla tech: Glowing on an invisible player renders only the outline, a red scoreboard team (`elemHuntGlow`) colours it, and `sendEquipmentChange` hides the gear (re-sent every second against item-swap packets). Forced first-person and true sound-muffling are client-side-only — the per-player midnight, Fear's bundled blindness/darkness and the heartbeat carry the dread instead.
 
 ### 🟨 Light — Supernova
 **All five Radiance stacks detonate at once** (needs the full bank): everything hostile within 8 blocks takes **6 damage (9 vs undead)** and is painted with **Luminosity (5s)** — and anyone **already luminous is upgraded to Absolute Radiance (10s)** instead: the debuff, the glow, the unresistable burn. Cast it while in **Harmony** and the afterglow keeps firing: **an automatic 2-true-damage beam at the nearest enemy every second for ten seconds**.

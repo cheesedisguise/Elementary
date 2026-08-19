@@ -23,16 +23,30 @@ import org.bukkit.scheduler.BukkitRunnable;
  * caster. Every enemy inside is held in Fear, the sky turns to
  * midnight on their screens (and scrolls back when they escape), the
  * caster's heartbeat pounds in their ears, and the caster hits
- * everyone inside 10% harder.
+ * everyone inside 10% harder. The hunter himself is FULLY invisible
+ * for the duration - armour, held items, everything - and all that
+ * remains of him is a red glow outline stalking through the dark
+ * (Glowing on an invisible player renders only the outline; a red
+ * scoreboard team colours it).
  */
 public class Hunt implements dev.elementary.ability.Ability {
     public static final double RADIUS = 35;
     private static final int DURATION = 20 * 20;
+    private static final String TEAM = "elemHuntGlow";
+    private static final org.bukkit.inventory.EquipmentSlot[] VISIBLE_SLOTS = {
+            org.bukkit.inventory.EquipmentSlot.HAND,
+            org.bukkit.inventory.EquipmentSlot.OFF_HAND,
+            org.bukkit.inventory.EquipmentSlot.HEAD,
+            org.bukkit.inventory.EquipmentSlot.CHEST,
+            org.bukkit.inventory.EquipmentSlot.LEGS,
+            org.bukkit.inventory.EquipmentSlot.FEET};
 
     /** caster -> tick the hunt ends. Consulted by CombatListener. */
     private static final Map<UUID, Integer> hunts = new HashMap<>();
     /** players whose sky we darkened, per hunting caster. */
     private static final Map<UUID, Set<UUID>> nightbound = new HashMap<>();
+    /** caster names, for stripping the glow team after they log off. */
+    private static final Map<UUID, String> hunterNames = new HashMap<>();
 
     private final ElementaryPlugin plugin;
 
@@ -56,10 +70,20 @@ public class Hunt implements dev.elementary.ability.Ability {
         int end = Bukkit.getCurrentTick() + DURATION;
         hunts.put(caster.getUniqueId(), end);
         nightbound.put(caster.getUniqueId(), new HashSet<>());
+        hunterNames.put(caster.getUniqueId(), caster.getName());
         caster.getWorld().playSound(caster.getLocation(),
                 Sound.ENTITY_WITHER_AMBIENT, 1.2f, 0.4f);
         caster.getWorld().playSound(caster.getLocation(),
                 Sound.AMBIENT_CAVE, 1.4f, 0.6f);
+        // the hunter dissolves: only a red outline remains
+        caster.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.INVISIBILITY,
+                DURATION + 10, 0, true, false, false));
+        caster.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                org.bukkit.potion.PotionEffectType.GLOWING,
+                DURATION + 10, 0, true, false, false));
+        redTeam().addEntry(caster.getName());
+        cloak(caster);
         new BukkitRunnable() {
             @Override public void run() {
                 int now = Bukkit.getCurrentTick();
@@ -70,6 +94,9 @@ public class Hunt implements dev.elementary.ability.Ability {
                     cancel();
                     return;
                 }
+                // equipment packets from item swaps re-reveal gear;
+                // re-hide it every second
+                if (now % 20 < 10) cloak(caster);
                 ambience(caster, now);
                 Set<UUID> stillInside = new HashSet<>();
                 for (LivingEntity target : caster.getLocation()
@@ -132,11 +159,62 @@ public class Hunt implements dev.elementary.ability.Ability {
 
     private static void endHunt(UUID casterId) {
         hunts.remove(casterId);
+        Player caster = Bukkit.getPlayer(casterId);
+        if (caster != null && caster.isOnline()) {
+            caster.removePotionEffect(org.bukkit.potion.PotionEffectType.INVISIBILITY);
+            caster.removePotionEffect(org.bukkit.potion.PotionEffectType.GLOWING);
+            uncloak(caster);
+        }
+        String name = hunterNames.remove(casterId);
+        if (name != null) {
+            org.bukkit.scoreboard.Team team = Bukkit.getScoreboardManager()
+                    .getMainScoreboard().getTeam(TEAM);
+            if (team != null) team.removeEntry(name);
+        }
         Set<UUID> darkened = nightbound.remove(casterId);
         if (darkened == null) return;
         for (UUID id : darkened) {
             Player freed = Bukkit.getPlayer(id);
             if (freed != null) freed.resetPlayerTime();
+        }
+    }
+
+    /** The red-glow team; registered once, reused for every hunt. */
+    private static org.bukkit.scoreboard.Team redTeam() {
+        org.bukkit.scoreboard.Scoreboard board =
+                Bukkit.getScoreboardManager().getMainScoreboard();
+        org.bukkit.scoreboard.Team team = board.getTeam(TEAM);
+        if (team == null) {
+            team = board.registerNewTeam(TEAM);
+            team.color(net.kyori.adventure.text.format.NamedTextColor.RED);
+        }
+        return team;
+    }
+
+    /** Tell every other client the hunter wears and holds nothing. */
+    private static void cloak(Player caster) {
+        Map<org.bukkit.inventory.EquipmentSlot, org.bukkit.inventory.ItemStack> bare =
+                new java.util.EnumMap<>(org.bukkit.inventory.EquipmentSlot.class);
+        for (org.bukkit.inventory.EquipmentSlot slot : VISIBLE_SLOTS) {
+            bare.put(slot, new org.bukkit.inventory.ItemStack(org.bukkit.Material.AIR));
+        }
+        for (Player viewer : caster.getWorld().getPlayers()) {
+            if (!viewer.equals(caster)) viewer.sendEquipmentChange(caster, bare);
+        }
+    }
+
+    /** The hunt ends: everyone sees the real gear again. */
+    private static void uncloak(Player caster) {
+        org.bukkit.inventory.PlayerInventory inv = caster.getInventory();
+        Map<org.bukkit.inventory.EquipmentSlot, org.bukkit.inventory.ItemStack> real =
+                new java.util.EnumMap<>(org.bukkit.inventory.EquipmentSlot.class);
+        for (org.bukkit.inventory.EquipmentSlot slot : VISIBLE_SLOTS) {
+            org.bukkit.inventory.ItemStack item = inv.getItem(slot);
+            real.put(slot, item != null ? item
+                    : new org.bukkit.inventory.ItemStack(org.bukkit.Material.AIR));
+        }
+        for (Player viewer : caster.getWorld().getPlayers()) {
+            if (!viewer.equals(caster)) viewer.sendEquipmentChange(caster, real);
         }
     }
 
