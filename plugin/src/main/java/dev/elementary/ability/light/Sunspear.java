@@ -1,169 +1,45 @@
 package dev.elementary.ability.light;
 
-import dev.elementary.ability.ChargedAbility;
+import dev.elementary.ElementaryPlugin;
+import dev.elementary.msg.Msg;
+import dev.elementary.status.StatusService;
 import dev.elementary.util.Targets;
 import dev.elementary.util.TrueDamage;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.Tag;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 /**
- * Sunspear: hold right-click and the light builds - one charge per
- * second, five in all, each one popping an expanding ring of light in
- * front of you. At five charges it fires ITSELF, and it hits like the
- * sun: solid base damage plus one TRUE damage per charge banked.
- * Release early to loose whatever you've gathered. Tier 2 pierces.
- *
- * The hold works because the Light shard is an unfinishable consumable
- * (Shards.create): the client keeps the use active while the button is
- * down, and Paper reports the release as PlayerStopUsingItemEvent.
+ * Sunspear: every banked Radiance stack is spent in one beam.
+ * One stack is a flicker - 1 true damage. Two is a lance - 2.5 true
+ * and 3s of Luminosity. From three up, each extra stack adds a full
+ * heart of true damage and another 1.5s of Luminosity. Tier 2 pierces
+ * everything on the line.
  */
-public class Sunspear implements ChargedAbility, org.bukkit.event.Listener {
-    private static final int TICKS_PER_CHARGE = 20;
-    private static final int MAX_CHARGES = 5;
+public class Sunspear implements dev.elementary.ability.Ability {
+    private final ElementaryPlugin plugin;
 
-    private class Draw {
-        final int startTick = Bukkit.getCurrentTick();
-        int charges = 0;
-        final int tier;
-        Draw(int tier) { this.tier = tier; }
-    }
-
-    private final JavaPlugin plugin;
-    private final Map<UUID, Draw> drawing = new HashMap<>();
-
-    public Sunspear(JavaPlugin plugin) { this.plugin = plugin; }
+    public Sunspear(ElementaryPlugin plugin) { this.plugin = plugin; }
 
     @Override public String name() { return "Sunspear"; }
-    @Override public double cooldownSeconds(int tier) { return 30; }
-
-    @Override
-    public boolean charging(Player player) {
-        return drawing.containsKey(player.getUniqueId());
-    }
-
-    @Override
-    public void feed(Player player) {
-        // holds are tracked through the item-use state, not repeats
-    }
-
-    /** Button released: loose the spear with whatever is banked. */
-    @org.bukkit.event.EventHandler
-    public void onRelease(io.papermc.paper.event.player.PlayerStopUsingItemEvent event) {
-        Draw draw = drawing.remove(event.getPlayer().getUniqueId());
-        if (draw != null) fire(event.getPlayer(), draw.tier, draw.charges);
-    }
+    @Override public double cooldownSeconds(int tier) { return 2; }
 
     @Override
     public boolean cast(Player caster, int tier) {
-        Draw draw = new Draw(tier);
-        drawing.put(caster.getUniqueId(), draw);
-        caster.getWorld().playSound(caster.getLocation(),
-                Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1f, 0.7f);
-        new BukkitRunnable() {
-            @Override public void run() {
-                if (drawing.get(caster.getUniqueId()) != draw) {
-                    cancel(); // released - the stop event already fired it
-                    return;
-                }
-                int now = Bukkit.getCurrentTick();
-                int age = now - draw.startTick;
-                if (!caster.isOnline() || caster.isDead()) {
-                    drawing.remove(caster.getUniqueId());
-                    cancel();
-                    return;
-                }
-                // older shard without the consumable component (or the
-                // use never started): behave like the old tap
-                if (age >= 4 && !caster.hasActiveItem()) {
-                    drawing.remove(caster.getUniqueId());
-                    cancel();
-                    fire(caster, draw.tier, draw.charges);
-                    return;
-                }
-                int due = Math.min(MAX_CHARGES, age / TICKS_PER_CHARGE);
-                while (draw.charges < due) {
-                    draw.charges++;
-                    chargeRing(caster, draw.charges);
-                }
-                // five charges gathered: the spear looses itself
-                if (draw.charges >= MAX_CHARGES) {
-                    drawing.remove(caster.getUniqueId());
-                    cancel();
-                    caster.clearActiveItem();
-                    fire(caster, draw.tier, MAX_CHARGES);
-                    return;
-                }
-                caster.addPotionEffect(new PotionEffect(
-                        PotionEffectType.SLOWNESS, 8, 1, true, false));
-                caster.getWorld().spawnParticle(Particle.END_ROD,
-                        caster.getEyeLocation().add(caster.getEyeLocation()
-                                .getDirection().multiply(0.8)),
-                        1 + draw.charges, 0.2, 0.2, 0.2, 0.008);
-            }
-        }.runTaskTimer(plugin, 1, 1);
-        return true;
-    }
-
-    /** One ring per charge: pops small in front of you, then expands. */
-    private void chargeRing(Player caster, int n) {
-        Vector dir = caster.getEyeLocation().getDirection().normalize();
-        Location center = caster.getEyeLocation().clone().add(dir.clone().multiply(2.2));
-        Vector right = dir.clone().crossProduct(new Vector(0, 1, 0));
-        if (right.lengthSquared() < 0.01) right = new Vector(1, 0, 0);
-        right.normalize();
-        Vector up = dir.clone().crossProduct(right).normalize();
-        Vector r2 = right;
-        caster.getWorld().playSound(caster.getLocation(),
-                Sound.BLOCK_AMETHYST_BLOCK_CHIME, 1.1f, 0.8f + 0.22f * n);
-        if (n >= MAX_CHARGES) {
-            caster.getWorld().playSound(caster.getLocation(),
-                    Sound.BLOCK_BEACON_POWER_SELECT, 1f, 1.7f);
+        int banked = plugin.radiance().stacks(caster);
+        if (banked < 1) {
+            Msg.fail(caster, "No Radiance banked");
+            return false;
         }
-        new BukkitRunnable() {
-            double radius = 0.35;
-            int age = 0;
-            @Override public void run() {
-                age++;
-                if (age > 9) { cancel(); return; }
-                for (int i = 0; i < 20; i++) {
-                    double a = 2 * Math.PI * i / 20;
-                    Location at = center.clone()
-                            .add(r2.clone().multiply(radius * Math.cos(a)))
-                            .add(up.clone().multiply(radius * Math.sin(a)));
-                    center.getWorld().spawnParticle(Particle.DUST, at, 1,
-                            0.02, 0.02, 0.02, 0,
-                            new Particle.DustOptions(Color.fromRGB(0xFFE08A), 1.3f));
-                    if (i % 4 == 0) {
-                        center.getWorld().spawnParticle(Particle.END_ROD, at, 1,
-                                0.02, 0.02, 0.02, 0.002);
-                    }
-                }
-                radius += 0.19;
-            }
-        }.runTaskTimer(plugin, 0, 1);
-    }
-
-    private void fire(Player caster, int tier, int charges) {
         double range = 24;
-        double base = 4;
         Vector dir = caster.getEyeLocation().getDirection();
         List<LivingEntity> struck = new ArrayList<>();
         if (tier >= 2) {
@@ -185,41 +61,44 @@ public class Sunspear implements ChargedAbility, org.bukkit.event.Listener {
                 struck.add(victim);
             }
         }
-        // the sound of something that should not be pointed at you
+        int spent = plugin.radiance().spendAll(caster);
+        double damage = spent <= 1 ? 1.0 : 2.5 + 2.0 * Math.max(0, spent - 2);
+        int lumTicks = spent < 2 ? 0
+                : (int) ((3.0 + 1.5 * Math.max(0, spent - 2)) * 20);
+
         caster.getWorld().playSound(caster.getLocation(),
-                Sound.ENTITY_ALLAY_ITEM_THROWN, 1.4f, 1.2f);
-        if (charges >= 3) {
+                Sound.ENTITY_ALLAY_ITEM_THROWN, 1.2f, 1.3f - 0.06f * spent);
+        if (spent >= 3) {
             caster.getWorld().playSound(caster.getLocation(),
-                    Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.55f, 1.7f);
+                    Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 0.5f, 1.8f);
         }
-        if (charges >= MAX_CHARGES) {
-            caster.getWorld().playSound(caster.getLocation(),
-                    Sound.ENTITY_GENERIC_EXPLODE, 0.8f, 1.5f);
+        if (spent >= MAX_FLASH) {
             caster.getWorld().playSound(caster.getLocation(),
                     Sound.BLOCK_BEACON_DEACTIVATE, 1f, 1.8f);
             caster.getWorld().spawnParticle(Particle.FLASH,
                     caster.getEyeLocation().add(dir.clone().multiply(1.5)), 1);
         }
-        int beamDensity = 1 + charges / 2;
+        int density = 1 + spent / 2;
         for (double d = 0.5; d < range; d += 0.4) {
             Location at = caster.getEyeLocation().clone().add(dir.clone().multiply(d));
-            caster.getWorld().spawnParticle(Particle.END_ROD, at, beamDensity,
+            caster.getWorld().spawnParticle(Particle.END_ROD, at, density,
                     0.03, 0.03, 0.03, 0.002);
-            if (charges >= 3 && ((int) (d * 2.5)) % 3 == 0) {
+            if (spent >= 3 && ((int) (d * 2.5)) % 3 == 0) {
                 caster.getWorld().spawnParticle(Particle.DUST, at, 2, 0.12, 0.12, 0.12, 0,
                         new Particle.DustOptions(Color.fromRGB(0xFFE08A), 1.2f));
             }
         }
         for (LivingEntity victim : struck) {
-            boolean undead = Tag.ENTITY_TYPES_SENSITIVE_TO_SMITE.isTagged(victim.getType());
-            victim.damage(undead ? base + 3 : base, caster);
-            if (charges > 0) {
-                // the banked light burns through everything: 1 true per charge
-                TrueDamage.apply(victim, charges, caster);
+            TrueDamage.apply(victim, damage, caster);
+            if (lumTicks > 0) {
+                plugin.status().apply(victim, StatusService.Status.LUMINOSITY,
+                        lumTicks, caster);
             }
-            victim.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 160, 0));
             victim.getWorld().spawnParticle(Particle.FIREWORK,
-                    victim.getEyeLocation(), 8 + 5 * charges, 0.25, 0.25, 0.25, 0.09);
+                    victim.getEyeLocation(), 6 + 4 * spent, 0.25, 0.25, 0.25, 0.08);
         }
+        return true;
     }
+
+    private static final int MAX_FLASH = 5;
 }

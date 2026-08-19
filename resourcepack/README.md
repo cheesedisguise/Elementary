@@ -15,11 +15,11 @@ python3 gen_textures.py
   a luminance gradient map (flat colours, vanilla facet shading). Tier 2
   (32×32) is the tier 1 shard wrapped in a one-art-pixel glow outline of a
   lighter tone of its own colour. See DESIGN.md §6.
-- `assets/elementary/textures/hud/` — 24 ability icons (DESIGN.md §3),
-  rendered from `icons_svg/` as white-on-transparent 64×64 glyphs so the
-  HUD can tint them per element and state. These become `elementary:hud`
-  font glyphs when the Option B font HUD is built.
-- `icons_svg/` — the game-icons.net SVG sources for the 24 icons (see
+- `assets/elementary/textures/hud/` — 24 ability icons + 6 status-effect
+  icons (DESIGN.md §3), rendered from `icons_svg/` as white-on-transparent
+  64×64 glyphs so the HUD can tint them per element and state. These
+  become `elementary:hud` font glyphs (U+E000+, in `ICONS` order).
+- `icons_svg/` — the game-icons.net SVG sources for the icons (see
   credits below).
 - `vanilla/amethyst_shard.png` — the vanilla 1.21 amethyst shard texture
   (16×16), the recolour base for the tier 1 shards.
@@ -60,15 +60,21 @@ licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
 | `frozen-ring` | Frozen Over | Delapouite |
 | `frozen-orb` | Orbital Ice | Lorc |
 | `frozen-body` | Sub-Zero | [Delapouite](https://delapouite.com/) |
-| `teleport` | Shadowstep | Lorc |
-| `human-target` | Mark for Death | Delapouite |
-| `eclipse-flare` | Eclipse | Lorc |
-| `beams-aura` | Consecrate | Lorc |
+| `daggers` | Shade Daggers | Lorc |
+| `teleport` | Vanquish | Lorc |
+| `evil-moon` | Hunt | Lorc |
+| `brainstorm` | Neural Overload | Lorc |
 | `sunbeams` | Sunspear | Lorc |
-| `sun` | Solar Flare | Lorc |
-| `sonic-lightning` | Volt Rush | Lorc |
-| `lightning-slashes` | Overcharge | Lorc |
-| `heavy-lightning` | Supercell | Lorc |
+| `sun` | Supernova | Lorc |
+| `sonic-lightning` | Volt Dash | Lorc |
+| `lightning-frequency` | Emotion Wave | Lorc |
+| `power-lightning` | Powerplant | Lorc |
+| `beams-aura` | Radiance (status) | Lorc |
+| `terror` | Fear (status) | Lorc |
+| `star-pupil` | Luminosity (status) | Lorc |
+| `yin-yang` | Harmony (status) | Delapouite |
+| `brain` | Concussion (status) | Lorc |
+| `explosion-rays` | Absolute Radiance (status) | Lorc |
 
 Keep this attribution with the pack when distributing it (the CC BY
 licence requires it — a link to this file from the server's pack listing

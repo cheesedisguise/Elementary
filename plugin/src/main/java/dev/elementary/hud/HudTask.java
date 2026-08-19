@@ -79,18 +79,74 @@ public class HudTask extends BukkitRunnable implements org.bukkit.event.Listener
         }
     }
 
+    /** Radiance price of each Light ability, for the grey-out. */
+    private static final Map<String, Integer> RADIANCE_COST = Map.of(
+            "Sunspear", 1,
+            "Neural Overload", 3,
+            "Supernova", 5);
+
     // ------------------------------------------------------------ font
     private Component fontLine(Player player) {
         PlayerData data = plugin.shards().dataFor(player);
         AbilityManager.Kit kit = plugin.abilities().kit(data.element);
         if (kit == null) return Component.empty();
         TextComponent.Builder line = Component.text();
-        segment(line, player, data, kit.primary(), false);
+        int radiance = -1;
+        if (data.element == dev.elementary.element.Element.LIGHT) {
+            // the Radiance bank leads the line: icon, then the count
+            radiance = plugin.radiance().stacks(player);
+            line.append(HudFont.text(HudFont.icon("Radiance"),
+                    radiance > 0 ? data.element.color() : NamedTextColor.DARK_GRAY));
+            line.append(HudFont.text(HudFont.offset(1), NamedTextColor.WHITE));
+            line.append(HudFont.text(String.valueOf(radiance),
+                    radiance > 0 ? NamedTextColor.WHITE : NamedTextColor.GRAY));
+            line.append(HudFont.text(HudFont.offset(9), NamedTextColor.WHITE));
+        }
+        segment(line, player, data, kit.primary(), locked(kit.primary(), data, radiance));
         line.append(HudFont.text(HudFont.offset(6), NamedTextColor.WHITE));
-        segment(line, player, data, kit.secondary(), false);
+        segment(line, player, data, kit.secondary(), locked(kit.secondary(), data, radiance));
         line.append(HudFont.text(HudFont.offset(6), NamedTextColor.WHITE));
-        segment(line, player, data, kit.ultimate(), data.tier < 2);
+        segment(line, player, data, kit.ultimate(),
+                data.tier < 2 || locked(kit.ultimate(), data, radiance));
+        statusRow(line, player);
         return line.build();
+    }
+
+    /** Light abilities grey out while the Radiance bank is short. */
+    private boolean locked(Ability ability, PlayerData data, int radiance) {
+        if (radiance < 0) return false;
+        Integer cost = RADIANCE_COST.get(ability.name());
+        return cost != null && radiance < cost;
+    }
+
+    /** Whatever rides the player is appended after the kit icons. */
+    private void statusRow(TextComponent.Builder line, Player player) {
+        var active = plugin.status().active(player.getUniqueId());
+        if (active.isEmpty()) return;
+        line.append(HudFont.text(HudFont.offset(10), NamedTextColor.WHITE));
+        for (var status : active) {
+            String icon = HudFont.icon(status.display());
+            if (icon == null) continue;
+            line.append(HudFont.text(icon, statusColor(status)));
+            line.append(HudFont.text(HudFont.offset(2), NamedTextColor.WHITE));
+        }
+    }
+
+    private net.kyori.adventure.text.format.TextColor statusColor(
+            dev.elementary.status.StatusService.Status status) {
+        return switch (status) {
+            case LUMINOSITY -> net.kyori.adventure.text.format.TextColor.color(0xFFE08A);
+            case ABSOLUTE_RADIANCE ->
+                    net.kyori.adventure.text.format.TextColor.color(0xFFF7D6);
+            case HARMONY -> {
+                float hue = (org.bukkit.Bukkit.getCurrentTick() % 60) / 60f;
+                java.awt.Color c = java.awt.Color.getHSBColor(hue, 0.7f, 1f);
+                yield net.kyori.adventure.text.format.TextColor.color(
+                        c.getRed(), c.getGreen(), c.getBlue());
+            }
+            case CONCUSSION -> net.kyori.adventure.text.format.TextColor.color(0xC9A8FF);
+            case FEAR -> net.kyori.adventure.text.format.TextColor.color(0xC0404E);
+        };
     }
 
     private void segment(TextComponent.Builder line, Player player, PlayerData data,

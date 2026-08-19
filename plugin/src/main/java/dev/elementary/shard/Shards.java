@@ -46,21 +46,6 @@ public final class Shards {
         pdc.set(OWNER_KEY, PersistentDataType.STRING, owner.toString());
         pdc.set(TIER_KEY, PersistentDataType.INTEGER, tier);
         item.setItemMeta(meta);
-        if (element == Element.LIGHT) {
-            // Sunspear charges by HOLDING right-click. A plain item
-            // never reports the button being held, so the Light shard
-            // is an unfinishable consumable: silent, invisible, twenty
-            // hours to "eat" - but the server now sees press and
-            // release exactly.
-            item.setData(io.papermc.paper.datacomponent.DataComponentTypes.CONSUMABLE,
-                    io.papermc.paper.datacomponent.item.Consumable.consumable()
-                            .consumeSeconds(72000f)
-                            .animation(io.papermc.paper.datacomponent.item.consumable
-                                    .ItemUseAnimation.NONE)
-                            .sound(net.kyori.adventure.key.Key.key(
-                                    "minecraft", "intentionally_empty"))
-                            .hasConsumeParticles(false));
-        }
         return item;
     }
 

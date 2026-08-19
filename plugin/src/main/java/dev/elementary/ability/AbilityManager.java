@@ -47,15 +47,6 @@ public class AbilityManager implements Listener {
         Kit kit = kits.get(data.element);
         if (kit == null) return;
 
-        // a held-down right click feeds the charging ability, whatever
-        // the sneak state - releasing the button is what fires it
-        if (right && kit.primary() instanceof ChargedAbility charged
-                && charged.charging(player)) {
-            charged.feed(player);
-            event.setCancelled(true);
-            return;
-        }
-
         Ability ability;
         if (right && player.isSneaking()) {
             ability = kit.ultimate();
@@ -67,11 +58,7 @@ public class AbilityManager implements Listener {
             return;
         }
         if (ability == null) return;
-        // claim the click - EXCEPT for charged abilities, whose hold
-        // detection needs the vanilla item-use to actually begin
-        if (right && !(ability instanceof ChargedAbility)) {
-            event.setCancelled(true);
-        }
+        if (right) event.setCancelled(true); // the click belongs to the cast
 
         if (ability.ultimate() && data.tier < 2) {
             Msg.fail(player, "Tier 2 required");

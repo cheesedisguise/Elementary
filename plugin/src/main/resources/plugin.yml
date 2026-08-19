@@ -1,5 +1,5 @@
 name: Elementary
-version: "2.0.0"
+version: "3.0.0"
 main: dev.elementary.ElementaryPlugin
 api-version: "1.21"
 description: Elemental shards - eight elements; aqudr always spawns with Ice.

@@ -1,19 +1,23 @@
 package dev.elementary.listener;
 
 import dev.elementary.ElementaryPlugin;
+import dev.elementary.ability.lightning.Powerplant;
+import dev.elementary.ability.shadow.Hunt;
+import dev.elementary.ability.shadow.Vanquish;
 import dev.elementary.data.PlayerData;
 import dev.elementary.element.Element;
-import dev.elementary.shard.Shards;
+import dev.elementary.status.StatusService;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-/** Damage-hook passives: fall handling, fire melee, nether bonus. */
+/** Damage-hook passives: fall handling, backstabs, fear, zaps, statuses. */
 public class CombatListener implements Listener {
     private final ElementaryPlugin plugin;
 
@@ -26,7 +30,8 @@ public class CombatListener implements Listener {
         return plugin.shards().dataFor(player);
     }
 
-    private final java.util.Map<java.util.UUID, Integer> staticCharge =
+    /** Run For Your Life's hit counter, per shadow player. */
+    private final java.util.Map<java.util.UUID, Integer> dreadCount =
             new java.util.HashMap<>();
 
     /** Earth's stone plates listen for every wound. */
@@ -61,25 +66,6 @@ public class CombatListener implements Listener {
         }
     }
 
-    private final java.util.Map<java.util.UUID, Long> lumenFlash = new java.util.HashMap<>();
-
-    /** Lumen: melee attackers get flash-blinded (3s per-attacker cooldown). */
-    @EventHandler(ignoreCancelled = true)
-    public void onLightStruck(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof Player victim)) return;
-        if (!(event.getDamager() instanceof LivingEntity attacker)) return;
-        PlayerData data = holdingData(victim);
-        if (data == null || data.element != Element.LIGHT) return;
-        long now = System.currentTimeMillis();
-        Long last = lumenFlash.get(attacker.getUniqueId());
-        if (last != null && now - last < 3000) return;
-        lumenFlash.put(attacker.getUniqueId(), now);
-        attacker.addPotionEffect(new org.bukkit.potion.PotionEffect(
-                org.bukkit.potion.PotionEffectType.BLINDNESS, 30, 0));
-        victim.getWorld().spawnParticle(org.bukkit.Particle.END_ROD,
-                victim.getLocation().add(0, 1.2, 0), 8, 0.3, 0.3, 0.3, 0.06);
-    }
-
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onMelee(EntityDamageByEntityEvent event) {
         if (!(event.getDamager() instanceof Player attacker)) return;
@@ -88,42 +74,51 @@ public class CombatListener implements Listener {
         if (data.element == Element.SHADOW
                 && event.getEntity() instanceof LivingEntity victim
                 && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-            // Umbra backstab: struck from behind
+            // Run For Your Life: struck from behind cuts deeper
             org.bukkit.util.Vector facing = victim.getLocation().getDirection().setY(0);
             org.bukkit.util.Vector toVictim = victim.getLocation().toVector()
                     .subtract(attacker.getLocation().toVector()).setY(0);
             if (facing.lengthSquared() > 0.01 && toVictim.lengthSquared() > 0.01
                     && facing.normalize().dot(toVictim.normalize()) > 0.35) {
-                double bonus = data.tier >= 2 ? 4.0 : 2.0;
-                // a marked victim takes the knife twice as deep
-                if (dev.elementary.ability.shadow.MarkForDeath.marked(victim, attacker)) {
-                    bonus *= 2;
-                }
-                event.setDamage(event.getDamage() + bonus);
+                event.setDamage(event.getDamage() + (data.tier >= 2 ? 4.0 : 2.0));
                 victim.getWorld().spawnParticle(org.bukkit.Particle.CRIT,
                         victim.getEyeLocation(), 10, 0.2, 0.2, 0.2, 0.1);
             }
+            // ...and every 4th hit (3rd at tier 2) plants the Fear
+            int threshold = data.tier >= 2 ? 3 : 4;
+            int count = dreadCount.merge(attacker.getUniqueId(), 1, Integer::sum);
+            if (count >= threshold) {
+                dreadCount.put(attacker.getUniqueId(), 0);
+                plugin.status().apply(victim, StatusService.Status.FEAR, 35, attacker);
+            }
+            // Vanquish: the knife raised behind them comes down
+            if (Vanquish.consumeEmpowered(attacker)) {
+                event.setDamage(event.getDamage() + (data.tier >= 2 ? 7.0 : 5.0));
+                plugin.status().apply(victim, StatusService.Status.FEAR, 60, attacker);
+                victim.getWorld().playSound(victim.getLocation(),
+                        org.bukkit.Sound.PARTICLE_SOUL_ESCAPE, 1.6f, 0.6f);
+                victim.getWorld().spawnParticle(org.bukkit.Particle.LARGE_SMOKE,
+                        victim.getEyeLocation(), 14, 0.25, 0.35, 0.25, 0.02);
+            }
         }
-        if (data.element == Element.LIGHTNING && !discharging
+        if (data.element == Element.LIGHTNING
                 && event.getEntity() instanceof LivingEntity victim
                 && event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
-            // Static: every 4th melee hit (3rd at tier 2) discharges.
-            // Overcharged, EVERY hit does - and each one arcs onward.
-            boolean overcharged = dev.elementary.ability.lightning.Overcharge.active(attacker);
-            int threshold = data.tier >= 2 ? 3 : 4;
-            int count = staticCharge.merge(attacker.getUniqueId(), 1, Integer::sum);
-            if (overcharged || count >= threshold) {
-                staticCharge.put(attacker.getUniqueId(), 0);
-                event.setDamage(event.getDamage() + 2.0);
+            // Over-Charged: at 12.5+ blocks/sec of Momentum, every hit
+            // zaps - bonus damage, a blink of camera lock, the sound
+            double charge = plugin.passives().momentum(attacker);
+            if (charge >= 12.5) {
+                boolean plant = Powerplant.active(attacker);
+                double zap = plant ? 2.0 : data.tier >= 2 ? 1.0 : 0.5;
+                event.setDamage(event.getDamage() + zap);
+                if (victim instanceof Player) {
+                    dev.elementary.util.CameraLock.hold(plugin, victim, 2, 0);
+                }
                 victim.getWorld().spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
-                        victim.getEyeLocation(), 24, 0.3, 0.4, 0.3, 0.12);
+                        victim.getEyeLocation(), 20, 0.3, 0.4, 0.3, 0.1);
                 victim.getWorld().playSound(victim.getLocation(),
-                        org.bukkit.Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.5f, 2f);
+                        org.bukkit.Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 0.45f, 2f);
                 plugin.challenges().staticDischarge(attacker);
-                if (overcharged) arcOnward(attacker, victim, data.tier);
-            } else {
-                victim.getWorld().spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
-                        victim.getEyeLocation(), 3, 0.2, 0.3, 0.2, 0.04);
             }
         }
         if (data.element == Element.FIRE && event.getEntity() instanceof LivingEntity victim) {
@@ -135,44 +130,28 @@ public class CombatListener implements Listener {
         }
     }
 
-    private boolean discharging = false;
-
-    /** Overcharged hits jump to the victim's nearest neighbours. */
-    private void arcOnward(Player attacker, LivingEntity victim, int tier) {
-        int jumps = tier >= 2 ? 2 : 1;
-        java.util.List<LivingEntity> nearby = new java.util.ArrayList<>();
-        for (LivingEntity candidate : victim.getLocation().getNearbyLivingEntities(4)) {
-            if (candidate.equals(victim)
-                    || !dev.elementary.util.Targets.hostile(attacker, candidate)) continue;
-            nearby.add(candidate);
-        }
-        nearby.sort(java.util.Comparator.comparingDouble(
-                c -> c.getLocation().distanceSquared(victim.getLocation())));
-        discharging = true;
-        try {
-            for (LivingEntity next : nearby.subList(0, Math.min(jumps, nearby.size()))) {
-                sparkLine(victim.getEyeLocation().toVector(),
-                        next.getEyeLocation().toVector(), victim.getWorld());
-                next.damage(2.0, attacker);
-                next.getWorld().spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
-                        next.getEyeLocation(), 12, 0.3, 0.4, 0.3, 0.08);
+    /** The status layer: every hit is rescaled by what rides each side.
+     *  Fear +15% in; Absolute Radiance +50% from Light hands; Luminosity
+     *  / AR / Harmony scale the damager; Hunt +10% inside the storm. */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onStatusScale(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof LivingEntity victim)) return;
+        Player damager = null;
+        if (event instanceof EntityDamageByEntityEvent byEntity) {
+            if (byEntity.getDamager() instanceof Player p) {
+                damager = p;
+            } else if (byEntity.getDamager() instanceof Projectile projectile
+                    && projectile.getShooter() instanceof Player p) {
+                damager = p;
             }
-        } finally {
-            discharging = false;
         }
-    }
-
-    private void sparkLine(org.bukkit.util.Vector from, org.bukkit.util.Vector to,
-                           World world) {
-        org.bukkit.util.Vector step = to.clone().subtract(from);
-        double length = step.length();
-        if (length < 0.01) return;
-        step.normalize().multiply(0.4);
-        org.bukkit.util.Vector cursor = from.clone();
-        for (double d = 0; d < length; d += 0.4) {
-            cursor.add(step);
-            world.spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
-                    cursor.toLocation(world), 1, 0.1, 0.1, 0.1, 0.01);
+        double mult = plugin.status().damageInMultiplier(victim, damager);
+        if (damager != null) {
+            mult *= plugin.status().damageOutMultiplier(damager);
+            mult *= Hunt.damageMultiplier(damager, victim);
+        }
+        if (Math.abs(mult - 1.0) > 0.0001) {
+            event.setDamage(event.getDamage() * mult);
         }
     }
 }

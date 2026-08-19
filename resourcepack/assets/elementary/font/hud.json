@@ -162,7 +162,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_consecrate.png",
+      "file": "elementary:hud/icon_neural_overload.png",
       "height": 16,
       "ascent": 7,
       "chars": [
@@ -180,7 +180,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_solar_flare.png",
+      "file": "elementary:hud/icon_supernova.png",
       "height": 16,
       "ascent": 7,
       "chars": [
@@ -189,7 +189,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_shadowstep.png",
+      "file": "elementary:hud/icon_shade_daggers.png",
       "height": 16,
       "ascent": 7,
       "chars": [
@@ -198,7 +198,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_mark_for_death.png",
+      "file": "elementary:hud/icon_vanquish.png",
       "height": 16,
       "ascent": 7,
       "chars": [
@@ -207,7 +207,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_eclipse.png",
+      "file": "elementary:hud/icon_hunt.png",
       "height": 16,
       "ascent": 7,
       "chars": [
@@ -216,7 +216,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_volt_rush.png",
+      "file": "elementary:hud/icon_volt_dash.png",
       "height": 16,
       "ascent": 7,
       "chars": [
@@ -225,7 +225,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_overcharge.png",
+      "file": "elementary:hud/icon_emotion_wave.png",
       "height": 16,
       "ascent": 7,
       "chars": [
@@ -234,11 +234,65 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_supercell.png",
+      "file": "elementary:hud/icon_powerplant.png",
       "height": 16,
       "ascent": 7,
       "chars": [
         "\ue017"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_radiance.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue018"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_fear.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue019"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_luminosity.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue01a"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_harmony.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue01b"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_concussion.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue01c"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "elementary:hud/icon_absolute_radiance.png",
+      "height": 16,
+      "ascent": 7,
+      "chars": [
+        "\ue01d"
       ]
     }
   ]

@@ -47,6 +47,10 @@ public class ElementaryPlugin extends JavaPlugin {
     public void onDisable() {
         // put every Pyre / Frozen Over floor back before we go
         dev.elementary.util.GroundCover.restoreAllNow();
+        // ...and every darkened sky, light block and status bundle
+        dev.elementary.ability.shadow.Hunt.cleanupAll();
+        if (radiance != null) radiance.shutdown();
+        if (status != null) status.shutdown();
         if (store != null) store.save();
     }
 
@@ -65,9 +69,15 @@ public class ElementaryPlugin extends JavaPlugin {
     }
 
     private dev.elementary.tier.Challenges challenges;
+    private dev.elementary.status.StatusService status;
+    private dev.elementary.status.Radiance radiance;
 
     public void setChallenges(dev.elementary.tier.Challenges c) { this.challenges = c; }
     public dev.elementary.tier.Challenges challenges() { return challenges; }
+    public void setStatus(dev.elementary.status.StatusService s) { this.status = s; }
+    public dev.elementary.status.StatusService status() { return status; }
+    public void setRadiance(dev.elementary.status.Radiance r) { this.radiance = r; }
+    public dev.elementary.status.Radiance radiance() { return radiance; }
 
     public DataStore store() { return store; }
     public ShardService shards() { return shardService; }

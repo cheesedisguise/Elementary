@@ -9,15 +9,15 @@ import dev.elementary.ability.ice.FrozenOver;
 import dev.elementary.ability.ice.OrbitalIce;
 import dev.elementary.ability.ice.SubZero;
 import dev.elementary.ability.earth.Boulder;
-import dev.elementary.ability.light.Consecrate;
-import dev.elementary.ability.lightning.Overcharge;
-import dev.elementary.ability.lightning.Supercell;
-import dev.elementary.ability.lightning.VoltRush;
-import dev.elementary.ability.light.SolarFlare;
+import dev.elementary.ability.light.NeuralOverload;
 import dev.elementary.ability.light.Sunspear;
-import dev.elementary.ability.shadow.Eclipse;
-import dev.elementary.ability.shadow.MarkForDeath;
-import dev.elementary.ability.shadow.Shadowstep;
+import dev.elementary.ability.light.Supernova;
+import dev.elementary.ability.lightning.EmotionWave;
+import dev.elementary.ability.lightning.Powerplant;
+import dev.elementary.ability.lightning.VoltDash;
+import dev.elementary.ability.shadow.Hunt;
+import dev.elementary.ability.shadow.ShadeDaggers;
+import dev.elementary.ability.shadow.Vanquish;
 import dev.elementary.ability.earth.Cataclysm;
 import dev.elementary.ability.earth.Fissure;
 import dev.elementary.ability.fire.FireballAbility;
@@ -37,6 +37,8 @@ import dev.elementary.item.ItemListener;
 import dev.elementary.item.Items;
 import dev.elementary.listener.CombatListener;
 import dev.elementary.passive.PassiveTask;
+import dev.elementary.status.Radiance;
+import dev.elementary.status.StatusService;
 import dev.elementary.tier.Challenges;
 import dev.elementary.tier.TierListener;
 import org.bukkit.plugin.PluginManager;
@@ -50,6 +52,13 @@ final class Registrations {
         AbilityManager abilities = plugin.abilities();
 
         Items.init(plugin);
+
+        // the status layer first - every kit leans on it
+        StatusService status = new StatusService(plugin);
+        plugin.setStatus(status);
+        dev.elementary.util.TrueDamage.init(status);
+        Radiance radiance = new Radiance(plugin);
+        plugin.setRadiance(radiance);
 
         Fissure fissure = new Fissure(plugin);
         Boulder boulder = new Boulder(plugin);
@@ -81,16 +90,12 @@ final class Registrations {
         abilities.register(Element.ICE,
                 new AbilityManager.Kit(frozenOver, orbitalIce, subZero));
 
-        MarkForDeath markForDeath = new MarkForDeath(plugin);
         abilities.register(Element.SHADOW, new AbilityManager.Kit(
-                new Shadowstep(plugin), markForDeath, new Eclipse(plugin)));
-        Sunspear sunspear = new Sunspear(plugin);
-        Consecrate consecrate = new Consecrate(plugin);
-        SolarFlare solarFlare = new SolarFlare(plugin);
+                new ShadeDaggers(plugin), new Vanquish(plugin), new Hunt(plugin)));
         abilities.register(Element.LIGHT, new AbilityManager.Kit(
-                sunspear, consecrate, solarFlare));
+                new Sunspear(plugin), new NeuralOverload(plugin), new Supernova(plugin)));
         abilities.register(Element.LIGHTNING, new AbilityManager.Kit(
-                new VoltRush(plugin), new Overcharge(plugin), new Supercell(plugin)));
+                new VoltDash(plugin), new EmotionWave(plugin), new Powerplant(plugin)));
 
         Challenges challenges = new Challenges(plugin);
         plugin.setChallenges(challenges);
@@ -98,15 +103,12 @@ final class Registrations {
         pm.registerEvents(new LockdownListener(plugin), plugin);
         pm.registerEvents(abilities, plugin);
         pm.registerEvents(new CombatListener(plugin), plugin);
+        pm.registerEvents(status, plugin);
         pm.registerEvents(boulder, plugin);
         pm.registerEvents(fireball, plugin);
         pm.registerEvents(meteor, plugin);
         pm.registerEvents(new CatchTheRainbow(plugin), plugin);
         pm.registerEvents(orbitalIce, plugin);
-        pm.registerEvents(consecrate, plugin);
-        pm.registerEvents(solarFlare, plugin);
-        pm.registerEvents(sunspear, plugin);
-        pm.registerEvents(markForDeath, plugin);
         pm.registerEvents(challenges, plugin);
         pm.registerEvents(new TierListener(plugin), plugin);
         BrokerMenu brokerMenu = new BrokerMenu(plugin);
@@ -116,6 +118,8 @@ final class Registrations {
         PassiveTask passives = new PassiveTask(plugin);
         plugin.setPassives(passives);
         passives.runTaskTimer(plugin, 20, 20);
+        status.runTaskTimer(plugin, 2, 2);
+        radiance.runTaskTimer(plugin, 5, 5);
 
         plugin.getCommand("info").setExecutor(new InfoCommand(plugin));
         plugin.getCommand("elementary").setExecutor(new AdminCommand(plugin));

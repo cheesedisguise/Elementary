@@ -120,68 +120,50 @@ public class PassiveTask extends BukkitRunnable {
     }
 
     private void shadow(Player player, PlayerData data) {
-        // Umbra: quick in the dark (backstab lives in CombatListener)
-        if (player.getLocation().getBlock().getLightLevel() <= 7) {
-            give(player, PotionEffectType.SPEED, 0);
-        }
+        // Run For Your Life: the fear-every-4th-hit and the backstab
+        // bonus both live in CombatListener; nothing timed here
     }
 
     private final java.util.Map<java.util.UUID, org.bukkit.util.Vector> lastPos =
             new java.util.HashMap<>();
-    private final java.util.Map<java.util.UUID, Long> lastMoved = new java.util.HashMap<>();
-    private final java.util.Map<java.util.UUID, Integer> momentum = new java.util.HashMap<>();
+    private final java.util.Map<java.util.UUID, Double> meter = new java.util.HashMap<>();
 
-    /** Volt Rush connects: the meter snaps straight to full. */
-    public void maxMomentum(Player player) {
-        momentum.put(player.getUniqueId(), 3);
-        lastMoved.put(player.getUniqueId(), System.currentTimeMillis());
-        give(player, PotionEffectType.SPEED, 2);
-        player.getWorld().spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
-                player.getLocation().add(0, 0.2, 0), 12, 0.3, 0.1, 0.3, 0.05);
+    /** Over-Charged's Momentum meter, in smoothed blocks-per-second. */
+    public double momentum(Player player) {
+        return meter.getOrDefault(player.getUniqueId(), 0.0);
     }
 
-    /** Momentum: moving builds Speed, standing still for 2s drains it. */
+    /**
+     * Over-Charged: Momentum is a smoothed measure of recent speed -
+     * each second the meter keeps half of itself and adds the blocks
+     * just travelled. Plain sprinting settles around 11; you need
+     * sprint-jumping or the meter's own Speed gifts to cross the 12.5
+     * zap threshold. Powerplant raises the cap to 20 and charges 50%
+     * faster.
+     */
     private void lightning(Player player, PlayerData data) {
         org.bukkit.util.Vector now = player.getLocation().toVector().setY(0);
         org.bukkit.util.Vector previous = lastPos.put(player.getUniqueId(), now);
-        long ms = System.currentTimeMillis();
-        boolean moved = previous != null && previous.distanceSquared(now) > 0.06;
-        if (moved) {
-            lastMoved.put(player.getUniqueId(), ms);
-            int stacks = Math.min(3, momentum.merge(player.getUniqueId(), 1, Integer::sum));
-            momentum.put(player.getUniqueId(), stacks);
-            give(player, PotionEffectType.SPEED, stacks - 1);
-            if (stacks >= 2) {
-                player.getWorld().spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
-                        player.getLocation().add(0, 0.2, 0), 2, 0.2, 0.05, 0.2, 0.01);
-            }
-        } else if (ms - lastMoved.getOrDefault(player.getUniqueId(), 0L) > 2000) {
-            momentum.remove(player.getUniqueId());
-        } else {
-            int stacks = momentum.getOrDefault(player.getUniqueId(), 0);
-            if (stacks > 0) give(player, PotionEffectType.SPEED, stacks - 1);
+        double dist = previous == null ? 0 : Math.min(25, previous.distance(now));
+        boolean plant = dev.elementary.ability.lightning.Powerplant.active(player);
+        double cap = plant ? 20 : 15;
+        double charge = Math.min(cap,
+                meter.getOrDefault(player.getUniqueId(), 0.0) * 0.5
+                        + dist * (plant ? 1.5 : 1.0));
+        meter.put(player.getUniqueId(), charge);
+        int amp = charge >= 13 ? 2 : charge >= 9 ? 1 : charge >= 5 ? 0 : -1;
+        if (amp >= 0) give(player, PotionEffectType.SPEED, amp);
+        if (charge >= 12.5) {
+            // fully overcharged: the body arcs - zaps are armed
+            player.getWorld().spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
+                    player.getLocation().add(0, 0.9, 0), 4, 0.25, 0.4, 0.25, 0.02);
+        } else if (charge >= 9) {
+            player.getWorld().spawnParticle(org.bukkit.Particle.ELECTRIC_SPARK,
+                    player.getLocation().add(0, 0.2, 0), 2, 0.2, 0.05, 0.2, 0.01);
         }
     }
 
     private void light(Player player, PlayerData data) {
-        // Lumen: permanent night vision, regeneration in sunlight
-        player.addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION,
-                400, 0, true, false, false));
-        boolean day = player.getWorld().isDayTime();
-        boolean openSky = player.getLocation().getBlock().getLightFromSky() >= 15;
-        if (day && (openSky || data.tier >= 2)) {
-            give(player, PotionEffectType.REGENERATION, 0);
-        }
-        // the harvest comes to the harvester: drops and XP drift over
-        org.bukkit.util.Vector to = player.getLocation().add(0, 0.6, 0).toVector();
-        for (org.bukkit.entity.Entity e : player.getNearbyEntities(6, 4, 6)) {
-            if (!(e instanceof org.bukkit.entity.Item)
-                    && !(e instanceof org.bukkit.entity.ExperienceOrb)) continue;
-            org.bukkit.util.Vector pull = to.clone().subtract(e.getLocation().toVector());
-            double dist = pull.length();
-            if (dist < 1.1) continue;
-            e.setVelocity(e.getVelocity().multiply(0.4)
-                    .add(pull.normalize().multiply(0.35)));
-        }
+        // Radiance carries the whole Light passive (status/Radiance)
     }
 }

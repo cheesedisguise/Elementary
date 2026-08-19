@@ -32,15 +32,21 @@ public final class HudFont {
             Map.entry("Frozen Over", "\uE00C"),
             Map.entry("Orbital Ice", "\uE00D"),
             Map.entry("Sub-Zero", "\uE00E"),
-            Map.entry("Consecrate", "\uE00F"),
+            Map.entry("Neural Overload", "\uE00F"),
             Map.entry("Sunspear", "\uE010"),
-            Map.entry("Solar Flare", "\uE011"),
-            Map.entry("Shadowstep", "\uE012"),
-            Map.entry("Mark for Death", "\uE013"),
-            Map.entry("Eclipse", "\uE014"),
-            Map.entry("Volt Rush", "\uE015"),
-            Map.entry("Overcharge", "\uE016"),
-            Map.entry("Supercell", "\uE017"));
+            Map.entry("Supernova", "\uE011"),
+            Map.entry("Shade Daggers", "\uE012"),
+            Map.entry("Vanquish", "\uE013"),
+            Map.entry("Hunt", "\uE014"),
+            Map.entry("Volt Dash", "\uE015"),
+            Map.entry("Emotion Wave", "\uE016"),
+            Map.entry("Powerplant", "\uE017"),
+            Map.entry("Radiance", "\uE018"),
+            Map.entry("Fear", "\uE019"),
+            Map.entry("Luminosity", "\uE01A"),
+            Map.entry("Harmony", "\uE01B"),
+            Map.entry("Concussion", "\uE01C"),
+            Map.entry("Absolute Radiance", "\uE01D"));
 
     private static final int[] NEGATIVE = {32, 16, 8, 4, 2, 1};
     private static final char[] NEGATIVE_CHARS =

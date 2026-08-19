@@ -44,7 +44,6 @@ On respawn, verify the player still holds their shard. If not, silently re-issue
 | Right-click | **Ability 1** |
 | Sneak + left-click | **Ability 2** |
 | Sneak + right-click | **Ultimate** (Tier 2 only) |
-| Hold right-click | **Charged abilities** (Sunspear) draw while held, fire on release |
 | `/info` | Your shard: element, tier, abilities, controls, challenge progress |
 | `/recipes` | Craftable items and their recipes |
 | `/trust`, `/untrust` | Manage your ally list (§1 rule 9) |
@@ -95,9 +94,22 @@ Icons are glyphs from **game-icons.net** (CC BY 3.0 — Lorc and Delapouite; att
 | Fire | Fireball — `fireball` | Pyre — `fire-ring` | Meteor Shower — `burning-meteor` |
 | Air | Updraft — `eruption` | Gale — `wind-slap` | Tempest — `tornado` |
 | Ice | Frozen Over — `frozen-ring` | Orbital Ice — `frozen-orb` | Sub-Zero — `frozen-body` |
-| Shadow | Shadowstep — `teleport` | Mark for Death — `human-target` | Eclipse — `eclipse-flare` |
-| Light | Sunspear — `sunbeams` | Consecrate — `beams-aura` | Solar Flare — `sun` |
-| Lightning | Volt Rush — `sonic-lightning` | Overcharge — `lightning-slashes` | Supercell — `heavy-lightning` |
+| Shadow | Shade Daggers — `daggers` | Vanquish — `teleport` | Hunt — `evil-moon` |
+| Light | Sunspear — `sunbeams` | Neural Overload — `brainstorm` | Supernova — `sun` |
+| Lightning | Volt Dash — `sonic-lightning` | Emotion Wave — `lightning-frequency` | Powerplant — `power-lightning` |
+
+**Status-effect icons** (U+E018+) ride the same font for the HUD status row —
+and for Light, the Radiance counter leads the action bar (`beams-aura` icon +
+stack count; Light abilities grey out while the bank can't afford them):
+
+| Status | Glyph | Shown |
+|---|---|---|
+| Radiance (counter) | `beams-aura` | Before the Light kit's icons, with the stack digit |
+| Fear | `terror` | Shadow-red, while feared |
+| Luminosity | `star-pupil` | Gold, while overexposed |
+| Harmony | `yin-yang` | Rainbow-cycling |
+| Concussion | `brain` | Violet, while concussed |
+| Absolute Radiance | `explosion-rays` | Near-white, while consumed by light |
 
 ---
 
@@ -291,98 +303,110 @@ Five ice pellets materialise and **orbit aqudr** — radius 1.5 blocks, one revo
 
 ### ⬛ Shadow Shard
 
-*Super dark red. Ambush — strike from the dark.*
+*Super dark red. Terror — the dark is a weapon now.*
 
-**Passive — Umbra**
-- Speed I while in darkness (light level ≤ 7)
-- **Backstab** — +2 melee damage when striking from behind
+**Passive — Run For Your Life**
+- **Backstab** — +2 melee damage when striking from behind (+4 at Tier 2)
+- **Every 4th melee hit plants Fear** for 1.75s (every 3rd at Tier 2) — see the status table below: +15% damage taken, blindness + darkness bundled, shadow-black hearts
 
-**Ability 1 (RMB) — Shadowstep** · 20s
-Two steps in one:
+**Ability 1 (RMB) — Shade Daggers** · 35s
+Aim at prey within 24 blocks: **three short blades of shadow** (four at Tier 2) condense above your head, hang for one second, then **hunt the target — curving mid-air to track**.
 
-- **Aimed at prey** (a target within 10 blocks): you step **directly behind them**, arriving facing their back, knife-ready — the backstab is served by positioning
-- **Aimed at nothing:** the classic blink — up to 8 blocks along your look direction, stopping at walls
+- **1.5 TRUE damage per dagger** — a full volley is 4.5 through any armour
+- **A raised shield shatters a dagger harmlessly** — the shield-block clang is the counterplay
+- Daggers dissolve after 7.5s if they never land; walls stop them
 
-Either way, Invisibility for 2s after landing.
+*Particles:* deep-red `DUST` trails with `SMOKE` wisps; netherite-sword `ITEM_DISPLAY`s for the blades themselves.
 
-*Particles:* dense `LARGE_SMOKE` and deep-red `DUST` bursts at both ends — the departure puff is the counterplay tell.
+**Ability 2 (⇧LMB) — Vanquish** · 40s
+Blink **directly behind** a target within 12 blocks (16 at Tier 2), arriving facing their back, knife raised — and for 4 seconds the next melee strike is **empowered: +5 damage (+7 at Tier 2) and 3s of Fear** on top of any backstab bonus.
 
-**Ability 2 (⇧LMB) — Mark for Death** · 25s
-Pick your prey: aim at a player or mob within 20 blocks. For 8 seconds they are **marked**:
+The assassin's loop in one button: appear, execute, and the terror does the rest.
 
-- **Revealed** — Glowing, visible through walls, a dark-red sigil circling their head
-- **Your backstab bonus against them doubles** (+4; +8 at Tier 2)
-- You gain Speed I for the hunt
-- **If the mark dies while it burns, Shadowstep's cooldown resets on the spot**
+*Particles:* dense `LARGE_SMOKE` and deep-red `DUST` at both ends of the blink; a soul-escape shriek when the empowered strike lands.
 
-The assassin's loop, mechanised: mark → step behind → knife → vanish → next victim.
-
-*Particles / sound:* the elder-guardian curse toll when the mark lands; a slow ring of deep-red `DUST` orbits the victim's head until it expires.
+**Ultimate (⇧RMB) — Hunt** · 60s — *described in §7*
 
 ---
 
 ### 🟨 Light Shard
 
-*Pale gold. The harvester — the grinding gem. Light feeds the farm: XP, loot, undead ash.*
+*Pale gold. The engine — Radiance is ammunition, and every shot is a decision.*
 
-**Passive — Lumen**
-- Permanent Night Vision
-- Regeneration I in direct sunlight
-- Melee attackers are flash-blinded for 1.5s (once per 3s per attacker)
-- **The magnet:** item drops and XP orbs within 6 blocks drift to you on their own
+**Passive — Radiance**
+- **Gain 1 Radiance stack every 7.5 seconds, up to 5.** The bank rides above the HUD as an icon + counter; abilities grey out while you can't afford them
+- Each stack held makes you **shine brighter** — aura particles, and a real (invisible) light block following your feet, stronger per stack
+- **Undead burn near you**, harder and farther per stack (radius 2 + stacks)
+- **At 3+ stacks, invisibility is useless against you** — hidden things are painted gold on your screen
 
-**Ability 1 (RMB) — Sunspear** · 30s
-Hold right-click and **the light builds: one charge per second, five charges in all.** Every charge pops an **expanding ring of light in front of you** — small, then wide — with a chime pitching higher each time. At five charges **the spear fires itself**, and it sounds like something that should not be pointed at a person: thunder-crack, blast, beacon wail, a `FLASH` at the muzzle.
+**Ability 1 (RMB) — Sunspear** · 2s + Radiance
+An instant beam, 24 blocks, that **spends the whole Radiance bank**:
 
-- **Damage: 4 base (+3 vs undead, vanilla smite tag) plus 1 TRUE damage per charge** — a full spear lands 4 + 5 true, armour be damned
-- Release early and it fires with whatever you banked; a bare tap is just the base jab
-- Range 24 blocks; victims glow 8s; charging slows you (Slowness II) — you are a lighthouse, commit to it
-- **Tier 2 pierces every target in the line**, whatever the charge
+- **1 stack:** a flicker — 1 TRUE damage
+- **2 stacks:** a lance — **2.5 TRUE damage + 3s Luminosity**
+- **3+ stacks:** each extra stack adds **+1 heart (2.0) of TRUE damage and +1.5s of Luminosity** — a full 5-stack spear lands 8.5 true with 7.5s of Luminosity
+- **Tier 2 pierces every target in the line**
 
-*Particles:* the five telegraph rings in gold `DUST` + `END_ROD`; the beam itself densifies with charges and ends in a `FIREWORK` burst per victim.
+*Particles:* the beam densifies with stacks spent; `FLASH` + thunder at full bank; `FIREWORK` burst per victim.
 
-**Ability 2 (⇧LMB) — Consecrate** · 30s
-Sanctify the ground: a 6-block circle at the cast spot for 10s. Holy ground works the farm for you:
+**Ability 2 (⇧LMB) — Neural Overload** · 12s + 3 Radiance
+Three stacks poured straight into a skull within 18 blocks (22 at Tier 2):
 
-- **The undead burn** inside it, as if under the noon sun
-- Everything inside is lit with Glowing — count your spawner's output at a glance
-- **Mobs inside take +30% damage; enemy players +15%**
-- **Mobs slain inside drop double XP**
+- **60% chance the target is Concussed** for 3s; they **always** take **6s of Luminosity**
+- **You always come away in Harmony** (8s): +15% speed, +15% damage, rainbow trail
+- **20% of the time the channel kicks back** and Concusses YOU for 5s — high risk, high tempo
 
-Drop it over the spawner floor, on the drop tube, in the ritual circle.
+*Particles:* a jagged gold thread from your eyes to theirs; an `ENCHANT` rune storm around the struck head.
 
-*Particles:* a gold `DUST` boundary ring with `END_ROD` motes drifting up from the blessed ground; beacon hum on cast, fading when it expires.
+**Ultimate (⇧RMB) — Supernova** · 60s + 5 Radiance — *described in §7*
 
 ---
 
 ### ⚡ Lightning Shard
 
-*Electric yellow. The duelist — speed becomes power. Every ability feeds the Momentum engine.*
+*Electric yellow. The duelist — speed IS the weapon.*
 
-**Passive — Static**
+**Passive — Over-Charged**
 - Immune to lightning damage
-- Every 4th melee hit **discharges**: +2 damage and a spark burst
-- **Momentum** — moving builds Speed, one step per second up to Speed III; stand still for 2 seconds and it drains away
+- **Momentum** — a meter of your recent speed (smoothed blocks/sec, capped at 15). Moving fills it, stopping halves it every second; the meter grants Speed I/II/III at 5 / 9 / 13
+- **At 12.5+ Momentum every melee hit ZAPS**: +0.5 damage, a zap crack, and the victim's screen locks for a tenth of a second. Plain sprinting settles just below the threshold — sprint-jump or ride the meter's own Speed to cross it
 
-*Particles:* faint `ELECTRIC_SPARK` crackle at the feet while Momentum is charged.
+*Particles:* `ELECTRIC_SPARK` crackle scaling with the meter; a full-body arc while zaps are armed.
 
-**Ability 1 (RMB) — Volt Rush** · 20s
-You **become the bolt**: an instant dash 7 blocks along your exact aim — pitch included — passing **straight through** anyone in the way. Stops at walls.
+**Ability 1 (RMB) — Volt Dash** · 25s
+You **become the bolt**: an instant dash 5 blocks along your exact aim, straight through anyone in the way.
 
-- Everyone passed through takes 3 damage and a shock burst
-- Touch at least one enemy and **Momentum snaps instantly to max** — dash in, come out at full speed
-- No invisibility, no subtlety: this is an engage, not an escape (that's Shadow's trick)
+- Everyone caught takes **3.5 damage**, their **camera snaps still**, and they hang **stunned mid-air for a full second** — pinned where the current left them
+- Stops at walls; no escape invisibility — this is an engage
 
-*Particles:* a solid `ELECTRIC_SPARK` line down the dash path, thunder-crack and riptide sounds.
+*Particles:* a solid `ELECTRIC_SPARK` line down the dash path; riptide + thunder-crack.
 
-**Ability 2 (⇧LMB) — Overcharge** · 35s
-A six-second **stance**: while it lasts, **every** melee hit discharges Static (not every 4th) and each hit **arcs to the nearest enemy** within 4 blocks of your victim for 2 damage.
+**Ability 2 (⇧LMB) — Emotion Wave** · 40s
+A signal flung to the skies — then **six walls of static crawl outward** from the cast point, one block per second, twelve blocks far.
 
-- The chain-lightning fantasy lives on your sword now — wade into a crowd and every swing forks
-- You crackle loudly the whole six seconds: the counterplay is to kite the window out
-- Discharges triggered this way still count for the Live Wire challenge
+- Each wall lands **1 TRUE damage** on whoever it washes over (once per wall)
+- Slow enough to sidestep; six directions at once make the floor a puzzle
+- During Powerplant the walls hit for 1.25
 
-*Particles:* twin `ELECTRIC_SPARK` orbits around the caster for the duration; spark arcs drawn victim-to-victim on every fork.
+*Particles:* an `END_ROD` column to the sky on cast; each wavefront is a 2.5-block-tall `ELECTRIC_SPARK` curtain.
+
+**Ultimate (⇧RMB) — Powerplant** · 90s — *described in §7*
+
+---
+
+### Status effects
+
+Elementary's own status layer (`status/StatusService`). Each status bundles its vanilla screen effects invisibly (ambient, no HUD icon) and shows ONE icon in the font HUD's status row instead.
+
+| Status | Duration source | What it does |
+|---|---|---|
+| **Fear** | Shadow passive (1.75s), Vanquish (3s), Hunt (rolling) | **+15% damage taken**; blindness + darkness bundled; hearts turn shadow-black (a wither shade too short to ever tick damage); the feared player **sees their tormentor as a red silhouette through walls and invisibility** |
+| **Luminosity** | Sunspear (3s+), Neural Overload (6s), Supernova (5s) | **−20% damage dealt, −15% speed**, gold shimmer. **60% weaker at night** (−8% / −6%) — light fades after dark |
+| **Absolute Radiance** | Supernova upgrade on already-luminous targets (10s) | Luminosity gone supernova: **−35% damage, −30% speed**, Glowing, blurry screen, **an unresistable burn** (1/s, ignores Fire Resistance), and **Light moves hit the bearer +50%**. 40% weaker at night. **Gaining darkness snuffs it out** — shadow counters light |
+| **Harmony** | Neural Overload (8s) | **+15% speed, +15% damage**, rainbow trail — and Supernova cast in Harmony keeps firing afterglow beams |
+| **Concussion** | Neural Overload (3s target / 5s self-kickback) | The screen swims (nausea) and the world blurs; fades back over one second when it ends |
+
+Client-honesty notes: sound muffling, forced first-person and true custom potion-GUI entries aren't possible server-side; Concussion/Fear approximate them with bundled vanilla effects, sounds played at the victim, and the font-HUD status row.
 
 ---
 
@@ -403,7 +427,7 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | **🧊 Ice** | **Hailstorm** — hit players or mobs with 100 Orbital Ice pellets. Misses don't count. |
 | **⬛ Shadow** | **Lights Out** — kill 40 entities in darkness (light level ≤ 7). |
 | **🟨 Light** | **High Noon** — deal 200 damage while standing in direct sunlight. |
-| **⚡ Lightning** | **Live Wire** — trigger 50 Static discharges. |
+| **⚡ Lightning** | **Live Wire** — land 50 Over-Charged zaps (12.5+ Momentum hits). |
 
 ### Route 2 — The Upgrader
 
@@ -435,9 +459,9 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | **Fire** | Nether bonus applies everywhere at +1 | Fireball fires 3 in a spread | Pyre radius 5 → 8, adds Regeneration I to caster |
 | **Air** | Speed II | Updraft radius 6 → 9 | Gale cone 8 → 12 blocks, stronger recoil |
 | **Ice** | Double jump gains a second charge (triple jump) during thunderstorms | Frozen Over lasts 8s → 12s; the cold seeps up — enemies on the ice are chilled | Orbital Ice 5 → 7 pellets |
-| **Shadow** | Backstab +2 → +4 | Shadowstep range 8 → 14 (behind-blink 10 → 16) | Mark lasts 8s → 12s |
-| **Light** | Lumen regenerates in any daylight, not just open sky | Sunspear pierces every target in the beam | Consecrate radius 6 → 8 |
-| **Lightning** | Static discharges every 3rd hit | Volt Rush range 7 → 10 | Overcharge forks to 2 extra targets per hit |
+| **Shadow** | Backstab +2 → +4; Fear every 4th → every 3rd hit | Shade Daggers 3 → 4 blades | Vanquish range 12 → 16; empowered strike +5 → +7 |
+| **Light** | *(Radiance cadence unchanged — the kit scales through the bank)* | Sunspear pierces every target in the beam | Neural Overload range 18 → 22 |
+| **Lightning** | Zap bonus +0.5 → +1.0 (Powerplant's 2.0 unchanged) | Volt Dash range 5 → 7 | Emotion Wave walls travel 12 → 16 blocks |
 
 ### Item appearance across tiers
 
@@ -593,7 +617,7 @@ Bukkit.broadcast(Component.text(player.getName() + " has made the advancement ")
 
 ---
 
-## 7. Ultimates (Tier 2 only, ⇧RMB, 60s cooldown)
+## 7. Ultimates (Tier 2 only, ⇧RMB, 60s cooldown — Powerplant 90s, see below)
 
 ### 🟫 Earth — Cataclysm
 Stone spikes erupt in a 10-block radius. 8 damage, enemies rooted 3s, caster gains Resistance II for 8s. Display entities, gone after 3s.
@@ -624,22 +648,24 @@ Every player and mob within a **10-block radius** is **flash-frozen for 2.5s**: 
 
 *Implementation:* suspension = lift ~0.5 and zero velocity every tick; frostbite = `setFreezeTicks(max)` refreshed every tick, which gives the vanilla frost vignette and frozen hearts for free; camera lock = re-send position-and-look with pinned yaw/pitch each tick. The lock is deliberately oppressive — it's the ult — but keep it exactly 2.5s and never chain-apply it without the full cooldown between casts.
 
-### ⬛ Shadow — Eclipse
-An 8s, 9-block zone of darkness fixed at the cast point. Enemies inside get Darkness and Weakness II and take 1 damage per second; the caster, while inside, gains Strength II, Speed II — and **true invisibility**: not the vanilla ghost-with-floating-armour, but *gone*. Other clients are told the caster's armour and held items don't exist, so nothing renders at all. Step outside the dark and every piece snaps back into view.
+### ⬛ Shadow — Hunt
+For **20 seconds a 35-block storm of dread follows the caster**. Every enemy inside is held in **Fear** (rolling reapply), **the sky turns to midnight on their screens** — per-player time, scrolling back the moment they escape the radius — the **caster's heartbeat pounds in their ears** (warden heartbeat every 2s), and the caster hits everyone inside **+10% harder**. Twenty seconds of being prey.
 
-*Particles:* a `SQUID_INK` dome edge with deep-red `DUST` motes drifting through the interior — inside it, the only trace of the caster.
+*Particles / sound:* drifting `SQUID_INK` motes through the whole volume, a deep-red `DUST` ring at the border, cave-ambience moans.
 
-*Implementation:* Invisibility effect plus `sendEquipmentChange` — every other client is sent empty equipment for all six visible slots while the caster stays in the zone, and the real gear on exit. Pure API, no packets library.
+*Implementation:* `setPlayerTime(18000, false)` per victim inside / `resetPlayerTime()` on exit, end and plugin shutdown. Forced first-person and true sound-muffling are client-side-only — the per-player midnight, Fear's bundled blindness/darkness and the heartbeat carry the dread instead.
 
-### 🟨 Light — Solar Flare
-Eight seconds of radiance: every second, enemies within 7 blocks take 2 damage and are revealed (Glowing 10s). The caster keeps Absorption II for the duration — and it's the golden hour: **mobs the caster kills during the flare drop double loot.**
+### 🟨 Light — Supernova
+**All five Radiance stacks detonate at once** (needs the full bank): everything hostile within 8 blocks takes **6 damage (9 vs undead)** and is painted with **Luminosity (5s)** — and anyone **already luminous is upgraded to Absolute Radiance (10s)** instead: the debuff, the glow, the unresistable burn. Cast it while in **Harmony** and the afterglow keeps firing: **an automatic 2-true-damage beam at the nearest enemy every second for ten seconds**.
 
-*Particles:* expanding gold `DUST` rings under an `END_ROD` halo.
+The loop is the kit: Sunspear paints Luminosity → Neural Overload buys Harmony → Supernova converts it all.
 
-### ⚡ Lightning — Supercell
-A personal storm for 8s: each second one random enemy within 10 blocks is struck by a visual bolt for 3 damage. The caster has Speed II throughout.
+*Particles:* one `FLASH`, an expanding gold `DUST` ring, `END_ROD` bursts per victim; afterglow beams as `END_ROD` threads.
 
-*Particles:* vanilla lightning flashes beneath a crackling `CLOUD` cell that follows the caster.
+### ⚡ Lightning — Powerplant
+**Thirty seconds as a live generator:** the Momentum cap rises 15 → 20 and charge builds 50% faster, **every Lightning move hits +25%** (Volt Dash 4.4, Emotion Wave 1.25 true), **zaps jump from +0.5 to +2 damage**, and a crackling halo spins over the caster's head the whole time. The 90s cooldown starts at cast — so it reads as 60s once the plant winds down, exactly the spec's "cooldown starts after it's inactive".
+
+*Particles:* a three-armed `ELECTRIC_SPARK` halo overhead; sculk-sensor clicks; beacon-wail shutdown.
 
 ---
 
