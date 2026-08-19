@@ -41,10 +41,9 @@ On respawn, verify the player still holds their shard. If not, silently re-issue
 |---|---|
 | Always | Passive active |
 | Shard in main hand | Abilities castable |
-| Right-click | **Ability 1** |
-| Sneak + left-click | **Ability 2** |
-| Sneak + right-click | **Ultimate** (Tier 2 only) |
-| `/ability1` · `/ability2` · `/ultimate` (`/ult`) | Command casting — the same three abilities, for keybinds. Same rules: shard in main hand, same cooldowns, same tier lock |
+| `/ability1` | **Ability 1** |
+| `/ability2` | **Ability 2** |
+| `/ultimate` (alias `/ult`) | **Ultimate** (Tier 2 only) |
 | `/info` | Your shard: element, tier, abilities, controls, challenge progress |
 | `/recipes` | Craftable items and their recipes |
 | `/trust`, `/untrust` | Manage your ally list (§1 rule 9) |
@@ -155,12 +154,12 @@ Ability messages are **client-sided** — only the caster sees them. Nothing is 
 - **Unshakeable** — 60% knockback resistance while standing on stone, deepslate, or dirt-family blocks. Rooted like the ground itself: hits that send others flying barely rock you
 - **Stone plates** — go 5 seconds without taking damage and Absorption armour (2 amber hearts) grows over you; it shatters when struck and regrows in the calm
 
-**Ability 1 (RMB) — Fissure** · 20s
+**Ability 1 (`/ability1`) — Fissure** · 20s
 Punch the ground: a **crack races 12 blocks along your aim** — fast, directional, climbing slopes and dying at cliff edges. Anyone standing over it as it passes is **erupted**: launched upward, 5 damage, Slowness II. Tremor's launch, made into a skill shot you aim.
 
 *Particles:* the ground splits open in **its own material** — each step of the crack bursts `BLOCK` particles of whatever block it crosses, with stone-break crunches racing along the line and a final eruption where it ends.
 
-**Ability 2 (⇧LMB) — Boulder** · 20s
+**Ability 2 (`/ability2`) — Boulder** · 20s
 Rip a slab of stone out of the ground and **hurl it**. The boulder is a real falling-block projectile flying a true arc along your aim — lob it over walls, skim it flat, drop it on heads.
 
 - **On impact** (first enemy touched, or the ground): 6 damage in a 2.6-block crater, everyone caught is **shoved back** from the impact and slowed (Slowness II, 3s)
@@ -180,12 +179,12 @@ Rip a slab of stone out of the ground and **hurl it**. The boulder is a real fal
 - Regeneration I while in contact with water or rain
 - No mining slowdown underwater, clear vision underwater
 
-**Ability 1 (RMB) — Tide Pull** · 20s
+**Ability 1 (`/ability1`) — Tide Pull** · 20s
 Fires a 15-block hook. Hits a player or mob → yanks them to you. Hits a block → yanks you to it. No damage.
 
 *Particles:* the hook line is drawn in `DRIPPING_WATER` + `BUBBLE_POP` particles as it flies; on impact a `SPLASH` burst, and a bubble stream trails whoever gets yanked.
 
-**Ability 2 (⇧LMB) — Healing Spring** · 35s
+**Ability 2 (`/ability2`) — Healing Spring** · 35s
 A pool of renewal, fixed at the cast spot, 4-block radius for 8s. Every second, **the caster and every trusted ally standing in it** are:
 
 - Healed — **Regeneration II** while they stay in the water
@@ -207,12 +206,12 @@ Enemies standing in it get nothing. Tide Pull is the rescue rope — yank a woun
 - Melee attacks ignite the target for 2s
 - +1 damage dealt while in the Nether
 
-**Ability 1 (RMB) — Fireball** · 20s
+**Ability 1 (`/ability1`) — Fireball** · 20s
 Explosive projectile. 5 damage, 1.5-block blast, ignites on hit. **Does not break blocks.**
 
 *Particles:* a `FLAME` + `LAVA` spark trail in flight; the blast is a single `EXPLOSION` followed by a shower of ember-orange `DUST`.
 
-**Ability 2 (⇧LMB) — Pyre** · 30s
+**Ability 2 (`/ability2`) — Pyre** · 30s
 Ignites a 5-block-radius ring of flame at the caster's feet that **stays there for 10s**. It does not follow the caster.
 
 - **Caster inside:** Speed I — quickness to hold the ground, not a duel steroid
@@ -246,14 +245,14 @@ Fixed in place, so it's a commitment. Leave it and you lose the buff — but the
 - Complete fall damage immunity
 - Sneaking in midair grants Slow Falling
 
-**Ability 1 (RMB) — Updraft** · 25s
+**Ability 1 (`/ability1`) — Updraft** · 25s
 Launches **all other players and mobs within 6 blocks** 5 blocks straight up. The caster is unaffected and stays grounded.
 
 *Particles:* a `GUST` burst at the caster's feet — the breeze wind-charge effect — and a rising column of `CLOUD` puffs under each launched target.
 
 > Nerfed from 8 blocks / 20s. Five blocks is enough to interrupt, break a combo, and reposition someone, but survivable without armour. Because Air takes zero fall damage and the target does, any height increase scales asymmetrically into a kill button.
 
-**Ability 2 (⇧LMB) — Gale** · 30s
+**Ability 2 (`/ability2`) — Gale** · 30s
 A cone of wind 8 blocks long and 60° wide in the aimed direction:
 
 - Enemies in the cone are knocked back hard, take 2 damage, and get Nausea for 3s
@@ -280,7 +279,7 @@ Air's escape, fully directional: the cone follows your exact aim, including pitc
 
 *Implementation:* the classic trick — while he's rain-exposed and mid-air-eligible, set `allowFlight(true)`; catch `PlayerToggleFlightEvent`, cancel it, apply the velocity, reset fall distance. Drop `allowFlight` the moment the rain window closes, or anti-cheat and vanilla flight-kick will both complain.
 
-**Ability 1 (RMB) — Frozen Over** · 30s
+**Ability 1 (`/ability1`) — Frozen Over** · 30s
 The floor itself freezes: a sheet of ice **spreads outward from the caster to 15 blocks** — the same terrain trick as Pyre, but cold. The topmost block of every column becomes a patchwork of **ice (55%), packed ice (30%) and blue ice (15%)**, with real vanilla slide physics.
 
 - **Enemies skid.** Ice under their feet means overshot strafes, missed jumps, sliding into range
@@ -291,7 +290,7 @@ The floor itself freezes: a sheet of ice **spreads outward from the caster to 15
 
 *Implementation:* shared `GroundCover` engine (Pyre uses it too) — columns sorted by distance, converted band-by-band as the radius grows, restored border-first as it recedes; same never-convert rules as Pyre (no tile entities, bedrock, obsidian), instant rollback on plugin disable.
 
-**Ability 2 (⇧LMB) — Orbital Ice** · 30s
+**Ability 2 (`/ability2`) — Orbital Ice** · 30s
 Five ice pellets materialise and **orbit aqudr** — radius 1.5 blocks, one revolution every ~2s, a slight bob. While any pellet survives, **left-click fires one** along his crosshair:
 
 - **2 damage** per pellet — honest damage now, armour applies (true damage is Light's business)
@@ -310,7 +309,7 @@ Five ice pellets materialise and **orbit aqudr** — radius 1.5 blocks, one revo
 - **Backstab** — +2 melee damage when striking from behind (+4 at Tier 2)
 - **Every 4th melee hit plants Fear** for 1.75s (every 3rd at Tier 2) — see the status table below: +15% damage taken, blindness + darkness bundled, shadow-black hearts
 
-**Ability 1 (RMB) — Shade Daggers** · 35s
+**Ability 1 (`/ability1`) — Shade Daggers** · 35s
 Aim at prey within 24 blocks: **three short blades of shadow** (four at Tier 2) condense above your head, hang for one second, then **hunt the target — curving mid-air to track**.
 
 - **1.5 TRUE damage per dagger** — a full volley is 4.5 through any armour
@@ -319,7 +318,7 @@ Aim at prey within 24 blocks: **three short blades of shadow** (four at Tier 2) 
 
 *Particles:* deep-red `DUST` trails with `SMOKE` wisps; netherite-sword `ITEM_DISPLAY`s for the blades themselves.
 
-**Ability 2 (⇧LMB) — Shadestep** · 20s
+**Ability 2 (`/ability2`) — Shadestep** · 20s
 *(Standing in for Vanquish, whose design is still open.)* Two steps in one:
 
 - **Aimed at prey** (a target within 10 blocks; 16 at Tier 2): you step **directly behind them**, arriving facing their back, knife-ready — the backstab is served by positioning
@@ -329,7 +328,7 @@ Either way, Invisibility for 2s after landing.
 
 *Particles:* dense `LARGE_SMOKE` and deep-red `DUST` bursts at both ends — the departure puff is the counterplay tell.
 
-**Ultimate (⇧RMB) — Hunt** · 60s — *described in §7*
+**Ultimate (`/ultimate`) — Hunt** · 60s — *described in §7*
 
 ---
 
@@ -343,7 +342,7 @@ Either way, Invisibility for 2s after landing.
 - **Undead burn near you**, harder and farther per stack (radius 2 + stacks)
 - **At 3+ stacks, invisibility is useless against you** — hidden things are painted gold on your screen
 
-**Ability 1 (RMB) — Sunspear** · 2s + Radiance
+**Ability 1 (`/ability1`) — Sunspear** · 2s + Radiance
 An instant beam, 24 blocks, that **spends the whole Radiance bank**:
 
 - **1 stack:** a flicker — 1 TRUE damage
@@ -353,7 +352,7 @@ An instant beam, 24 blocks, that **spends the whole Radiance bank**:
 
 *Particles:* the beam densifies with stacks spent; `FLASH` + thunder at full bank; `FIREWORK` burst per victim.
 
-**Ability 2 (⇧LMB) — Neural Overload** · 12s + 3 Radiance
+**Ability 2 (`/ability2`) — Neural Overload** · 12s + 3 Radiance
 Three stacks poured straight into a skull within 18 blocks (22 at Tier 2):
 
 - **60% chance the target is Concussed** for 3s; they **always** take **6s of Luminosity**
@@ -362,7 +361,7 @@ Three stacks poured straight into a skull within 18 blocks (22 at Tier 2):
 
 *Particles:* a jagged gold thread from your eyes to theirs; an `ENCHANT` rune storm around the struck head.
 
-**Ultimate (⇧RMB) — Supernova** · 60s + 5 Radiance — *described in §7*
+**Ultimate (`/ultimate`) — Supernova** · 60s + 5 Radiance — *described in §7*
 
 ---
 
@@ -377,7 +376,7 @@ Three stacks poured straight into a skull within 18 blocks (22 at Tier 2):
 
 *Particles:* `ELECTRIC_SPARK` crackle scaling with the meter; a full-body arc while zaps are armed.
 
-**Ability 1 (RMB) — Volt Dash** · 25s
+**Ability 1 (`/ability1`) — Volt Dash** · 25s
 You **become the bolt**: an instant dash 5 blocks along your exact aim, straight through anyone in the way.
 
 - Everyone caught takes **3.5 damage**, their **camera snaps still**, and they hang **stunned mid-air for a full second** — pinned where the current left them
@@ -385,7 +384,7 @@ You **become the bolt**: an instant dash 5 blocks along your exact aim, straight
 
 *Particles:* a solid `ELECTRIC_SPARK` line down the dash path; riptide + thunder-crack.
 
-**Ability 2 (⇧LMB) — Emotion Wave** · 40s
+**Ability 2 (`/ability2`) — Emotion Wave** · 40s
 A signal flung to the skies — then **six walls of static crawl outward** from the cast point, one block per second, twelve blocks far.
 
 - Each wall lands **1 TRUE damage** on whoever it washes over (once per wall)
@@ -394,7 +393,7 @@ A signal flung to the skies — then **six walls of static crawl outward** from 
 
 *Particles:* an `END_ROD` column to the sky on cast; each wavefront is a 2.5-block-tall `ELECTRIC_SPARK` curtain.
 
-**Ultimate (⇧RMB) — Powerplant** · 90s — *described in §7*
+**Ultimate (`/ultimate`) — Powerplant** · 90s — *described in §7*
 
 ---
 
@@ -621,7 +620,7 @@ Bukkit.broadcast(Component.text(player.getName() + " has made the advancement ")
 
 ---
 
-## 7. Ultimates (Tier 2 only, ⇧RMB, 60s cooldown — Powerplant 90s, see below)
+## 7. Ultimates (Tier 2 only, `/ultimate`, 60s cooldown — Powerplant 90s, see below)
 
 ### 🟫 Earth — Cataclysm
 Stone spikes erupt in a 10-block radius. 8 damage, enemies rooted 3s, caster gains Resistance II for 8s. Display entities, gone after 3s.
@@ -694,7 +693,7 @@ The loop is the kit: Sunspear paints Luminosity → Neural Overload buys Harmony
 
 ### `/ability1`, `/ability2`, `/ultimate`
 
-Command casting — the same three abilities the clicks fire, one command each (`/ult` is an alias for `/ultimate`). Meant for keybinds: bind the command and you never fumble a sneak-click combo mid-fight. The chat box gets no special treatment — the shard must be in your **main hand**, cooldowns and the Tier 2 ultimate lock apply exactly as with clicks, and Light's Radiance costs still gate its casts.
+**The** casting input — abilities fire by command only, one per slot (`/ult` is an alias for `/ultimate`); clicking with the shard does nothing. Bind them to keys and casting is a keypress. The chat box gets no special treatment: the shard must be in your **main hand**, cooldowns and the Tier 2 ultimate lock always apply, and Light's Radiance costs still gate its casts.
 
 ### `/trust` and `/untrust`
 
@@ -721,7 +720,7 @@ A GUI showing:
 - All abilities with icon, name, input, cooldown, and full effect text
 - Ultimate — greyed out with an unlock hint if Tier 1
 - Challenge progress bar with exact numbers (`147 / 200 damage absorbed`)
-- Controls reference: RMB, ⇧LMB, ⇧RMB
+- Controls reference: `/ability1`, `/ability2`, `/ultimate`
 - Ability message toggle
 
 ### `/recipes`

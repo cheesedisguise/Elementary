@@ -61,6 +61,7 @@ public class ShadeDaggers implements dev.elementary.ability.Ability {
                 d.setTransformation(new Transformation(
                         new Vector3f(), new Quaternionf(),
                         new Vector3f(0.62f, 0.62f, 0.62f), new Quaternionf()));
+                d.setTeleportDuration(1); // glide between per-tick steps
                 d.setPersistent(false);
             });
             daggers.add(dagger);
@@ -145,15 +146,19 @@ public class ShadeDaggers implements dev.elementary.ability.Ability {
         }
     }
 
-    /** Roll the display so the blade leads along its motion. */
+    /** Roll the display so the blade TIP leads along its motion.
+     *  The sword model's blade runs along the +X+Y diagonal, so roll
+     *  +45° about Z to stand it on +Y, pitch it over +90°+pitch about
+     *  X to lay the tip forward/down, then yaw about Y onto the aim
+     *  (rotations apply innermost-first: Z, then X, then Y). */
     private void point(ItemDisplay dagger, Vector dir) {
         Vector d = dir.clone().normalize();
-        float yaw = (float) Math.atan2(-d.getX(), d.getZ());
+        float yaw = (float) Math.atan2(d.getX(), d.getZ());
         float pitch = (float) Math.asin(-d.getY());
         Quaternionf rot = new Quaternionf()
                 .rotateY(yaw)
                 .rotateX(pitch + (float) Math.PI / 2f)
-                .rotateZ((float) (-Math.PI / 4));
+                .rotateZ((float) (Math.PI / 4));
         Transformation t = dagger.getTransformation();
         dagger.setTransformation(new Transformation(
                 t.getTranslation(), rot, t.getScale(), new Quaternionf()));

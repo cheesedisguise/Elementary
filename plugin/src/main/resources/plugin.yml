@@ -22,13 +22,13 @@ commands:
     description: Remove a player from your ally list.
     usage: /untrust <player>
   ability1:
-    description: Cast your first ability (same as right-click).
+    description: Cast your first ability.
     usage: /ability1
   ability2:
-    description: Cast your second ability (same as sneak + left-click).
+    description: Cast your second ability.
     usage: /ability2
   ultimate:
-    description: Cast your ultimate (same as sneak + right-click, Tier 2 only).
+    description: Cast your ultimate (Tier 2 only).
     usage: /ultimate
     aliases: [ult]
 permissions:

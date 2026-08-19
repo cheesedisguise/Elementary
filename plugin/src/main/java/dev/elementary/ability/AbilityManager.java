@@ -4,17 +4,17 @@ import dev.elementary.ElementaryPlugin;
 import dev.elementary.data.PlayerData;
 import dev.elementary.element.Element;
 import dev.elementary.msg.Msg;
-import dev.elementary.shard.Shards;
 import java.util.EnumMap;
 import java.util.Map;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
 
-/** Routes offhand-shard clicks to abilities: RMB, sneak-LMB, sneak-RMB. */
-public class AbilityManager implements Listener {
+/**
+ * The kit registry and the single casting gate. Abilities are cast by
+ * command only - /ability1, /ability2, /ultimate (AbilityCommand) -
+ * clicking with the shard does nothing. Passives never route through
+ * here at all.
+ */
+public class AbilityManager {
     public record Kit(Ability primary, Ability secondary, Ability ultimate) {}
 
     private final ElementaryPlugin plugin;
@@ -30,41 +30,8 @@ public class AbilityManager implements Listener {
 
     public Kit kit(Element element) { return kits.get(element); }
 
-    @EventHandler
-    public void onInteract(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        // passives follow you anywhere; casting demands a grip -
-        // the three abilities need the shard in the MAIN hand
-        if (!Shards.isShard(player.getInventory().getItemInMainHand())) return;
-        // interact fires once per hand; only the main-hand event casts
-        if (event.getHand() != org.bukkit.inventory.EquipmentSlot.HAND) return;
-        Action action = event.getAction();
-        boolean right = action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK;
-        boolean left = action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK;
-        if (!right && !left) return;
-
-        PlayerData data = plugin.shards().dataFor(player);
-        Kit kit = kits.get(data.element);
-        if (kit == null) return;
-
-        Ability ability;
-        if (right && player.isSneaking()) {
-            ability = kit.ultimate();
-        } else if (right) {
-            ability = kit.primary();
-        } else if (player.isSneaking()) {
-            ability = kit.secondary();
-        } else {
-            return;
-        }
-        if (ability == null) return;
-        if (right) event.setCancelled(true); // the click belongs to the cast
-
-        tryCast(player, data, ability);
-    }
-
-    /** The one gate every activation path (clicks, commands) goes
-     *  through: tier lock, cooldown, cast, cooldown start, message. */
+    /** The one gate every activation path goes through: tier lock,
+     *  cooldown, cast, cooldown start, message. */
     public boolean tryCast(Player player, PlayerData data, Ability ability) {
         if (ability.ultimate() && data.tier < 2) {
             Msg.fail(player, "Tier 2 required");

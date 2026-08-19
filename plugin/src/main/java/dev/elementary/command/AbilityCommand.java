@@ -13,10 +13,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 /**
- * Command casting: /ability1, /ability2 and /ultimate (alias /ult)
- * fire the same three abilities as the clicks - handy for keybinds.
- * The rules don't bend for the chat box: shard in the MAIN hand,
- * same cooldowns, same tier lock.
+ * THE casting input: /ability1, /ability2 and /ultimate (alias /ult).
+ * Clicks never cast - bind these commands to keys. The rules don't
+ * bend for the chat box: shard in the MAIN hand, cooldowns, tier lock.
  */
 public class AbilityCommand implements org.bukkit.command.CommandExecutor {
     private final ElementaryPlugin plugin;

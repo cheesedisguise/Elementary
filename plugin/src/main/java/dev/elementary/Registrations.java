@@ -102,7 +102,6 @@ final class Registrations {
         plugin.setChallenges(challenges);
 
         pm.registerEvents(new LockdownListener(plugin), plugin);
-        pm.registerEvents(abilities, plugin);
         pm.registerEvents(new CombatListener(plugin), plugin);
         pm.registerEvents(status, plugin);
         pm.registerEvents(boulder, plugin);
