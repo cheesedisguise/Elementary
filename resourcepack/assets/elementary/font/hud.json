@@ -198,7 +198,7 @@
     },
     {
       "type": "bitmap",
-      "file": "elementary:hud/icon_vanquish.png",
+      "file": "elementary:hud/icon_shadestep.png",
       "height": 16,
       "ascent": 7,
       "chars": [

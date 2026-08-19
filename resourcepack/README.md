@@ -61,7 +61,7 @@ licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/):
 | `frozen-orb` | Orbital Ice | Lorc |
 | `frozen-body` | Sub-Zero | [Delapouite](https://delapouite.com/) |
 | `daggers` | Shade Daggers | Lorc |
-| `teleport` | Vanquish | Lorc |
+| `teleport` | Shadestep | Lorc |
 | `evil-moon` | Hunt | Lorc |
 | `brainstorm` | Neural Overload | Lorc |
 | `sunbeams` | Sunspear | Lorc |

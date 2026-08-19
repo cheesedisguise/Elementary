@@ -60,22 +60,29 @@ public class AbilityManager implements Listener {
         if (ability == null) return;
         if (right) event.setCancelled(true); // the click belongs to the cast
 
+        tryCast(player, data, ability);
+    }
+
+    /** The one gate every activation path (clicks, commands) goes
+     *  through: tier lock, cooldown, cast, cooldown start, message. */
+    public boolean tryCast(Player player, PlayerData data, Ability ability) {
         if (ability.ultimate() && data.tier < 2) {
             Msg.fail(player, "Tier 2 required");
-            return;
+            return false;
         }
         String key = ability.name();
         long remaining = plugin.cooldowns().remainingMs(player.getUniqueId(), key);
         if (remaining > 0) {
             Msg.cooldown(player, remaining);
-            return;
+            return false;
         }
-        if (!ability.cast(player, data.tier)) return;
+        if (!ability.cast(player, data.tier)) return false;
         plugin.cooldowns().set(player.getUniqueId(), key, ability.cooldownSeconds(data.tier));
         if (ability.ultimate()) {
             Msg.ultimate(player, data, ability.name());
         } else {
             Msg.used(player, data, ability.name());
         }
+        return true;
     }
 }

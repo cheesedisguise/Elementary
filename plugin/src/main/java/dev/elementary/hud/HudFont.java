@@ -36,7 +36,7 @@ public final class HudFont {
             Map.entry("Sunspear", "\uE010"),
             Map.entry("Supernova", "\uE011"),
             Map.entry("Shade Daggers", "\uE012"),
-            Map.entry("Vanquish", "\uE013"),
+            Map.entry("Shadestep", "\uE013"),
             Map.entry("Hunt", "\uE014"),
             Map.entry("Volt Dash", "\uE015"),
             Map.entry("Emotion Wave", "\uE016"),

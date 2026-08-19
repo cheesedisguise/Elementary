@@ -3,7 +3,6 @@ package dev.elementary.listener;
 import dev.elementary.ElementaryPlugin;
 import dev.elementary.ability.lightning.Powerplant;
 import dev.elementary.ability.shadow.Hunt;
-import dev.elementary.ability.shadow.Vanquish;
 import dev.elementary.data.PlayerData;
 import dev.elementary.element.Element;
 import dev.elementary.status.StatusService;
@@ -90,15 +89,6 @@ public class CombatListener implements Listener {
             if (count >= threshold) {
                 dreadCount.put(attacker.getUniqueId(), 0);
                 plugin.status().apply(victim, StatusService.Status.FEAR, 35, attacker);
-            }
-            // Vanquish: the knife raised behind them comes down
-            if (Vanquish.consumeEmpowered(attacker)) {
-                event.setDamage(event.getDamage() + (data.tier >= 2 ? 7.0 : 5.0));
-                plugin.status().apply(victim, StatusService.Status.FEAR, 60, attacker);
-                victim.getWorld().playSound(victim.getLocation(),
-                        org.bukkit.Sound.PARTICLE_SOUL_ESCAPE, 1.6f, 0.6f);
-                victim.getWorld().spawnParticle(org.bukkit.Particle.LARGE_SMOKE,
-                        victim.getEyeLocation(), 14, 0.25, 0.35, 0.25, 0.02);
             }
         }
         if (data.element == Element.LIGHTNING

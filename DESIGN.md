@@ -44,6 +44,7 @@ On respawn, verify the player still holds their shard. If not, silently re-issue
 | Right-click | **Ability 1** |
 | Sneak + left-click | **Ability 2** |
 | Sneak + right-click | **Ultimate** (Tier 2 only) |
+| `/ability1` · `/ability2` · `/ultimate` (`/ult`) | Command casting — the same three abilities, for keybinds. Same rules: shard in main hand, same cooldowns, same tier lock |
 | `/info` | Your shard: element, tier, abilities, controls, challenge progress |
 | `/recipes` | Craftable items and their recipes |
 | `/trust`, `/untrust` | Manage your ally list (§1 rule 9) |
@@ -94,7 +95,7 @@ Icons are glyphs from **game-icons.net** (CC BY 3.0 — Lorc and Delapouite; att
 | Fire | Fireball — `fireball` | Pyre — `fire-ring` | Meteor Shower — `burning-meteor` |
 | Air | Updraft — `eruption` | Gale — `wind-slap` | Tempest — `tornado` |
 | Ice | Frozen Over — `frozen-ring` | Orbital Ice — `frozen-orb` | Sub-Zero — `frozen-body` |
-| Shadow | Shade Daggers — `daggers` | Vanquish — `teleport` | Hunt — `evil-moon` |
+| Shadow | Shade Daggers — `daggers` | Shadestep — `teleport` | Hunt — `evil-moon` |
 | Light | Sunspear — `sunbeams` | Neural Overload — `brainstorm` | Supernova — `sun` |
 | Lightning | Volt Dash — `sonic-lightning` | Emotion Wave — `lightning-frequency` | Powerplant — `power-lightning` |
 
@@ -318,12 +319,15 @@ Aim at prey within 24 blocks: **three short blades of shadow** (four at Tier 2) 
 
 *Particles:* deep-red `DUST` trails with `SMOKE` wisps; netherite-sword `ITEM_DISPLAY`s for the blades themselves.
 
-**Ability 2 (⇧LMB) — Vanquish** · 40s
-Blink **directly behind** a target within 12 blocks (16 at Tier 2), arriving facing their back, knife raised — and for 4 seconds the next melee strike is **empowered: +5 damage (+7 at Tier 2) and 3s of Fear** on top of any backstab bonus.
+**Ability 2 (⇧LMB) — Shadestep** · 20s
+*(Standing in for Vanquish, whose design is still open.)* Two steps in one:
 
-The assassin's loop in one button: appear, execute, and the terror does the rest.
+- **Aimed at prey** (a target within 10 blocks; 16 at Tier 2): you step **directly behind them**, arriving facing their back, knife-ready — the backstab is served by positioning
+- **Aimed at nothing:** the classic blink — up to 8 blocks (14 at Tier 2) along your look direction, stopping at walls
 
-*Particles:* dense `LARGE_SMOKE` and deep-red `DUST` at both ends of the blink; a soul-escape shriek when the empowered strike lands.
+Either way, Invisibility for 2s after landing.
+
+*Particles:* dense `LARGE_SMOKE` and deep-red `DUST` bursts at both ends — the departure puff is the counterplay tell.
 
 **Ultimate (⇧RMB) — Hunt** · 60s — *described in §7*
 
@@ -400,7 +404,7 @@ Elementary's own status layer (`status/StatusService`). Each status bundles its 
 
 | Status | Duration source | What it does |
 |---|---|---|
-| **Fear** | Shadow passive (1.75s), Vanquish (3s), Hunt (rolling) | **+15% damage taken**; blindness + darkness bundled; hearts turn shadow-black (a wither shade too short to ever tick damage); the feared player **sees their tormentor as a red silhouette through walls and invisibility** |
+| **Fear** | Shadow passive (1.75s), Hunt (rolling) | **+15% damage taken**; blindness + darkness bundled; hearts turn shadow-black (a wither shade too short to ever tick damage); the feared player **sees their tormentor as a red silhouette through walls and invisibility** |
 | **Luminosity** | Sunspear (3s+), Neural Overload (6s), Supernova (5s) | **−20% damage dealt, −15% speed**, gold shimmer. **60% weaker at night** (−8% / −6%) — light fades after dark |
 | **Absolute Radiance** | Supernova upgrade on already-luminous targets (10s) | Luminosity gone supernova: **−35% damage, −30% speed**, Glowing, blurry screen, **an unresistable burn** (1/s, ignores Fire Resistance), and **Light moves hit the bearer +50%**. 40% weaker at night. **Gaining darkness snuffs it out** — shadow counters light |
 | **Harmony** | Neural Overload (8s) | **+15% speed, +15% damage**, rainbow trail — and Supernova cast in Harmony keeps firing afterglow beams |
@@ -459,7 +463,7 @@ Progress is tracked persistently and shown in `/info`, with chat notifications a
 | **Fire** | Nether bonus applies everywhere at +1 | Fireball fires 3 in a spread | Pyre radius 5 → 8, adds Regeneration I to caster |
 | **Air** | Speed II | Updraft radius 6 → 9 | Gale cone 8 → 12 blocks, stronger recoil |
 | **Ice** | Double jump gains a second charge (triple jump) during thunderstorms | Frozen Over lasts 8s → 12s; the cold seeps up — enemies on the ice are chilled | Orbital Ice 5 → 7 pellets |
-| **Shadow** | Backstab +2 → +4; Fear every 4th → every 3rd hit | Shade Daggers 3 → 4 blades | Vanquish range 12 → 16; empowered strike +5 → +7 |
+| **Shadow** | Backstab +2 → +4; Fear every 4th → every 3rd hit | Shade Daggers 3 → 4 blades | Shadestep range 8 → 14 (behind-blink 10 → 16) |
 | **Light** | *(Radiance cadence unchanged — the kit scales through the bank)* | Sunspear pierces every target in the beam | Neural Overload range 18 → 22 |
 | **Lightning** | Zap bonus +0.5 → +1.0 (Powerplant's 2.0 unchanged) | Volt Dash range 5 → 7 | Emotion Wave walls travel 12 → 16 blocks |
 
@@ -685,6 +689,10 @@ The loop is the kit: Sunspear paints Luminosity → Neural Overload buys Harmony
 > The Trader is the cheap gamble; the Broker is the expensive certainty. Diamonds buy you the right to stop rolling.
 
 **Admin:** `/broker <player> <shard>` applies the exchange to anyone, free — no item, no menu. Bound players still refuse it (edit `bound-players` first).
+
+### `/ability1`, `/ability2`, `/ultimate`
+
+Command casting — the same three abilities the clicks fire, one command each (`/ult` is an alias for `/ultimate`). Meant for keybinds: bind the command and you never fumble a sneak-click combo mid-fight. The chat box gets no special treatment — the shard must be in your **main hand**, cooldowns and the Tier 2 ultimate lock apply exactly as with clicks, and Light's Radiance costs still gate its casts.
 
 ### `/trust` and `/untrust`
 

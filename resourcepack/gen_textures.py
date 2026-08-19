@@ -146,7 +146,7 @@ ICONS = {
     "icon_sunspear": ("sunbeams", "Lorc"),
     "icon_supernova": ("sun", "Lorc"),
     "icon_shade_daggers": ("daggers", "Lorc"),
-    "icon_vanquish": ("teleport", "Lorc"),
+    "icon_shadestep": ("teleport", "Lorc"),
     "icon_hunt": ("evil-moon", "Lorc"),
     "icon_volt_dash": ("sonic-lightning", "Lorc"),
     "icon_emotion_wave": ("lightning-frequency", "Lorc"),

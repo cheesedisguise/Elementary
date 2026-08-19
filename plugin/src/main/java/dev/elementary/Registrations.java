@@ -17,7 +17,7 @@ import dev.elementary.ability.lightning.Powerplant;
 import dev.elementary.ability.lightning.VoltDash;
 import dev.elementary.ability.shadow.Hunt;
 import dev.elementary.ability.shadow.ShadeDaggers;
-import dev.elementary.ability.shadow.Vanquish;
+import dev.elementary.ability.shadow.Shadestep;
 import dev.elementary.ability.earth.Cataclysm;
 import dev.elementary.ability.earth.Fissure;
 import dev.elementary.ability.fire.FireballAbility;
@@ -26,6 +26,7 @@ import dev.elementary.ability.fire.Pyre;
 import dev.elementary.ability.water.HealingSpring;
 import dev.elementary.ability.water.Maelstrom;
 import dev.elementary.ability.water.TidePull;
+import dev.elementary.command.AbilityCommand;
 import dev.elementary.command.AdminCommand;
 import dev.elementary.command.BrokerCommand;
 import dev.elementary.command.InfoCommand;
@@ -91,7 +92,7 @@ final class Registrations {
                 new AbilityManager.Kit(frozenOver, orbitalIce, subZero));
 
         abilities.register(Element.SHADOW, new AbilityManager.Kit(
-                new ShadeDaggers(plugin), new Vanquish(plugin), new Hunt(plugin)));
+                new ShadeDaggers(plugin), new Shadestep(plugin), new Hunt(plugin)));
         abilities.register(Element.LIGHT, new AbilityManager.Kit(
                 new Sunspear(plugin), new NeuralOverload(plugin), new Supernova(plugin)));
         abilities.register(Element.LIGHTNING, new AbilityManager.Kit(
@@ -131,5 +132,9 @@ final class Registrations {
         plugin.getCommand("trust").setTabCompleter(trustCommand);
         plugin.getCommand("untrust").setExecutor(trustCommand);
         plugin.getCommand("untrust").setTabCompleter(trustCommand);
+        AbilityCommand abilityCommand = new AbilityCommand(plugin);
+        plugin.getCommand("ability1").setExecutor(abilityCommand);
+        plugin.getCommand("ability2").setExecutor(abilityCommand);
+        plugin.getCommand("ultimate").setExecutor(abilityCommand);
     }
 }
