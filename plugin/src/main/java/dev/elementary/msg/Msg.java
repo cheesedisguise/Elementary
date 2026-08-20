@@ -25,8 +25,10 @@ public final class Msg {
         caster.playSound(caster.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.35f, 1.6f);
     }
 
+    /** Failures go to CHAT, never the action bar - the action bar is
+     *  the ability HUD's, and a message there stomps the icons. */
     public static void fail(Player caster, String reason) {
-        caster.sendActionBar(Component.text(reason, NamedTextColor.RED));
+        caster.sendMessage(Component.text(reason, NamedTextColor.RED));
     }
 
     public static void cooldown(Player caster, long remainingMs) {

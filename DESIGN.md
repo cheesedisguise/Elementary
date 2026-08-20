@@ -133,8 +133,8 @@ Ability messages are **client-sided** — only the caster sees them. Nothing is 
 
 - Sent only to the caster, coloured to match the element
 - Nobody else ever receives an ability message — chat stays clean and abilities keep the element of surprise
-- No rate limiting needed: a successful cast cannot repeat inside its own cooldown, and failed casts never produce a chat line
-- Failed activations (on cooldown, wrong tier) send a private action-bar message only
+- No rate limiting needed: a successful cast cannot repeat inside its own cooldown
+- Failed activations (on cooldown, wrong tier, missing Radiance, no target) send a private **chat** line — **never the action bar**, which belongs to the icon HUD and must not be stomped
 - Toggleable per player with `/info` → settings, and globally in `config.yml`
 - Ascension is quiet in chat too: the ascending player gets a personal line and the toast (if the advancement datapack is installed); nothing is broadcast
 
